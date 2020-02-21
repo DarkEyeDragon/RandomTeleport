@@ -1,7 +1,16 @@
 message:
   initteleport: "&aSearching for safe location to teleport to..."
+  teleport: "&bA safe place has been found! Teleporting..."
   #valid placeholders: %mp (minutes partial) %sp (seconds partial) %m (total minutes) %s(total seconds)
   countdown: "&cYou cannot teleport for another &6%mp minutes %sp seconds"
   nopermission: "&cYou do not have permission to execute this command!"
 #m = minutes, s = seconds
+#default: "60m"
 cooldown: "60m"
+radius: 21474836
+
+#Plugins to take into consideration when teleporting
+#Currently supports Factions and WorldGuard
+plugins:
+  - "Factions"
+  - "WorldGuard"

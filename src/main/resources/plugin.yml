@@ -3,4 +3,7 @@ version: ${project.version}
 main: me.darkeyedragon.randomtp.RandomTeleport
 api-version: 1.13
 authors: [DarkEyeDragon]
+softdepend:
+  - Factions
+  - WorldGuard
 description: Yeet a player to a random location, and hopefully they won't die in the process

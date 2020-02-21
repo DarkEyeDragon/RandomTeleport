@@ -15,18 +15,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.time.LocalDateTime;
-
 @CommandAlias("rtp|randomtp|randomteleport")
 public class Teleport extends BaseCommand {
 
-    private LocationHelper locationHelper = new LocationHelper();
+    private LocationHelper locationHelper;
     private ConfigHandler configHandler;
     private RandomTeleport plugin;
 
     public Teleport(RandomTeleport plugin) {
         this.plugin = plugin;
-        configHandler = new ConfigHandler(plugin);
+        configHandler = plugin.getConfigHandler();
+        locationHelper = new LocationHelper(plugin);
     }
 
     @Default
@@ -54,8 +53,14 @@ public class Teleport extends BaseCommand {
         }
     }
 
+    @Subcommand("reload")
+    @CommandPermission("rtp.reload")
+    public void onReload(CommandSender commandSender){
+        plugin.saveConfig();
+        plugin.reloadConfig();
+    }
+
     private void teleport(Player player, boolean force) {
-        System.out.println(LocalDateTime.now());
         String initMessage = configHandler.getInitMessage();
         if (plugin.getCooldowns().containsKey(player.getUniqueId())) {
             long lasttp = plugin.getCooldowns().get(player.getUniqueId());
@@ -69,17 +74,15 @@ public class Teleport extends BaseCommand {
         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 3, 5, false, false));
         player.sendMessage(initMessage);
         drawWarpParticles(player);
-        locationHelper.getRandomLocation(player.getWorld(), Integer.MAX_VALUE / 100).thenAccept(loc -> {
+        locationHelper.getRandomLocation(player.getWorld(), configHandler.getRadius()).thenAccept(loc -> {
             Location location = loc.getWorld().getHighestBlockAt(loc).getLocation().add(0.5,2,0.5);
-            System.out.println("Location from Teleport: " + location.toString());
-            player.teleportAsync(location);
             plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
-            player.sendMessage("X:" + location.getBlockX() + " Y:" + location.getBlockY() + " Z:" + location.getBlockZ());
+            player.teleportAsync(location);
+            player.sendMessage(configHandler.getTeleportMessage());
         }).exceptionally(throwable -> {
             throwable.printStackTrace();
             return null;
         });
-
     }
 
     private void drawWarpParticles(Player player) {

@@ -1,17 +1,17 @@
 package me.darkeyedragon.randomtp.config;
 
-import org.apache.commons.lang.time.DurationFormatUtils;
+import me.darkeyedragon.randomtp.RandomTeleport;
 import org.bukkit.ChatColor;
-import org.bukkit.plugin.Plugin;
 
 import java.time.Duration;
+import java.util.List;
 
 public class ConfigHandler {
 
-    private Plugin plugin;
+    private RandomTeleport plugin;
     private long cooldown = -1;
 
-    public ConfigHandler(Plugin plugin) {
+    public ConfigHandler(RandomTeleport plugin) {
         this.plugin = plugin;
     }
 
@@ -20,6 +20,18 @@ public class ConfigHandler {
         if (message != null)
             message = ChatColor.translateAlternateColorCodes('&', message);
         return message;
+    }
+
+    public String getTeleportMessage(){
+        String message = plugin.getConfig().getString("message.teleport");
+        if(message != null){
+            message = ChatColor.translateAlternateColorCodes('&', message);
+        }
+        return message;
+    }
+
+    public int getRadius(){
+        return plugin.getConfig().getInt("radius");
     }
 
     public String getCountdownRemainingMessage(long remainingTime) {
@@ -61,5 +73,9 @@ public class ConfigHandler {
             cooldown = formatCooldown();
         }
         return cooldown;
+    }
+
+    public List<String> getPlugins(){
+        return plugin.getConfig().getStringList("plugins");
     }
 }

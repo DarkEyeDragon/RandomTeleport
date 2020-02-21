@@ -1,5 +1,7 @@
 package me.darkeyedragon.randomtp.util;
 
+import me.darkeyedragon.randomtp.RandomTeleport;
+import me.darkeyedragon.randomtp.validator.ChunkValidator;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -8,7 +10,6 @@ import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -20,11 +21,13 @@ public class LocationHelper {
     private final Set<Material> blacklistMaterial;
     private final Set<Biome> blacklistBiome;
     private Location lastLocaction;
+    private RandomTeleport plugin;
 
     /**
      * A simple utility class to help with {@link Location}
      */
-    public LocationHelper() {
+    public LocationHelper(RandomTeleport plugin) {
+        this.plugin = plugin;
         blacklistMaterial = new HashSet<>();
         blacklistBiome = new HashSet<>();
         //Illegal material types
@@ -67,7 +70,6 @@ public class LocationHelper {
 
     /* Will search through the chunk to find a location that is safe, returning null if none is found. */
     private Location getRandomLocationFromChunk(Chunk chunk) {
-        System.out.println("getRandomLocationFromChunk:"+chunk.toString());
         for (int i = 8; i < 16; i++) {
             for (int j = 8; j < 16; j++) {
                 Block block = chunk.getBlock(i, 64, j);
@@ -86,38 +88,11 @@ public class LocationHelper {
         return chunkFuture.thenCompose((chunk) -> {
             boolean isSafe = isSafeChunk(chunk);
             if (!isSafe) {
-                System.out.println(chunk.toString()+": not safe");
                 return getRandomChunk(world, radius);
             }
             else return CompletableFuture.completedFuture(chunk);
         });
     }
-
-
-    /**
-     * @param world  The {@link World} the player will be teleported to.
-     * @param radius the max distance from 0, 0 to select a {@link Location} from.
-     * @return a random {@link Location}.
-     */
-    /*public CompletableFuture<Optional<Location>> pickRandom(World world, int radius) {
-        System.out.println("Getting chunk:");
-        CompletableFuture<Chunk> chunkFuture = getRandomChunkAsync(world, radius / 16);
-        return chunkFuture.thenApply(chunk -> {
-            //Pick another chunk since biome isn't safe
-            if (!isSafeChunk(chunk)) return Optional.empty();
-            for (int i = 0; i < 16; i++) {
-                for (int j = 0; j < 16; j++) {
-                    Block block = chunk.getBlock(i, 64, j);
-                    System.out.println(block.getBiome());
-                    if (isSafeLocation(block.getLocation())) {
-                        return Optional.of(block.getLocation());
-                    }
-                }
-            }
-            return Optional.empty();
-        });
-    }*/
-
     private CompletableFuture<Chunk> getRandomChunkAsync(World world, int radius) {
         Random rnd = ThreadLocalRandom.current();
         int x = rnd.nextInt(radius * 2) - radius;
@@ -125,27 +100,17 @@ public class LocationHelper {
         return world.getChunkAtAsync(x, z);
     }
 
-    public Optional<Location> pickRandomBasedOnPrevious(int radius) {
-        if (lastLocaction == null) return Optional.empty();
-        Random rnd = ThreadLocalRandom.current();
-        int x = rnd.nextInt(radius * 2) - radius;
-        int z = rnd.nextInt(radius * 2) - radius;
-
-        //Seems to fix some glitches even tho it shouldn't??
-        //lastLocaction.getWorld().getChunkAtAsync(x >> 4, z >> 4).thenAccept(Chunk::load);
-
-        return Optional.of(lastLocaction.add(x, 1, z));
-    }
-
     public boolean isSafeLocation(Location loc) {
-        /*World world = loc.getWorld();
+        World world = loc.getWorld();
         if (world == null) return false;
-        if (loc.add(0, 2, 0).getBlock().getType() != Material.AIR) return false;stop
-        return blacklistMaterial.contains(loc.getBlock().getType());*/
-        return true;
+        if (loc.add(0, 2, 0).getBlock().getType() != Material.AIR) return false;
+        return !blacklistMaterial.contains(loc.getBlock().getType());
     }
 
     private boolean isSafeChunk(Chunk chunk) {
+        for (ChunkValidator validator : plugin.getValidatorList()) {
+            if(!validator.isValidChunk(chunk)) return false;
+        }
         for (int i = 0; i < 16; i++) {
             for (int j = 0; j < 16; j++) {
                 if (!blacklistBiome.contains(chunk.getBlock(i, 64, j).getBiome())) {
