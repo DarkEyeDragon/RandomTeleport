@@ -2,16 +2,20 @@ package me.darkeyedragon.randomtp.command;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
+import co.aikar.commands.bukkit.contexts.OnlinePlayer;
+import com.destroystokyo.paper.ParticleBuilder;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
 import me.darkeyedragon.randomtp.util.LocationHelper;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
-import java.time.Duration;
+import java.time.LocalDateTime;
 
 @CommandAlias("rtp|randomtp|randomteleport")
 public class Teleport extends BaseCommand {
@@ -41,8 +45,8 @@ public class Teleport extends BaseCommand {
     @CommandPermission("rtp.teleport.other")
     @CatchUnknown
     @CommandCompletion("@players")
-    public void onTeleportOther(CommandSender sender, String[] args) {
-        Player target = Bukkit.getPlayer(args[0]);
+    public void onTeleportOther(CommandSender sender, OnlinePlayer player) {
+        Player target = player.player;
         if (target != null) {
             teleport(target, true);
         } else {
@@ -51,6 +55,7 @@ public class Teleport extends BaseCommand {
     }
 
     private void teleport(Player player, boolean force) {
+        System.out.println(LocalDateTime.now());
         String initMessage = configHandler.getInitMessage();
         if (plugin.getCooldowns().containsKey(player.getUniqueId())) {
             long lasttp = plugin.getCooldowns().get(player.getUniqueId());
@@ -61,14 +66,28 @@ public class Teleport extends BaseCommand {
                 return;
             }
         }
-        player.setWalkSpeed(1.2F);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 3, 5, false, false));
         player.sendMessage(initMessage);
-        Location loc;
-        do {
-            loc = locationHelper.pickRandom(player.getWorld(), Integer.MAX_VALUE / 100);
-        } while (!locationHelper.isSafe(loc));
-        player.teleportAsync(loc);
-        plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
-        player.sendMessage("X:" + loc.getBlockX() + " Y:" + loc.getBlockY() + " Z:" + loc.getBlockZ());
+        drawWarpParticles(player);
+        locationHelper.getRandomLocation(player.getWorld(), Integer.MAX_VALUE / 100).thenAccept(loc -> {
+            Location location = loc.getWorld().getHighestBlockAt(loc).getLocation().add(0.5,2,0.5);
+            System.out.println("Location from Teleport: " + location.toString());
+            player.teleportAsync(location);
+            plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
+            player.sendMessage("X:" + location.getBlockX() + " Y:" + location.getBlockY() + " Z:" + location.getBlockZ());
+        }).exceptionally(throwable -> {
+            throwable.printStackTrace();
+            return null;
+        });
+
+    }
+
+    private void drawWarpParticles(Player player) {
+        ParticleBuilder builder = new ParticleBuilder(Particle.CLOUD);
+        Location spawnLoc = player.getEyeLocation().add(player.getLocation().getDirection());
+        builder.count(20)
+                .extra(1)
+                .location(spawnLoc)
+                .spawn();
     }
 }
