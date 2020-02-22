@@ -1,6 +1,6 @@
 package me.darkeyedragon.randomtp.validator;
 
-import org.bukkit.Chunk;
+import org.bukkit.Location;
 
 
 /**
@@ -9,5 +9,5 @@ import org.bukkit.Chunk;
  * Example: {@link FactionValidator}, {@link WorldGuardValidator}
  */
 public interface ChunkValidator {
-    boolean isValidChunk(Chunk chunk);
+    boolean isValid(Location Location);
 }

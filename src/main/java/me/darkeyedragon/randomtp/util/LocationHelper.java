@@ -104,13 +104,17 @@ public class LocationHelper {
         World world = loc.getWorld();
         if (world == null) return false;
         if (loc.add(0, 2, 0).getBlock().getType() != Material.AIR) return false;
-        return !blacklistMaterial.contains(loc.getBlock().getType());
+        if(blacklistMaterial.contains(loc.getBlock().getType())) return false;
+        for (ChunkValidator validator : plugin.getValidatorList()) {
+            if(!validator.isValid(loc)){
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean isSafeChunk(Chunk chunk) {
-        for (ChunkValidator validator : plugin.getValidatorList()) {
-            if(!validator.isValidChunk(chunk)) return false;
-        }
+
         for (int i = 0; i < 16; i++) {
             for (int j = 0; j < 16; j++) {
                 if (!blacklistBiome.contains(chunk.getBlock(i, 64, j).getBiome())) {
