@@ -61,7 +61,7 @@ public class Teleport extends BaseCommand {
 
     private void teleport(Player player, boolean force) {
         String initMessage = configHandler.getInitMessage();
-        if (plugin.getCooldowns().containsKey(player.getUniqueId())) {
+        if (plugin.getCooldowns().containsKey(player.getUniqueId()) && !player.hasPermission("rtp.teleport.bypass")) {
             long lasttp = plugin.getCooldowns().get(player.getUniqueId());
             long remaining = lasttp + configHandler.getCooldown() - System.currentTimeMillis();
             boolean ableToTp = remaining < 0;
