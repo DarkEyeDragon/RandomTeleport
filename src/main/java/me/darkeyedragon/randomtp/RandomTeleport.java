@@ -31,7 +31,10 @@ public final class RandomTeleport extends JavaPlugin {
         configHandler.getPlugins().forEach(s -> {
             if (getServer().getPluginManager().getPlugin(s) != null) {
                 var validator = ValidatorFactory.createFrom(s);
-                if (validator != null) validatorList.add(validator);
+                if (validator != null){
+                    validatorList.add(validator);
+                    getLogger().info(s + " loaded as validator.");
+                }
             }else{
                 getLogger().warning(s+" is not a valid plugin or is not loaded!");
             }

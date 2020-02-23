@@ -8,7 +8,7 @@ public class ValidatorFactory {
     public static ChunkValidator createFrom(Validator validator){
         switch (validator){
             case Factions:
-                return new FactionValidator();
+                return new FactionsUuidValidator();
             case WorldGuard:
                 return new WorldGuardValidator();
             default:

@@ -114,7 +114,6 @@ public class LocationHelper {
     }
 
     private boolean isSafeChunk(Chunk chunk) {
-
         for (int i = 0; i < 16; i++) {
             for (int j = 0; j < 16; j++) {
                 if (!blacklistBiome.contains(chunk.getBlock(i, 64, j).getBiome())) {

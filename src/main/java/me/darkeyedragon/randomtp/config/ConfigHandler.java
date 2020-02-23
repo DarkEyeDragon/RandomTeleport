@@ -1,7 +1,9 @@
 package me.darkeyedragon.randomtp.config;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 
 import java.time.Duration;
 import java.util.List;
@@ -66,6 +68,13 @@ public class ConfigHandler {
             return time;
         }
         throw new NumberFormatException("Not a valid format");
+    }
+
+    public World getDefaultWorld(){
+        String worldStr = plugin.getConfig().getString("default_world");
+        if(worldStr != null)
+            return Bukkit.getWorld(worldStr);
+        return null;
     }
 
     public long getCooldown() {

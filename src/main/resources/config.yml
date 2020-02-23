@@ -8,6 +8,7 @@ message:
 #default: "60m"
 cooldown: "60m"
 radius: 21474836
+default_world: "world"
 
 #Plugins to take into consideration when teleporting
 #Currently supports Factions and WorldGuard

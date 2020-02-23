@@ -56,7 +56,6 @@ public class Teleport extends BaseCommand {
     @Subcommand("reload")
     @CommandPermission("rtp.reload")
     public void onReload(CommandSender commandSender){
-        plugin.saveConfig();
         plugin.reloadConfig();
     }
 
