@@ -1,6 +1,6 @@
-#Random Teleport
+# Random Teleport
 Teleport a player to a random (safe) location in the Minecraft world.
-###Permissions
+### Permissions
 |Permission|Description|
 |----------|-------|
 |``rtp.teleport.self``| Allows you to use the `/rtp` base command |
