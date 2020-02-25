@@ -7,13 +7,14 @@ import com.destroystokyo.paper.ParticleBuilder;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
 import me.darkeyedragon.randomtp.util.LocationHelper;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 @CommandAlias("rtp|randomtp|randomteleport")
 public class Teleport extends BaseCommand {
@@ -30,36 +31,35 @@ public class Teleport extends BaseCommand {
 
     @Default
     @CommandPermission("rtp.teleport.self")
-    public void onTeleport(CommandSender sender) {
+    @CommandCompletion("@players")
+    public void onTeleport(CommandSender sender, @Optional @CommandPermission("rtp.teleport.other") OnlinePlayer target, @Optional @CommandPermission("rtp.teleport.world") World world) {
         Player player;
-        if (sender instanceof Player) {
+        if (target == null && sender instanceof Player) {
             player = (Player) sender;
         } else {
-            sender.sendMessage(ChatColor.RED + "Please specify a user!");
-            return;
+            player = target.getPlayer();
         }
-        teleport(player, false);
-    }
+        if (world == null) {
+            world = configHandler.getDefaultWorld();
+        }
+        final World finalWorld = world;
 
-    @CommandPermission("rtp.teleport.other")
-    @CatchUnknown
-    @CommandCompletion("@players")
-    public void onTeleportOther(CommandSender sender, OnlinePlayer player) {
-        Player target = player.player;
-        if (target != null) {
-            teleport(target, true);
-        } else {
-            sender.sendMessage(ChatColor.RED + "That player is not online!");
-        }
+        //Add it to the Scheduler to not falsely trigger the "Moved to quickly" warning
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                teleport(player, finalWorld, false);
+            }
+        }.runTaskLater(plugin, 1);
     }
 
     @Subcommand("reload")
     @CommandPermission("rtp.reload")
-    public void onReload(CommandSender commandSender){
+    public void onReload(CommandSender commandSender) {
         plugin.reloadConfig();
     }
 
-    private void teleport(Player player, boolean force) {
+    private void teleport(Player player, World world, boolean force) {
         String initMessage = configHandler.getInitMessage();
         if (plugin.getCooldowns().containsKey(player.getUniqueId()) && !player.hasPermission("rtp.teleport.bypass")) {
             long lasttp = plugin.getCooldowns().get(player.getUniqueId());
@@ -73,8 +73,8 @@ public class Teleport extends BaseCommand {
         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 3, 5, false, false));
         player.sendMessage(initMessage);
         drawWarpParticles(player);
-        locationHelper.getRandomLocation(player.getWorld(), configHandler.getRadius()).thenAccept(loc -> {
-            Location location = loc.getWorld().getHighestBlockAt(loc).getLocation().add(0.5,2,0.5);
+        locationHelper.getRandomLocation(world, configHandler.getRadius()).thenAccept(loc -> {
+            Location location = loc.getWorld().getHighestBlockAt(loc).getLocation().add(0.5, 2, 0.5);
             plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
             player.teleportAsync(location);
             player.sendMessage(configHandler.getTeleportMessage());
