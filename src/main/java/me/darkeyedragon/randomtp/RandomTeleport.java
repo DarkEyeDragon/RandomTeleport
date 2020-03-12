@@ -44,7 +44,8 @@ public final class RandomTeleport extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
-        getServer().getLogger().info("Good night dad!");
+        getLogger().info("Unregistering commands...");
+        manager.unregisterCommands();
     }
 
     public HashMap<UUID, Long> getCooldowns() {
