@@ -1,7 +1,7 @@
 package me.darkeyedragon.randomtp;
 
 import co.aikar.commands.PaperCommandManager;
-import me.darkeyedragon.randomtp.command.Teleport;
+import me.darkeyedragon.randomtp.command.TeleportCommand;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
 import me.darkeyedragon.randomtp.validator.ChunkValidator;
 import me.darkeyedragon.randomtp.validator.ValidatorFactory;
@@ -26,7 +26,7 @@ public final class RandomTeleport extends JavaPlugin {
         configHandler = new ConfigHandler(this);
         cooldowns = new HashMap<>();
         saveDefaultConfig();
-        manager.registerCommand(new Teleport(this));
+        manager.registerCommand(new TeleportCommand(this));
         validatorList = new ArrayList<>();
         configHandler.getPlugins().forEach(s -> {
             if (getServer().getPluginManager().getPlugin(s) != null) {

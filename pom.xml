@@ -43,9 +43,22 @@
                     <relocations>
                         <relocation>
                             <pattern>co.aikar.commands</pattern>
-                            <shadedPattern>me.darkeyedragon.randomtp.acf</shadedPattern> <!-- Replace this -->
+                            <shadedPattern>me.darkeyedragon.randomtp.acf</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>io.papermc.lib</pattern>
+                            <shadedPattern>me.darkeyedragon.randomtp.paperlib</shadedPattern>
                         </relocation>
                     </relocations>
+                    <filters>
+                        <filter>
+                            <artifact>paperlib</artifact>
+                            <excludes>
+                                <exclude>io/papermc/lib/features/blockstatesnapshot</exclude>
+                                <exclude>io/papermc/lib/features/chunkisgenerated</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
                 </configuration>
                 <executions>
                     <execution>
@@ -120,6 +133,12 @@
             <artifactId>Factions</artifactId>
             <version>1.6.9.5-U0.5.7</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.papermc</groupId>
+            <artifactId>paperlib</artifactId>
+            <version>1.0.2</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

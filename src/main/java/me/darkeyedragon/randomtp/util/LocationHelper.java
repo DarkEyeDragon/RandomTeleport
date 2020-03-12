@@ -1,5 +1,6 @@
 package me.darkeyedragon.randomtp.util;
 
+import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.validator.ChunkValidator;
 import org.bukkit.Chunk;
@@ -20,7 +21,6 @@ public class LocationHelper {
     private static final String OCEAN = "ocean";
     private final Set<Material> blacklistMaterial;
     private final Set<Biome> blacklistBiome;
-    private Location lastLocaction;
     private RandomTeleport plugin;
 
     /**
@@ -97,7 +97,7 @@ public class LocationHelper {
         Random rnd = ThreadLocalRandom.current();
         int x = rnd.nextInt(radius * 2) - radius;
         int z = rnd.nextInt(radius * 2) - radius;
-        return world.getChunkAtAsync(x, z);
+        return PaperLib.getChunkAtAsync(world, x, z);
     }
 
     public boolean isSafeLocation(Location loc) {

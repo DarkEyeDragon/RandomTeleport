@@ -3,10 +3,11 @@ package me.darkeyedragon.randomtp.command;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
-import com.destroystokyo.paper.ParticleBuilder;
+import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
 import me.darkeyedragon.randomtp.util.LocationHelper;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -17,13 +18,13 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 @CommandAlias("rtp|randomtp|randomteleport")
-public class Teleport extends BaseCommand {
+public class TeleportCommand extends BaseCommand {
 
     private LocationHelper locationHelper;
     private ConfigHandler configHandler;
     private RandomTeleport plugin;
 
-    public Teleport(RandomTeleport plugin) {
+    public TeleportCommand(RandomTeleport plugin) {
         this.plugin = plugin;
         configHandler = plugin.getConfigHandler();
         locationHelper = new LocationHelper(plugin);
@@ -48,7 +49,7 @@ public class Teleport extends BaseCommand {
         new BukkitRunnable() {
             @Override
             public void run() {
-                teleport(player, finalWorld, false);
+                teleport(player, finalWorld, sender.hasPermission("rtp.teleport.bypass"));
             }
         }.runTaskLater(plugin, 1);
     }
@@ -56,7 +57,10 @@ public class Teleport extends BaseCommand {
     @Subcommand("reload")
     @CommandPermission("rtp.reload")
     public void onReload(CommandSender commandSender) {
+        commandSender.sendMessage(ChatColor.GREEN + "Reloading config...");
+        plugin.saveDefaultConfig();
         plugin.reloadConfig();
+        commandSender.sendMessage(ChatColor.GREEN + "Reloaded config");
     }
 
     private void teleport(Player player, World world, boolean force) {
@@ -76,7 +80,7 @@ public class Teleport extends BaseCommand {
         locationHelper.getRandomLocation(world, configHandler.getRadius()).thenAccept(loc -> {
             Location location = loc.getWorld().getHighestBlockAt(loc).getLocation().add(0.5, 2, 0.5);
             plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
-            player.teleportAsync(location);
+            PaperLib.teleportAsync(player, location);
             player.sendMessage(configHandler.getTeleportMessage());
         }).exceptionally(throwable -> {
             throwable.printStackTrace();
@@ -85,11 +89,7 @@ public class Teleport extends BaseCommand {
     }
 
     private void drawWarpParticles(Player player) {
-        ParticleBuilder builder = new ParticleBuilder(Particle.CLOUD);
         Location spawnLoc = player.getEyeLocation().add(player.getLocation().getDirection());
-        builder.count(20)
-                .extra(1)
-                .location(spawnLoc)
-                .spawn();
+        player.getWorld().spawnParticle(Particle.CLOUD, spawnLoc, 20);
     }
 }
