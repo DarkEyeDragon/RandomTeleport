@@ -1,10 +1,11 @@
 package me.darkeyedragon.randomtp.command;
 
 import co.aikar.commands.BaseCommand;
+import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.annotation.*;
-import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.RandomTeleport;
+import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
 import me.darkeyedragon.randomtp.util.LocationHelper;
 import org.bukkit.ChatColor;
@@ -32,19 +33,38 @@ public class TeleportCommand extends BaseCommand {
 
     @Default
     @CommandPermission("rtp.teleport.self")
-    @CommandCompletion("@players")
-    public void onTeleport(CommandSender sender, @Optional @CommandPermission("rtp.teleport.other") OnlinePlayer target, @Optional @CommandPermission("rtp.teleport.world") World world) {
+    @CommandCompletion("@players|@worlds")
+    public void onTeleport(CommandSender sender, @Optional @CommandPermission("rtp.teleport.other") PlayerWorldContext target, @Optional @CommandPermission("rtp.teleport.world") World world) {
         Player player;
-        if (target == null && sender instanceof Player) {
-            player = (Player) sender;
-        } else {
-            player = target.getPlayer();
+        World newWorld;
+        if(target == null){
+            if (sender instanceof Player) {
+                player = (Player) sender;
+                newWorld = player.getWorld();
+            }else{
+                throw new InvalidCommandArgument(true);
+            }
+        }else{
+            if(target.isPlayer()) {
+                player = target.getPlayer();
+                newWorld = world;
+            }else if(target.isWorld()) {
+                if (sender instanceof Player) {
+                    player = (Player) sender;
+                    newWorld = target.getWorld();
+                } else {
+                    throw new InvalidCommandArgument(true);
+                }
+            }else{
+                throw new InvalidCommandArgument(true);
+            }
         }
+        final World finalWorld = newWorld;
         //Add it to the Scheduler to not falsely trigger the "Moved to quickly" warning
         new BukkitRunnable() {
             @Override
             public void run() {
-                teleport(player, world, sender.hasPermission("rtp.teleport.bypass"));
+                teleport(player, finalWorld, sender.hasPermission("rtp.teleport.bypass"));
             }
         }.runTaskLater(plugin, 1);
     }

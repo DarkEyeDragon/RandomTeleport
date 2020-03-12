@@ -1,10 +1,15 @@
 package me.darkeyedragon.randomtp;
 
+import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
 import me.darkeyedragon.randomtp.command.TeleportCommand;
+import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
 import me.darkeyedragon.randomtp.validator.ChunkValidator;
 import me.darkeyedragon.randomtp.validator.ValidatorFactory;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -23,6 +28,25 @@ public final class RandomTeleport extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
         manager = new PaperCommandManager(this);
+
+        //check if the first argument is a world or player
+        manager.getCommandContexts().registerContext(PlayerWorldContext.class, c ->{
+            String arg1 = c.getArgs().get(0);
+            World world = Bukkit.getWorld(arg1);
+            Player player = Bukkit.getPlayer(arg1);
+            if(world != null){
+                var context = new PlayerWorldContext();
+                context.setWorld(true);
+                context.setWorld(world);
+                return context;
+            }else if(player != null){
+                var context = new PlayerWorldContext();
+                context.setPlayer(true);
+                context.setPlayer(player);
+                return context;
+            }
+            throw new InvalidCommandArgument(true);
+        });
         configHandler = new ConfigHandler(this);
         cooldowns = new HashMap<>();
         saveDefaultConfig();
