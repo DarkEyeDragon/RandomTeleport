@@ -4,14 +4,25 @@ message:
   #valid placeholders: %mp (minutes partial) %sp (seconds partial) %m (total minutes) %s(total seconds)
   countdown: "&cYou cannot teleport for another &6%mp minutes %sp seconds"
   nopermission: "&cYou do not have permission to execute this command!"
-#m = minutes, s = seconds
-#default: "60m"
-cooldown: "60m"
-radius: 21474836
-default_world: "world"
+
+teleport:
+  #m = minutes, s = seconds
+  #default: "60m"
+  cooldown: "60m"
+  #teleportation radius
+  radius: 21474836
+  #Center coordinates for the radius
+  startX: 0
+  startZ: 0
+#When no world is provided, use this world as a default
+world:
+  #When false use the world the target is in
+  use_default: true
+  default: "world"
 
 #Plugins to take into consideration when teleporting
-#Currently supports Factions and WorldGuard
+#Currently supports FactionsUUID and WorldGuard
+#If you want more plugins to be supported: https://github.com/DarkEyeDragon/RandomTeleport/issues
 plugins:
   - "Factions"
   - "WorldGuard"

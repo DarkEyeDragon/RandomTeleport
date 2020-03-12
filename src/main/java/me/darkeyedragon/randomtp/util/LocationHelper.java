@@ -83,7 +83,7 @@ public class LocationHelper {
     }
 
     private CompletableFuture<Chunk> getRandomChunk(World world, int radius) {
-        var chunkFuture = getRandomChunkAsync(world, radius/16);
+        var chunkFuture = getRandomChunkAsync(world, radius);
 
         return chunkFuture.thenCompose((chunk) -> {
             boolean isSafe = isSafeChunk(chunk);
@@ -95,9 +95,13 @@ public class LocationHelper {
     }
     private CompletableFuture<Chunk> getRandomChunkAsync(World world, int radius) {
         Random rnd = ThreadLocalRandom.current();
-        int x = rnd.nextInt(radius * 2) - radius;
-        int z = rnd.nextInt(radius * 2) - radius;
-        return PaperLib.getChunkAtAsync(world, x, z);
+        int chunkRadius = radius/16;
+        int x = rnd.nextInt(chunkRadius * 2) - chunkRadius;
+        int z = rnd.nextInt(chunkRadius * 2) - chunkRadius;
+        int offsetX = plugin.getConfigHandler().getStartX()/16;
+        int offsetZ = plugin.getConfigHandler().getStartZ()/16;
+        plugin.getLogger().warning("offsetX: "+offsetX +"offsetZ: "+offsetZ);
+        return PaperLib.getChunkAtAsync(world, x+offsetX, z+offsetZ);
     }
 
     public boolean isSafeLocation(Location loc) {

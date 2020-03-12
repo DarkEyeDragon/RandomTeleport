@@ -4,6 +4,7 @@ import me.darkeyedragon.randomtp.RandomTeleport;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
+import org.bukkit.util.Vector;
 
 import java.time.Duration;
 import java.util.List;
@@ -33,7 +34,7 @@ public class ConfigHandler {
     }
 
     public int getRadius(){
-        return plugin.getConfig().getInt("radius");
+        return plugin.getConfig().getInt("teleport.radius");
     }
 
     public String getCountdownRemainingMessage(long remainingTime) {
@@ -49,8 +50,18 @@ public class ConfigHandler {
         return message;
     }
 
+    public int getStartX(){
+        return plugin.getConfig().getInt("teleport.startX");
+    }
+    public int getStartZ(){
+        return plugin.getConfig().getInt("teleport.startZ");
+    }
+    public Vector getStartLocation(){
+        return new Vector((double)getStartX(), 0,(double)getStartZ());
+    }
+
     private long formatCooldown() throws NumberFormatException {
-        String message = plugin.getConfig().getString("cooldown");
+        String message = plugin.getConfig().getString("teleport.cooldown");
         if (message != null) {
             String suffix = message.substring(message.length() - 1);
             String timeStr = message.replace(suffix, "");
@@ -70,8 +81,13 @@ public class ConfigHandler {
         throw new NumberFormatException("Not a valid format");
     }
 
+
+    public boolean useDefault(){
+        return plugin.getConfig().getBoolean("world.use_default");
+    }
+
     public World getDefaultWorld(){
-        String worldStr = plugin.getConfig().getString("default_world");
+        String worldStr = plugin.getConfig().getString("world.default");
         if(worldStr != null)
             return Bukkit.getWorld(worldStr);
         return null;
