@@ -14,11 +14,6 @@ teleport:
   #Center coordinates for the radius
   startX: 0
   startZ: 0
-#When no world is provided, use this world as a default
-world:
-  #When false use the world the target is in
-  use_default: true
-  default: "world"
 
 #Plugins to take into consideration when teleporting
 #Currently supports FactionsUUID and WorldGuard

@@ -40,16 +40,11 @@ public class TeleportCommand extends BaseCommand {
         } else {
             player = target.getPlayer();
         }
-        if (world == null) {
-            world = configHandler.getDefaultWorld();
-        }
-        final World finalWorld = world;
-
         //Add it to the Scheduler to not falsely trigger the "Moved to quickly" warning
         new BukkitRunnable() {
             @Override
             public void run() {
-                teleport(player, finalWorld, sender.hasPermission("rtp.teleport.bypass"));
+                teleport(player, world, sender.hasPermission("rtp.teleport.bypass"));
             }
         }.runTaskLater(plugin, 1);
     }
