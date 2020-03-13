@@ -4,6 +4,7 @@ message:
   #valid placeholders: %mp (minutes partial) %sp (seconds partial) %m (total minutes) %s(total seconds)
   countdown: "&cYou cannot teleport for another &6%mp minutes %sp seconds"
   nopermission: "&cYou do not have permission to execute this command!"
+  blacklisted: "&cI am sorry, that world is blacklisted!"
 
 teleport:
   #m = minutes, s = seconds
@@ -14,7 +15,11 @@ teleport:
   #Center coordinates for the radius
   startX: 0
   startZ: 0
-
+blacklist:
+  isWhitelist: false
+  worlds:
+    - "world_nether"
+    - "world_the_end"
 #Plugins to take into consideration when teleporting
 #Currently supports FactionsUUID and WorldGuard
 #If you want more plugins to be supported: https://github.com/DarkEyeDragon/RandomTeleport/issues

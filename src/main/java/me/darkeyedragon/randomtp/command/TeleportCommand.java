@@ -79,6 +79,12 @@ public class TeleportCommand extends BaseCommand {
     }
 
     private void teleport(Player player, World world, boolean force) {
+        if(configHandler.getWorldsBlacklist().contains(world)){
+            if(!configHandler.isWhitelist() && !player.hasPermission("rtp.world.bypass")){
+                player.sendMessage(configHandler.getBlacklistMessage());
+                return;
+            }
+        }
         String initMessage = configHandler.getInitMessage();
         if (plugin.getCooldowns().containsKey(player.getUniqueId()) && !player.hasPermission("rtp.teleport.bypass")) {
             long lasttp = plugin.getCooldowns().get(player.getUniqueId());

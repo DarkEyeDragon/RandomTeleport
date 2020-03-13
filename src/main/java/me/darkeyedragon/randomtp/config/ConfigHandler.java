@@ -8,6 +8,7 @@ import org.bukkit.util.Vector;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ConfigHandler {
 
@@ -32,7 +33,13 @@ public class ConfigHandler {
         }
         return message;
     }
-
+    public String getBlacklistMessage(){
+        String message = plugin.getConfig().getString("message.blacklisted");
+        if(message != null){
+            message = ChatColor.translateAlternateColorCodes('&', message);
+        }
+        return message;
+    }
     public int getRadius(){
         return plugin.getConfig().getInt("teleport.radius");
     }
@@ -81,16 +88,9 @@ public class ConfigHandler {
         throw new NumberFormatException("Not a valid format");
     }
 
-
-    public boolean useDefault(){
-        return plugin.getConfig().getBoolean("world.use_default");
-    }
-
-    public World getDefaultWorld(){
-        String worldStr = plugin.getConfig().getString("world.default");
-        if(worldStr != null)
-            return Bukkit.getWorld(worldStr);
-        return null;
+    public List<World> getWorldsBlacklist(){
+        var strings = plugin.getConfig().getStringList("blacklist.worlds");
+        return strings.stream().map(Bukkit::getWorld).collect(Collectors.toList());
     }
 
     public long getCooldown() {
@@ -102,5 +102,9 @@ public class ConfigHandler {
 
     public List<String> getPlugins(){
         return plugin.getConfig().getStringList("plugins");
+    }
+
+    public boolean isWhitelist(){
+        return plugin.getConfig().getBoolean("blacklist.isWhitelist");
     }
 }

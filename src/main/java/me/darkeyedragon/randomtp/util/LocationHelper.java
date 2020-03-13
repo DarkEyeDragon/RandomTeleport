@@ -100,7 +100,6 @@ public class LocationHelper {
         int z = rnd.nextInt(chunkRadius * 2) - chunkRadius;
         int offsetX = plugin.getConfigHandler().getStartX()/16;
         int offsetZ = plugin.getConfigHandler().getStartZ()/16;
-        plugin.getLogger().warning("offsetX: "+offsetX +"offsetZ: "+offsetZ);
         return PaperLib.getChunkAtAsync(world, x+offsetX, z+offsetZ);
     }
 
