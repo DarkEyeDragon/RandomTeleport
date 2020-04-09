@@ -10,6 +10,7 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -19,31 +20,33 @@ import java.util.concurrent.ThreadLocalRandom;
 public class LocationHelper {
 
     private static final String OCEAN = "ocean";
-    private final Set<Material> blacklistMaterial;
+    private final EnumSet<Material> blacklistMaterial;
     private final Set<Biome> blacklistBiome;
-    private RandomTeleport plugin;
+    private final RandomTeleport plugin;
 
     /**
      * A simple utility class to help with {@link Location}
      */
     public LocationHelper(RandomTeleport plugin) {
         this.plugin = plugin;
-        blacklistMaterial = new HashSet<>();
+        blacklistMaterial = EnumSet.of(
+            Material.LAVA,
+            Material.CACTUS,
+            Material.FIRE,
+            Material.TRIPWIRE,
+            Material.ACACIA_PRESSURE_PLATE,
+            Material.BIRCH_PRESSURE_PLATE,
+            Material.JUNGLE_PRESSURE_PLATE,
+            Material.OAK_PRESSURE_PLATE,
+            Material.SPRUCE_PRESSURE_PLATE,
+            Material.STONE_PRESSURE_PLATE,
+            Material.DARK_OAK_PRESSURE_PLATE,
+            Material.HEAVY_WEIGHTED_PRESSURE_PLATE,
+            Material.LIGHT_WEIGHTED_PRESSURE_PLATE
+        );
         blacklistBiome = new HashSet<>();
         //Illegal material types
-        blacklistMaterial.add(Material.LAVA);
-        blacklistMaterial.add(Material.CACTUS);
-        blacklistMaterial.add(Material.FIRE);
-        blacklistMaterial.add(Material.TRIPWIRE);
-        blacklistMaterial.add(Material.ACACIA_PRESSURE_PLATE);
-        blacklistMaterial.add(Material.BIRCH_PRESSURE_PLATE);
-        blacklistMaterial.add(Material.JUNGLE_PRESSURE_PLATE);
-        blacklistMaterial.add(Material.OAK_PRESSURE_PLATE);
-        blacklistMaterial.add(Material.SPRUCE_PRESSURE_PLATE);
-        blacklistMaterial.add(Material.STONE_PRESSURE_PLATE);
-        blacklistMaterial.add(Material.DARK_OAK_PRESSURE_PLATE);
-        blacklistMaterial.add(Material.HEAVY_WEIGHTED_PRESSURE_PLATE);
-        blacklistMaterial.add(Material.LIGHT_WEIGHTED_PRESSURE_PLATE);
+
 
         //Illegal biomes
         for (Biome biome : Biome.values()) {
@@ -53,18 +56,19 @@ public class LocationHelper {
         }
     }
 
-    public CompletableFuture<Location> getRandomLocation(World world, int radius) {
-        CompletableFuture<Location> location = pickRandomLocation(world, radius);
+    /* This is the final method that will be called from the other end, to get a location */
+    public CompletableFuture<Location> getRandomLocation(World world, int radius, int offsetX, int offsetZ) {
+        CompletableFuture<Location> location = pickRandomLocation(world, radius, offsetX, offsetZ);
         return location.thenCompose((loc) -> {
             if (loc == null) {
-                return getRandomLocation(world, radius);
+                return getRandomLocation(world, radius, offsetX, offsetZ);
             } else return CompletableFuture.completedFuture(loc);
         });
     }
 
-    /* This is the final method that will be called from the other end, to get a location */
-    private CompletableFuture<Location> pickRandomLocation(World world, int radius) {
-        CompletableFuture<Chunk> chunk = getRandomChunk(world, radius);
+    /*Pick a random location based on chunks*/
+    private CompletableFuture<Location> pickRandomLocation(World world, int radius, int offsetX, int offsetZ) {
+        CompletableFuture<Chunk> chunk = getRandomChunk(world, radius, offsetX, offsetZ);
         return chunk.thenApply(this::getRandomLocationFromChunk);
     }
 
@@ -82,34 +86,32 @@ public class LocationHelper {
         return null;
     }
 
-    private CompletableFuture<Chunk> getRandomChunk(World world, int radius) {
-        var chunkFuture = getRandomChunkAsync(world, radius);
+    private CompletableFuture<Chunk> getRandomChunk(World world, int radius, int offsetX, int offsetZ) {
+        var chunkFuture = getRandomChunkAsync(world, radius, offsetX, offsetZ);
 
         return chunkFuture.thenCompose((chunk) -> {
             boolean isSafe = isSafeChunk(chunk);
             if (!isSafe) {
-                return getRandomChunk(world, radius);
-            }
-            else return CompletableFuture.completedFuture(chunk);
+                return getRandomChunk(world, radius, offsetX / 16, offsetZ / 16);
+            } else return CompletableFuture.completedFuture(chunk);
         });
     }
-    private CompletableFuture<Chunk> getRandomChunkAsync(World world, int radius) {
+
+    private CompletableFuture<Chunk> getRandomChunkAsync(World world, int radius, int offsetX, int offsetZ) {
         Random rnd = ThreadLocalRandom.current();
-        int chunkRadius = radius/16;
+        int chunkRadius = radius / 16;
         int x = rnd.nextInt(chunkRadius * 2) - chunkRadius;
         int z = rnd.nextInt(chunkRadius * 2) - chunkRadius;
-        int offsetX = plugin.getConfigHandler().getStartX()/16;
-        int offsetZ = plugin.getConfigHandler().getStartZ()/16;
-        return PaperLib.getChunkAtAsync(world, x+offsetX, z+offsetZ);
+        return PaperLib.getChunkAtAsync(world, x + offsetX, z + offsetZ);
     }
 
     public boolean isSafeLocation(Location loc) {
         World world = loc.getWorld();
         if (world == null) return false;
         if (loc.add(0, 2, 0).getBlock().getType() != Material.AIR) return false;
-        if(blacklistMaterial.contains(loc.getBlock().getType())) return false;
+        if (blacklistMaterial.contains(loc.getBlock().getType())) return false;
         for (ChunkValidator validator : plugin.getValidatorList()) {
-            if(!validator.isValid(loc)){
+            if (!validator.isValid(loc)) {
                 return false;
             }
         }

@@ -7,16 +7,19 @@ message:
   blacklisted: "&cI am sorry, that world is blacklisted!"
 #The amount of pre-generated locations in the queue
 queue:
-  amount: 10
+  size: 10
+
+size:
+  #Use the worldborder (if set) for offset
+  use_worldborder: true
+  #Will be ignored if use_worldborder is true
+  radius: 21474836
+  offsetX: 0
+  offsetZ: 0
 teleport:
   #m = minutes, s = seconds
   #default: "60m"
   cooldown: "60m"
-  #teleportation radius
-  radius: 21474836
-  #Center coordinates for the radius
-  startX: 0
-  startZ: 0
 blacklist:
   isWhitelist: false
   worlds:

@@ -41,7 +41,7 @@ public class ConfigHandler {
         return message;
     }
     public int getRadius(){
-        return plugin.getConfig().getInt("teleport.radius");
+        return plugin.getConfig().getInt("size.radius");
     }
 
     public String getCountdownRemainingMessage(long remainingTime) {
@@ -57,14 +57,14 @@ public class ConfigHandler {
         return message;
     }
 
-    public int getStartX(){
+    public int getOffsetX(){
         return plugin.getConfig().getInt("teleport.startX");
     }
-    public int getStartZ(){
+    public int getOffsetZ(){
         return plugin.getConfig().getInt("teleport.startZ");
     }
     public Vector getStartLocation(){
-        return new Vector((double)getStartX(), 0,(double)getStartZ());
+        return new Vector((double) getOffsetX(), 0,(double)getOffsetZ());
     }
 
     private long formatCooldown() throws NumberFormatException {
@@ -105,10 +105,13 @@ public class ConfigHandler {
     }
 
     public boolean isWhitelist(){
-        return plugin.getConfig().getBoolean("blacklist.isWhitelist", false);
+        return plugin.getConfig().getBoolean("blacklist.isWhitelist");
     }
 
-    public int getQueueAmount(){
-        return plugin.getConfig().getInt("queue.amount");
+    public int getQueueSize(){
+        return plugin.getConfig().getInt("queue.size", 10);
+    }
+    public boolean useWorldBorder(){
+        return plugin.getConfig().getBoolean("size.use_worldborder");
     }
 }

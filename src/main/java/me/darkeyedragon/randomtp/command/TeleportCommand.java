@@ -105,16 +105,22 @@ public class TeleportCommand extends BaseCommand {
             player.sendMessage(configHandler.getBlacklistMessage());
             return;
         }
-        Location loc = plugin.getQueue(world).poll();
+        Location loc = plugin.popLocation(world);
+        int offsetX;
+        int offsetZ;
+        if(configHandler.useWorldBorder()){
+            offsetX = world.getWorldBorder().getCenter().getBlockX()/16;
+            offsetZ = world.getWorldBorder().getCenter().getBlockZ()/16;
+        }else{
+            offsetX = configHandler.getOffsetX()/16;
+            offsetZ = configHandler.getOffsetZ()/16;
+        }
         if( loc == null){
             player.sendMessage(ChatColor.GOLD + "Locations queue depleted... Forcing generation of a new location");
-            locationHelper.getRandomLocation(world, configHandler.getRadius()).thenAccept(loc1 -> {
-                teleport(player, loc1, world);
-            });
+            locationHelper.getRandomLocation(world, configHandler.getRadius(), offsetX, offsetZ).thenAccept(loc1 -> teleport(player, loc1, world));
         }else{
             teleport(player, loc, world);
         }
-
     }
     public void teleport(Player player,Location loc, World world){
         Location location = loc.getWorld().getHighestBlockAt(loc).getLocation().add(0.5, 2, 0.5);
