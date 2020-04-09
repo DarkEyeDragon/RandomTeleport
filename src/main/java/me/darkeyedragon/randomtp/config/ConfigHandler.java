@@ -105,6 +105,10 @@ public class ConfigHandler {
     }
 
     public boolean isWhitelist(){
-        return plugin.getConfig().getBoolean("blacklist.isWhitelist");
+        return plugin.getConfig().getBoolean("blacklist.isWhitelist", false);
+    }
+
+    public int getQueueAmount(){
+        return plugin.getConfig().getInt("queue.amount");
     }
 }

@@ -5,41 +5,45 @@ import co.aikar.commands.PaperCommandManager;
 import me.darkeyedragon.randomtp.command.TeleportCommand;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
+import me.darkeyedragon.randomtp.util.LocationHelper;
 import me.darkeyedragon.randomtp.validator.ChunkValidator;
 import me.darkeyedragon.randomtp.validator.ValidatorFactory;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public final class RandomTeleport extends JavaPlugin {
 
     private HashMap<UUID, Long> cooldowns;
     private PaperCommandManager manager;
     private List<ChunkValidator> validatorList;
+    private Map<World, BlockingQueue<Location>> worldQueueMap;
     private ConfigHandler configHandler;
+    private LocationHelper locationHelper;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
         manager = new PaperCommandManager(this);
-
+        locationHelper = new LocationHelper(this);
         //check if the first argument is a world or player
-        manager.getCommandContexts().registerContext(PlayerWorldContext.class, c ->{
+        worldQueueMap = new HashMap<>();
+        manager.getCommandContexts().registerContext(PlayerWorldContext.class, c -> {
             String arg1 = c.getArgs().get(0);
             World world = Bukkit.getWorld(arg1);
             Player player = Bukkit.getPlayer(arg1);
-            if(world != null){
+            if (world != null) {
                 var context = new PlayerWorldContext();
                 context.setWorld(true);
                 context.setWorld(world);
                 return context;
-            }else if(player != null){
+            } else if (player != null) {
                 var context = new PlayerWorldContext();
                 context.setPlayer(true);
                 context.setPlayer(player);
@@ -63,6 +67,23 @@ public final class RandomTeleport extends JavaPlugin {
                 getLogger().warning(s + " is not a valid plugin or is not loaded!");
             }
         });
+        populateWorldQueue();
+        worldQueueMap.forEach((world, locations) -> addToLocationQueue(configHandler.getQueueAmount(), world));
+    }
+
+    private void populateWorldQueue() {
+        for (World world : Bukkit.getWorlds()) {
+            if (configHandler.getWorldsBlacklist().contains(world)) {
+                if (configHandler.isWhitelist()) {
+                    worldQueueMap.put(world, new ArrayBlockingQueue<>(configHandler.getQueueAmount()));
+                }
+            } else {
+                if (!configHandler.isWhitelist()) {
+                    worldQueueMap.put(world, new ArrayBlockingQueue<>(configHandler.getQueueAmount()));
+                }
+            }
+        }
+        getLogger().warning(worldQueueMap.size() + " size");
     }
 
     @Override
@@ -70,6 +91,17 @@ public final class RandomTeleport extends JavaPlugin {
         // Plugin shutdown logic
         getLogger().info("Unregistering commands...");
         manager.unregisterCommands();
+        worldQueueMap.clear();
+    }
+
+    public void addToLocationQueue(int amount, World world) {
+        for (int i = 0; i < amount; i++) {
+            Queue<Location> queue = worldQueueMap.get(world);
+            locationHelper.getRandomLocation(world, configHandler.getRadius()).thenAccept(location -> {
+                queue.offer(location);
+                getLogger().info("Safe location added for " + world.getName() +"("+queue.size()+"/"+configHandler.getQueueAmount()+")");
+            });
+        }
     }
 
     public HashMap<UUID, Long> getCooldowns() {
@@ -82,5 +114,18 @@ public final class RandomTeleport extends JavaPlugin {
 
     public ConfigHandler getConfigHandler() {
         return configHandler;
+    }
+
+    public Map<World, BlockingQueue<Location>> getWorldQueueMap() {
+        getLogger().warning(worldQueueMap.size() + " size");
+        return worldQueueMap;
+    }
+
+    public Queue<Location> getQueue(World world) {
+        return getWorldQueueMap().get(world);
+    }
+
+    public LocationHelper getLocationHelper() {
+        return locationHelper;
     }
 }

@@ -18,6 +18,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Queue;
+
 @CommandAlias("rtp|randomtp|randomteleport")
 public class TeleportCommand extends BaseCommand {
 
@@ -28,7 +30,7 @@ public class TeleportCommand extends BaseCommand {
     public TeleportCommand(RandomTeleport plugin) {
         this.plugin = plugin;
         configHandler = plugin.getConfigHandler();
-        locationHelper = new LocationHelper(plugin);
+        locationHelper = plugin.getLocationHelper();
     }
 
     @Default
@@ -64,7 +66,7 @@ public class TeleportCommand extends BaseCommand {
         new BukkitRunnable() {
             @Override
             public void run() {
-                teleport(player, finalWorld, sender.hasPermission("rtp.teleport.bypass"));
+                teleportSetup(player, finalWorld, sender.hasPermission("rtp.teleport.bypass"));
             }
         }.runTaskLater(plugin, 1);
     }
@@ -78,7 +80,7 @@ public class TeleportCommand extends BaseCommand {
         commandSender.sendMessage(ChatColor.GREEN + "Reloaded config");
     }
 
-    private void teleport(Player player, World world, boolean force) {
+    private void teleportSetup(Player player, World world, boolean force) {
         if(configHandler.getWorldsBlacklist().contains(world)){
             if(!configHandler.isWhitelist() && !player.hasPermission("rtp.world.bypass")){
                 player.sendMessage(configHandler.getBlacklistMessage());
@@ -98,15 +100,28 @@ public class TeleportCommand extends BaseCommand {
         player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 3, 5, false, false));
         player.sendMessage(initMessage);
         drawWarpParticles(player);
-        locationHelper.getRandomLocation(world, configHandler.getRadius()).thenAccept(loc -> {
-            Location location = loc.getWorld().getHighestBlockAt(loc).getLocation().add(0.5, 2, 0.5);
-            plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
-            PaperLib.teleportAsync(player, location);
-            player.sendMessage(configHandler.getTeleportMessage());
-        }).exceptionally(throwable -> {
-            throwable.printStackTrace();
-            return null;
-        });
+        Queue<Location> locationQueue = plugin.getQueue(world);
+        if(locationQueue == null){
+            player.sendMessage(configHandler.getBlacklistMessage());
+            return;
+        }
+        Location loc = plugin.getQueue(world).poll();
+        if( loc == null){
+            player.sendMessage(ChatColor.GOLD + "Locations queue depleted... Forcing generation of a new location");
+            locationHelper.getRandomLocation(world, configHandler.getRadius()).thenAccept(loc1 -> {
+                teleport(player, loc1, world);
+            });
+        }else{
+            teleport(player, loc, world);
+        }
+
+    }
+    public void teleport(Player player,Location loc, World world){
+        Location location = loc.getWorld().getHighestBlockAt(loc).getLocation().add(0.5, 2, 0.5);
+        plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
+        PaperLib.teleportAsync(player, location);
+        player.sendMessage(configHandler.getTeleportMessage());
+        plugin.addToLocationQueue( 1, world);
     }
 
     private void drawWarpParticles(Player player) {
