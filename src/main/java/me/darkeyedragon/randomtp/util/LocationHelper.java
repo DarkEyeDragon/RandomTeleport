@@ -29,23 +29,23 @@ public class LocationHelper {
      */
     public LocationHelper(RandomTeleport plugin) {
         this.plugin = plugin;
+        //Illegal material types
         blacklistMaterial = EnumSet.of(
-            Material.LAVA,
-            Material.CACTUS,
-            Material.FIRE,
-            Material.TRIPWIRE,
-            Material.ACACIA_PRESSURE_PLATE,
-            Material.BIRCH_PRESSURE_PLATE,
-            Material.JUNGLE_PRESSURE_PLATE,
-            Material.OAK_PRESSURE_PLATE,
-            Material.SPRUCE_PRESSURE_PLATE,
-            Material.STONE_PRESSURE_PLATE,
-            Material.DARK_OAK_PRESSURE_PLATE,
-            Material.HEAVY_WEIGHTED_PRESSURE_PLATE,
-            Material.LIGHT_WEIGHTED_PRESSURE_PLATE
+                Material.LAVA,
+                Material.CACTUS,
+                Material.FIRE,
+                Material.TRIPWIRE,
+                Material.ACACIA_PRESSURE_PLATE,
+                Material.BIRCH_PRESSURE_PLATE,
+                Material.JUNGLE_PRESSURE_PLATE,
+                Material.OAK_PRESSURE_PLATE,
+                Material.SPRUCE_PRESSURE_PLATE,
+                Material.STONE_PRESSURE_PLATE,
+                Material.DARK_OAK_PRESSURE_PLATE,
+                Material.HEAVY_WEIGHTED_PRESSURE_PLATE,
+                Material.LIGHT_WEIGHTED_PRESSURE_PLATE
         );
         blacklistBiome = new HashSet<>();
-        //Illegal material types
 
 
         //Illegal biomes
@@ -74,10 +74,12 @@ public class LocationHelper {
 
     /* Will search through the chunk to find a location that is safe, returning null if none is found. */
     private Location getRandomLocationFromChunk(Chunk chunk) {
-        for (int i = 8; i < 16; i++) {
-            for (int j = 8; j < 16; j++) {
-                Block block = chunk.getBlock(i, 64, j);
+        for (int x = 8; x < 16; x++) {
+            for (int z = 8; z < 16; z++) {
+                int y = chunk.getWorld().getHighestBlockAt(x << 4, z << 4).getY();
+                Block block = chunk.getBlock(x, y, z);
                 if (isSafeLocation(block.getLocation())) {
+                    System.out.println(block.getLocation());
                     return block.getLocation();
                 }
             }
@@ -119,9 +121,10 @@ public class LocationHelper {
     }
 
     private boolean isSafeChunk(Chunk chunk) {
-        for (int i = 0; i < 16; i++) {
-            for (int j = 0; j < 16; j++) {
-                if (!blacklistBiome.contains(chunk.getBlock(i, 64, j).getBiome())) {
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                int y = chunk.getWorld().getHighestBlockAt(x << 4, z << 4).getY();
+                if (!blacklistBiome.contains(chunk.getBlock(x, y, z).getBiome())) {
                     return true;
                 }
             }

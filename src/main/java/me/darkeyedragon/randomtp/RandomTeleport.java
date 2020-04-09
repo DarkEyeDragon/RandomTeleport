@@ -83,7 +83,6 @@ public final class RandomTeleport extends JavaPlugin {
                 }
             }
         }
-        getLogger().warning(worldQueueMap.size() + " size");
     }
 
     @Override
@@ -94,24 +93,24 @@ public final class RandomTeleport extends JavaPlugin {
         worldQueueMap.clear();
     }
 
-public void addToLocationQueue(int amount, World world) {
-    for (int i = 0; i < amount; i++) {
-        Queue<Location> queue = worldQueueMap.get(world);
-        int offsetX;
-        int offsetZ;
-        if(configHandler.useWorldBorder()){
-            offsetX = world.getWorldBorder().getCenter().getBlockX();
-            offsetZ = world.getWorldBorder().getCenter().getBlockZ();
-        }else{
-            offsetX = configHandler.getOffsetX();
-            offsetZ = configHandler.getOffsetZ();
+    public void addToLocationQueue(int amount, World world) {
+        for (int i = 0; i < amount; i++) {
+            Queue<Location> queue = worldQueueMap.get(world);
+            int offsetX;
+            int offsetZ;
+            if (configHandler.useWorldBorder()) {
+                offsetX = world.getWorldBorder().getCenter().getBlockX();
+                offsetZ = world.getWorldBorder().getCenter().getBlockZ();
+            } else {
+                offsetX = configHandler.getOffsetX();
+                offsetZ = configHandler.getOffsetZ();
+            }
+            locationHelper.getRandomLocation(world, configHandler.getRadius(), offsetX, offsetZ).thenAccept(location -> {
+                queue.offer(location);
+                getLogger().info("Safe location added for " + world.getName() + "(" + queue.size() + "/" + configHandler.getQueueSize() + ")");
+            });
         }
-        locationHelper.getRandomLocation(world, configHandler.getRadius(), offsetX, offsetZ).thenAccept(location -> {
-            queue.offer(location);
-            getLogger().info("Safe location added for " + world.getName() +"("+queue.size()+"/"+configHandler.getQueueSize()+")");
-        });
     }
-}
 
     public HashMap<UUID, Long> getCooldowns() {
         return cooldowns;
@@ -128,10 +127,10 @@ public void addToLocationQueue(int amount, World world) {
     public Map<World, BlockingQueue<Location>> getWorldQueueMap() {
         return worldQueueMap;
     }
-    public Location popLocation(World world){
+    public Location popLocation(World world) {
         Queue<Location> queue = getQueue(world);
         Location location = queue.poll();
-        getLogger().info("Location removed from "+ world.getName() +"("+queue.size()+"/"+configHandler.getQueueSize()+")");
+        getLogger().info("Location removed from " + world.getName() + "(" + queue.size() + "/" + configHandler.getQueueSize() + ")");
         return location;
     }
     public Queue<Location> getQueue(World world) {
