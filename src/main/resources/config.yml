@@ -26,8 +26,9 @@ blacklist:
     - "world_nether"
     - "world_the_end"
 #Plugins to take into consideration when teleporting
-#Currently supports FactionsUUID and WorldGuard
+#Currently supports Factions (FactionsUUID), WorldGuard, GriefPrevention
 #If you want more plugins to be supported: https://github.com/DarkEyeDragon/RandomTeleport/issues
 plugins:
   - "Factions"
   - "WorldGuard"
+  - "GriefPrevention"

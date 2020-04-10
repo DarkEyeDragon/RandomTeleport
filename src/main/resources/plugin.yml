@@ -6,6 +6,7 @@ authors: [DarkEyeDragon]
 softdepend:
   - Factions
   - WorldGuard
+  - GriefPrevention
 description: Yeet a player to a random location, and hopefully they won't die in the process
 permissions:
   rtp.teleport.*:

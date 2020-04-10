@@ -9,5 +9,5 @@ import org.bukkit.Location;
  * Example: {@link FactionsUuidValidator}, {@link WorldGuardValidator}
  */
 public interface ChunkValidator {
-    boolean isValid(Location Location);
+    boolean isValid(Location location);
 }

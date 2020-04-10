@@ -79,7 +79,6 @@ public class LocationHelper {
                 int y = chunk.getWorld().getHighestBlockAt(x << 4, z << 4).getY();
                 Block block = chunk.getBlock(x, y, z);
                 if (isSafeLocation(block.getLocation())) {
-                    System.out.println(block.getLocation());
                     return block.getLocation();
                 }
             }

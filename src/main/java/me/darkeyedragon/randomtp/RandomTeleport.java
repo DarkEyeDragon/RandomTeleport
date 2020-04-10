@@ -58,11 +58,16 @@ public final class RandomTeleport extends JavaPlugin {
         validatorList = new ArrayList<>();
         configHandler.getPlugins().forEach(s -> {
             if (getServer().getPluginManager().getPlugin(s) != null) {
-                var validator = ValidatorFactory.createFrom(s);
-                if (validator != null) {
-                    validatorList.add(validator);
-                    getLogger().info(s + " loaded as validator.");
+                try {
+                    var validator = ValidatorFactory.createFrom(s);
+                    if (validator != null) {
+                        validatorList.add(validator);
+                        getLogger().info(s + " loaded as validator.");
+                    }
+                }catch (IllegalArgumentException ignored){
+                    getLogger().warning(s + " is not a valid validator. Make sure it is spelled correctly.");
                 }
+
             } else {
                 getLogger().warning(s + " is not a valid plugin or is not loaded!");
             }
@@ -140,4 +145,5 @@ public final class RandomTeleport extends JavaPlugin {
     public LocationHelper getLocationHelper() {
         return locationHelper;
     }
+
 }
