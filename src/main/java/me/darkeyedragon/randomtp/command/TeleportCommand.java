@@ -134,7 +134,12 @@ public class TeleportCommand extends BaseCommand {
                 plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
                 PaperLib.teleportAsync(player, location);
                 player.sendMessage(configHandler.getTeleportMessage());
-                plugin.addToLocationQueue(1, world);
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        plugin.addToLocationQueue(1, world);
+                    }
+                }.runTaskLater(plugin, 60);
             }
         }.runTaskLater(plugin, 1);
 

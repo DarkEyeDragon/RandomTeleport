@@ -1,12 +1,13 @@
 package me.darkeyedragon.randomtp.config;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
+import me.darkeyedragon.randomtp.util.CustomTime;
+import me.darkeyedragon.randomtp.util.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,11 +49,13 @@ public class ConfigHandler {
         String message = plugin.getConfig().getString("message.countdown");
         if (message != null) {
             message = ChatColor.translateAlternateColorCodes('&', message);
-            Duration duration = Duration.ofMillis(remainingTime);
-            String messagePart = message.replaceAll("%mp", duration.toMinutesPart()+"");
-            messagePart = messagePart.replaceAll("%sp", duration.toSecondsPart()+"");
-            messagePart = messagePart.replaceAll("%m", duration.toMinutes()+"");
-            message = messagePart.replaceAll("%s", duration.toSeconds()+"");
+            CustomTime duration = TimeUtil.formatTime(remainingTime);
+            String messagePart = message.replaceAll("%hp", duration.getHours()+"");
+            messagePart = messagePart.replaceAll("%mp", duration.getMinutes()+"");
+            messagePart = messagePart.replaceAll("%sp", duration.getSeconds()+"");
+            messagePart = messagePart.replaceAll("%m", duration.getTotalMinutes()+"");
+            messagePart = messagePart.replaceAll("%h", duration.getTotalHours()+"");
+            message = messagePart.replaceAll("%s", duration.getTotalSeconds()+"");
         }
         return message;
     }
@@ -89,7 +92,7 @@ public class ConfigHandler {
     }
 
     public List<World> getWorldsBlacklist(){
-        var strings = plugin.getConfig().getStringList("blacklist.worlds");
+        List<String> strings = plugin.getConfig().getStringList("blacklist.worlds");
         return strings.stream().map(Bukkit::getWorld).collect(Collectors.toList());
     }
 

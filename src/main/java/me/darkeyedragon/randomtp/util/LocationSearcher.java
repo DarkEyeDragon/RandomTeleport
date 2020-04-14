@@ -87,8 +87,7 @@ public class LocationSearcher {
     }
 
     private CompletableFuture<Chunk> getRandomChunk(World world, int radius, int offsetX, int offsetZ) {
-        var chunkFuture = getRandomChunkAsync(world, radius, offsetX, offsetZ);
-
+        CompletableFuture<Chunk> chunkFuture = getRandomChunkAsync(world, radius, offsetX, offsetZ);
         return chunkFuture.thenCompose((chunk) -> {
             boolean isSafe = isSafeChunk(chunk);
             if (!isSafe) {
@@ -99,7 +98,7 @@ public class LocationSearcher {
 
     private CompletableFuture<Chunk> getRandomChunkAsync(World world, int radius, int offsetX, int offsetZ) {
         ThreadLocalRandom rnd = ThreadLocalRandom.current();
-        int chunkRadius = radius >> 16;
+        int chunkRadius = radius / 16;
         int x = rnd.nextInt(-chunkRadius, chunkRadius);
         int z = rnd.nextInt(-chunkRadius, chunkRadius);
         return PaperLib.getChunkAtAsync(world, x + offsetX, z + offsetZ);
@@ -109,11 +108,6 @@ public class LocationSearcher {
         World world = loc.getWorld();
         if (world == null) return false;
         if (loc.add(0, 2, 0).getBlock().getType() != Material.AIR) return false;
-        if (useWorldBorder) {
-            if (!loc.getWorld().getWorldBorder().isInside(loc)) {
-                return false;
-            }
-        }
         if (blacklistMaterial.contains(loc.getBlock().getType())) return false;
         for (ChunkValidator validator : plugin.getValidatorList()) {
             if (!validator.isValid(loc)) {

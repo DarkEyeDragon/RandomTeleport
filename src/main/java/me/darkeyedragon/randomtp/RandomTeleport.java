@@ -39,13 +39,13 @@ public final class RandomTeleport extends JavaPlugin {
             String arg1 = c.getArgs().get(0);
             World world = Bukkit.getWorld(arg1);
             Player player = Bukkit.getPlayer(arg1);
+            PlayerWorldContext context = new PlayerWorldContext();
             if (world != null) {
-                var context = new PlayerWorldContext();
                 context.setWorld(true);
                 context.setWorld(world);
                 return context;
             } else if (player != null) {
-                var context = new PlayerWorldContext();
+                context = new PlayerWorldContext();
                 context.setPlayer(true);
                 context.setPlayer(player);
                 return context;
@@ -59,7 +59,7 @@ public final class RandomTeleport extends JavaPlugin {
         configHandler.getPlugins().forEach(s -> {
             if (getServer().getPluginManager().getPlugin(s) != null) {
                 try {
-                    var validator = ValidatorFactory.createFrom(s);
+                    ChunkValidator validator = ValidatorFactory.createFrom(s);
                     if (validator != null) {
                         validatorList.add(validator);
                         getLogger().info(s + " loaded as validator.");
@@ -111,7 +111,7 @@ public final class RandomTeleport extends JavaPlugin {
             if (configHandler.useWorldBorder()) {
                 offsetX = world.getWorldBorder().getCenter().getBlockX();
                 offsetZ = world.getWorldBorder().getCenter().getBlockZ();
-                radius = (int)Math.floor(world.getWorldBorder().getSize());
+                radius = (int)Math.floor(world.getWorldBorder().getSize()/2-world.getWorldBorder().getWarningDistance());
             } else {
                 offsetX = configHandler.getOffsetX();
                 offsetZ = configHandler.getOffsetZ();
