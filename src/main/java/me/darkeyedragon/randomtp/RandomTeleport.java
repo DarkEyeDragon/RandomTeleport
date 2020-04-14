@@ -36,21 +36,20 @@ public final class RandomTeleport extends JavaPlugin {
         //check if the first argument is a world or player
         worldQueueMap = new HashMap<>();
         manager.getCommandContexts().registerContext(PlayerWorldContext.class, c -> {
-            String arg1 = c.getArgs().get(0);
+            String arg1 = c.popFirstArg();
             World world = Bukkit.getWorld(arg1);
             Player player = Bukkit.getPlayer(arg1);
-            PlayerWorldContext context = new PlayerWorldContext();
             if (world != null) {
-                context.setWorld(true);
+                PlayerWorldContext context = new PlayerWorldContext();
                 context.setWorld(world);
                 return context;
             } else if (player != null) {
-                context = new PlayerWorldContext();
-                context.setPlayer(true);
+                PlayerWorldContext context = new PlayerWorldContext();
                 context.setPlayer(player);
                 return context;
+            }else{
+                throw new InvalidCommandArgument(true);
             }
-            throw new InvalidCommandArgument(true);
         });
         cooldowns = new HashMap<>();
         saveDefaultConfig();
@@ -64,7 +63,7 @@ public final class RandomTeleport extends JavaPlugin {
                         validatorList.add(validator);
                         getLogger().info(s + " loaded as validator.");
                     }
-                }catch (IllegalArgumentException ignored){
+                } catch (IllegalArgumentException ignored) {
                     getLogger().warning(s + " is not a valid validator. Make sure it is spelled correctly.");
                 }
 
@@ -89,7 +88,7 @@ public final class RandomTeleport extends JavaPlugin {
         }
     }
 
-    public void populateQueue(){
+    public void populateQueue() {
         populateWorldQueue();
         worldQueueMap.forEach((world, locations) -> addToLocationQueue(configHandler.getQueueSize(), world));
     }
@@ -111,7 +110,7 @@ public final class RandomTeleport extends JavaPlugin {
             if (configHandler.useWorldBorder()) {
                 offsetX = world.getWorldBorder().getCenter().getBlockX();
                 offsetZ = world.getWorldBorder().getCenter().getBlockZ();
-                radius = (int)Math.floor(world.getWorldBorder().getSize()/2-world.getWorldBorder().getWarningDistance());
+                radius = (int) Math.floor(world.getWorldBorder().getSize() / 2 - world.getWorldBorder().getWarningDistance());
             } else {
                 offsetX = configHandler.getOffsetX();
                 offsetZ = configHandler.getOffsetZ();
@@ -139,15 +138,18 @@ public final class RandomTeleport extends JavaPlugin {
     public Map<World, BlockingQueue<Location>> getWorldQueueMap() {
         return worldQueueMap;
     }
-    public void clearWorldQueueMap(){
+
+    public void clearWorldQueueMap() {
         worldQueueMap.clear();
     }
+
     public Location popLocation(World world) {
         Queue<Location> queue = getQueue(world);
         Location location = queue.poll();
         getLogger().info("Location removed from " + world.getName() + "(" + queue.size() + "/" + configHandler.getQueueSize() + ")");
         return location;
     }
+
     public Queue<Location> getQueue(World world) {
         return getWorldQueueMap().get(world);
     }

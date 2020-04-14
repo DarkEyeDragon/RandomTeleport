@@ -17,3 +17,5 @@ Teleport a player to a random (safe) location in the Minecraft world.
 - Vastly improved location searching
 - When reloading the config you the queue gets repopulated with the new parameters
 - Reformatted the config (it is highly recommended to generate a new one!)
+- Added Java 8 support (previously only Java 9+ was supported)
+- Added Griefprevention support
