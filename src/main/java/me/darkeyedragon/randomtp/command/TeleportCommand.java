@@ -81,7 +81,7 @@ public class TeleportCommand extends BaseCommand {
 
     private void teleportSetup(Player player, World world, boolean force) {
         if (configHandler.getWorldsBlacklist().contains(world)) {
-            if (!configHandler.isWhitelist() && !player.hasPermission("rtp.world.bypass")) {
+            if (!configHandler.isWhitelist()) {
                 player.sendMessage(configHandler.getBlacklistMessage());
                 return;
             }
