@@ -12,23 +12,24 @@ import org.bukkit.block.Block;
 
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class LocationHelper {
+public class LocationSearcher {
 
     private static final String OCEAN = "ocean";
     private final EnumSet<Material> blacklistMaterial;
     private final Set<Biome> blacklistBiome;
     private final RandomTeleport plugin;
+    private boolean useWorldBorder;
 
     /**
      * A simple utility class to help with {@link Location}
      */
-    public LocationHelper(RandomTeleport plugin) {
+    public LocationSearcher(RandomTeleport plugin, boolean useWorldBorder) {
         this.plugin = plugin;
+        this.useWorldBorder = useWorldBorder;
         //Illegal material types
         blacklistMaterial = EnumSet.of(
                 Material.LAVA,
@@ -46,7 +47,6 @@ public class LocationHelper {
                 Material.LIGHT_WEIGHTED_PRESSURE_PLATE
         );
         blacklistBiome = new HashSet<>();
-
 
         //Illegal biomes
         for (Biome biome : Biome.values()) {
@@ -74,10 +74,9 @@ public class LocationHelper {
 
     /* Will search through the chunk to find a location that is safe, returning null if none is found. */
     private Location getRandomLocationFromChunk(Chunk chunk) {
-        for (int x = 8; x < 16; x++) {
-            for (int z = 8; z < 16; z++) {
-                int y = chunk.getWorld().getHighestBlockAt(x << 4, z << 4).getY();
-                Block block = chunk.getBlock(x, y, z);
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                Block block = chunk.getWorld().getHighestBlockAt((chunk.getX() << 4) + x, (chunk.getZ() << 4) + z);
                 if (isSafeLocation(block.getLocation())) {
                     return block.getLocation();
                 }
@@ -93,16 +92,16 @@ public class LocationHelper {
         return chunkFuture.thenCompose((chunk) -> {
             boolean isSafe = isSafeChunk(chunk);
             if (!isSafe) {
-                return getRandomChunk(world, radius, offsetX / 16, offsetZ / 16);
+                return getRandomChunk(world, radius, offsetX, offsetZ);
             } else return CompletableFuture.completedFuture(chunk);
         });
     }
 
     private CompletableFuture<Chunk> getRandomChunkAsync(World world, int radius, int offsetX, int offsetZ) {
-        Random rnd = ThreadLocalRandom.current();
-        int chunkRadius = radius / 16;
-        int x = rnd.nextInt(chunkRadius * 2) - chunkRadius;
-        int z = rnd.nextInt(chunkRadius * 2) - chunkRadius;
+        ThreadLocalRandom rnd = ThreadLocalRandom.current();
+        int chunkRadius = radius >> 16;
+        int x = rnd.nextInt(-chunkRadius, chunkRadius);
+        int z = rnd.nextInt(-chunkRadius, chunkRadius);
         return PaperLib.getChunkAtAsync(world, x + offsetX, z + offsetZ);
     }
 
@@ -110,6 +109,11 @@ public class LocationHelper {
         World world = loc.getWorld();
         if (world == null) return false;
         if (loc.add(0, 2, 0).getBlock().getType() != Material.AIR) return false;
+        if (useWorldBorder) {
+            if (!loc.getWorld().getWorldBorder().isInside(loc)) {
+                return false;
+            }
+        }
         if (blacklistMaterial.contains(loc.getBlock().getType())) return false;
         for (ChunkValidator validator : plugin.getValidatorList()) {
             if (!validator.isValid(loc)) {
@@ -122,12 +126,20 @@ public class LocationHelper {
     private boolean isSafeChunk(Chunk chunk) {
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
-                int y = chunk.getWorld().getHighestBlockAt(x << 4, z << 4).getY();
-                if (!blacklistBiome.contains(chunk.getBlock(x, y, z).getBiome())) {
-                    return true;
+                Block block = chunk.getWorld().getHighestBlockAt((chunk.getX() << 4) + x, (chunk.getZ() << 4) + z);
+                if (blacklistBiome.contains(block.getBiome())) {
+                    return false;
                 }
             }
         }
-        return false;
+        return true;
+    }
+
+    public boolean isUseWorldBorder() {
+        return useWorldBorder;
+    }
+
+    public void setUseWorldBorder(boolean useWorldBorder) {
+        this.useWorldBorder = useWorldBorder;
     }
 }

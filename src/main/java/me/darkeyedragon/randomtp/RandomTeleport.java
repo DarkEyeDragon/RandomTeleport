@@ -5,7 +5,7 @@ import co.aikar.commands.PaperCommandManager;
 import me.darkeyedragon.randomtp.command.TeleportCommand;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
-import me.darkeyedragon.randomtp.util.LocationHelper;
+import me.darkeyedragon.randomtp.util.LocationSearcher;
 import me.darkeyedragon.randomtp.validator.ChunkValidator;
 import me.darkeyedragon.randomtp.validator.ValidatorFactory;
 import org.bukkit.Bukkit;
@@ -25,14 +25,14 @@ public final class RandomTeleport extends JavaPlugin {
     private List<ChunkValidator> validatorList;
     private Map<World, BlockingQueue<Location>> worldQueueMap;
     private ConfigHandler configHandler;
-    private LocationHelper locationHelper;
+    private LocationSearcher locationHelper;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
         manager = new PaperCommandManager(this);
         configHandler = new ConfigHandler(this);
-        locationHelper = new LocationHelper(this);
+        locationHelper = new LocationSearcher(this, configHandler.useWorldBorder());
         //check if the first argument is a world or player
         worldQueueMap = new HashMap<>();
         manager.getCommandContexts().registerContext(PlayerWorldContext.class, c -> {
@@ -72,8 +72,7 @@ public final class RandomTeleport extends JavaPlugin {
                 getLogger().warning(s + " is not a valid plugin or is not loaded!");
             }
         });
-        populateWorldQueue();
-        worldQueueMap.forEach((world, locations) -> addToLocationQueue(configHandler.getQueueSize(), world));
+        populateQueue();
     }
 
     private void populateWorldQueue() {
@@ -90,6 +89,11 @@ public final class RandomTeleport extends JavaPlugin {
         }
     }
 
+    public void populateQueue(){
+        populateWorldQueue();
+        worldQueueMap.forEach((world, locations) -> addToLocationQueue(configHandler.getQueueSize(), world));
+    }
+
     @Override
     public void onDisable() {
         // Plugin shutdown logic
@@ -103,14 +107,17 @@ public final class RandomTeleport extends JavaPlugin {
             Queue<Location> queue = worldQueueMap.get(world);
             int offsetX;
             int offsetZ;
+            int radius;
             if (configHandler.useWorldBorder()) {
                 offsetX = world.getWorldBorder().getCenter().getBlockX();
                 offsetZ = world.getWorldBorder().getCenter().getBlockZ();
+                radius = (int)Math.floor(world.getWorldBorder().getSize());
             } else {
                 offsetX = configHandler.getOffsetX();
                 offsetZ = configHandler.getOffsetZ();
+                radius = configHandler.getRadius();
             }
-            locationHelper.getRandomLocation(world, configHandler.getRadius(), offsetX, offsetZ).thenAccept(location -> {
+            locationHelper.getRandomLocation(world, radius, offsetX, offsetZ).thenAccept(location -> {
                 queue.offer(location);
                 getLogger().info("Safe location added for " + world.getName() + "(" + queue.size() + "/" + configHandler.getQueueSize() + ")");
             });
@@ -132,6 +139,9 @@ public final class RandomTeleport extends JavaPlugin {
     public Map<World, BlockingQueue<Location>> getWorldQueueMap() {
         return worldQueueMap;
     }
+    public void clearWorldQueueMap(){
+        worldQueueMap.clear();
+    }
     public Location popLocation(World world) {
         Queue<Location> queue = getQueue(world);
         Location location = queue.poll();
@@ -142,7 +152,7 @@ public final class RandomTeleport extends JavaPlugin {
         return getWorldQueueMap().get(world);
     }
 
-    public LocationHelper getLocationHelper() {
+    public LocationSearcher getLocationHelper() {
         return locationHelper;
     }
 
