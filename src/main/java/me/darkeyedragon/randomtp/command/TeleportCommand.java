@@ -139,7 +139,7 @@ public class TeleportCommand extends BaseCommand {
                     public void run() {
                         plugin.addToLocationQueue(1, world);
                     }
-                }.runTaskLater(plugin, 60);
+                }.runTaskLater(plugin, configHandler.getInitDelay());
             }
         }.runTaskLater(plugin, 1);
 

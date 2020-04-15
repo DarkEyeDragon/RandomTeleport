@@ -118,7 +118,8 @@ public final class RandomTeleport extends JavaPlugin {
             }
             locationHelper.getRandomLocation(world, radius, offsetX, offsetZ).thenAccept(location -> {
                 queue.offer(location);
-                getLogger().info("Safe location added for " + world.getName() + "(" + queue.size() + "/" + configHandler.getQueueSize() + ")");
+                if(configHandler.getDebugShowQueuePopulation())
+                    getLogger().info("Safe location added for " + world.getName() + "(" + queue.size() + "/" + configHandler.getQueueSize() + ")");
             });
         }
     }
@@ -146,7 +147,8 @@ public final class RandomTeleport extends JavaPlugin {
     public Location popLocation(World world) {
         Queue<Location> queue = getQueue(world);
         Location location = queue.poll();
-        getLogger().info("Location removed from " + world.getName() + "(" + queue.size() + "/" + configHandler.getQueueSize() + ")");
+        if(configHandler.getDebugShowQueuePopulation())
+            getLogger().info("Location removed from " + world.getName() + "(" + queue.size() + "/" + configHandler.getQueueSize() + ")");
         return location;
     }
 

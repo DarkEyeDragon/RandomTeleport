@@ -103,10 +103,12 @@ public class ConfigHandler {
         return strings.stream().map(Bukkit::getWorld).collect(Collectors.toList());
     }
 
-    public int initDelay(){
-        return plugin.getConfig().getInt("queue.init_delay", 90);
+    public int getInitDelay(){
+        return plugin.getConfig().getInt("queue.init_delay", 60);
     }
-
+    public boolean getDebugShowQueuePopulation(){
+        return plugin.getConfig().getBoolean("debug.show_queue_population", true);
+    }
     public long getCooldown() {
         if (cooldown == -1) {
             cooldown = formatCooldown();
