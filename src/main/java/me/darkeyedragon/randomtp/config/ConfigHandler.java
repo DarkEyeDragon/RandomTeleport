@@ -20,7 +20,7 @@ public class ConfigHandler {
         this.plugin = plugin;
     }
 
-    public String getInitMessage() {
+    public String getInitTeleportMessage() {
         String message = plugin.getConfig().getString("message.initteleport");
         if (message != null)
             message = ChatColor.translateAlternateColorCodes('&', message);
@@ -57,7 +57,7 @@ public class ConfigHandler {
         if (message != null) {
             message = ChatColor.translateAlternateColorCodes('&', message);
             CustomTime duration = TimeUtil.formatTime(remainingTime);
-            TimeUtil.toFormattedString(message, duration);
+            message = TimeUtil.toFormattedString(message, duration);
         }
         return message;
     }
@@ -81,7 +81,7 @@ public class ConfigHandler {
     }
 
     public long getTeleportDelay(){
-        String message = plugin.getConfig().getString("teleport.delay", "0m");
+        String message = plugin.getConfig().getString("teleport.delay", "0s");
         if(message != null){
             return TimeUtil.stringToTicks(message);
         }
@@ -115,7 +115,7 @@ public class ConfigHandler {
     }
 
     public int getQueueSize(){
-        return plugin.getConfig().getInt("queue.size", 10);
+        return plugin.getConfig().getInt("queue.size", 5);
     }
     public boolean useWorldBorder(){
         return plugin.getConfig().getBoolean("size.use_worldborder");
@@ -132,7 +132,7 @@ public class ConfigHandler {
         String message = plugin.getConfig().getString("message.teleport_delay", "&aYou will be teleported in &6%s seconds. Do not move");
         if(message != null){
             message = ChatColor.translateAlternateColorCodes('&', message);
-            CustomTime time = TimeUtil.formatTime(getTeleportDelay());
+            CustomTime time = TimeUtil.formatTime(getTeleportDelay()*50);
             message = TimeUtil.toFormattedString(message, time);
         }
         return message;

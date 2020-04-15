@@ -87,7 +87,6 @@ public class TeleportCommand extends BaseCommand {
                 return;
             }
         }
-        String initMessage = configHandler.getInitMessage();
         if (plugin.getCooldowns().containsKey(player.getUniqueId()) && !player.hasPermission("rtp.teleport.bypass")) {
             long lasttp = plugin.getCooldowns().get(player.getUniqueId());
             long remaining = lasttp + configHandler.getCooldown() - System.currentTimeMillis();
@@ -97,9 +96,9 @@ public class TeleportCommand extends BaseCommand {
                 return;
             }
         }
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 3, 5, false, false));
-        player.sendMessage(initMessage);
-        drawWarpParticles(player);
+        if(configHandler.getTeleportDelay() > 0) {
+            player.sendMessage(configHandler.getInitTeleportDelay());
+        }
         Queue<Location> locationQueue = plugin.getQueue(world);
         if (locationQueue == null) {
             player.sendMessage(configHandler.getBlacklistMessage());
@@ -130,9 +129,13 @@ public class TeleportCommand extends BaseCommand {
         BukkitRunnable runnable = new BukkitRunnable() {
             @Override
             public void run() {
+                player.sendMessage(configHandler.getInitTeleportMessage());
+                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 3, 5, false, false));
                 Location location = loc.getWorld().getHighestBlockAt(loc).getLocation().add(0.5, 2, 0.5);
                 plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
+                drawWarpParticles(player);
                 PaperLib.teleportAsync(player, location);
+                drawWarpParticles(player);
                 player.sendMessage(configHandler.getTeleportMessage());
                 teleportSuccess = true;
                 new BukkitRunnable() {
@@ -147,21 +150,22 @@ public class TeleportCommand extends BaseCommand {
 
         Location originalLoc = player.getLocation().clone();
         if (configHandler.getTeleportDelay() > 0 && configHandler.isCanceledOnMove()) {
-            player.sendMessage(configHandler.getInitTeleportDelay());
             new BukkitRunnable() {
                 @Override
                 public void run() {
                     Location currentLoc = player.getLocation();
                     if (originalLoc.getX() != currentLoc.getX() || originalLoc.getY() != currentLoc.getY() || originalLoc.getZ() != currentLoc.getZ()) {
-                        player.sendMessage(configHandler.getCancelMessage());
+                        if(!isTeleportSuccess())
+                            player.sendMessage(configHandler.getCancelMessage());
                         runnable.cancel();
                         cancel();
                     }
                     if (isTeleportSuccess()) {
                         cancel();
+                        teleportSuccess = false;
                     }
                 }
-            }.runTaskTimer(plugin, 0, 20L);
+            }.runTaskTimer(plugin, 0, 5L);
         }
 
     }
