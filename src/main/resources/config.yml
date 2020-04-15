@@ -1,5 +1,9 @@
 message:
   initteleport: "&aSearching for safe location to teleport to..."
+  #Used when teleport delay is larger than 0. This supports placeholders
+  #valid placeholders: %hp (hours partial) %mp (minutes partial) %sp (seconds partial) %h (total hours) %m (total minutes) %s(total seconds)
+  initteleport_delay: "&aYou will be teleported in &6%s seconds. Do not move"
+  teleport_canceled: "&aYou moved! Teleportation canceled"
   teleport: "&bA safe place has been found! Teleporting..."
   depleted_queue: "&6Locations queue depleted... Forcing generation of a new location"
   #valid placeholders: %hp (hours partial) %mp (minutes partial) %sp (seconds partial) %h (total hours) %m (total minutes) %s(total seconds)
@@ -23,6 +27,9 @@ teleport:
   #m = minutes, s = seconds
   #default: "60m"
   cooldown: "60m"
+  #default: "0s"
+  delay: "0s"
+  cancel_on_move: true
 blacklist:
   isWhitelist: false
   worlds:

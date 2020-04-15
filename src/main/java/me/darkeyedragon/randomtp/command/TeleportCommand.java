@@ -26,6 +26,7 @@ public class TeleportCommand extends BaseCommand {
     private LocationSearcher locationHelper;
     private ConfigHandler configHandler;
     private RandomTeleport plugin;
+    private boolean teleportSuccess;
 
     public TeleportCommand(RandomTeleport plugin) {
         this.plugin = plugin;
@@ -126,14 +127,14 @@ public class TeleportCommand extends BaseCommand {
     }
 
     public void teleport(Player player, Location loc, World world) {
-        //Add it to the Scheduler to not falsely trigger the "Moved to quickly" warning
-        new BukkitRunnable() {
+        BukkitRunnable runnable = new BukkitRunnable() {
             @Override
             public void run() {
                 Location location = loc.getWorld().getHighestBlockAt(loc).getLocation().add(0.5, 2, 0.5);
                 plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
                 PaperLib.teleportAsync(player, location);
                 player.sendMessage(configHandler.getTeleportMessage());
+                teleportSuccess = true;
                 new BukkitRunnable() {
                     @Override
                     public void run() {
@@ -141,12 +142,36 @@ public class TeleportCommand extends BaseCommand {
                     }
                 }.runTaskLater(plugin, configHandler.getInitDelay());
             }
-        }.runTaskLater(plugin, 1);
+        };
+        runnable.runTaskLater(plugin, configHandler.getTeleportDelay());
+
+        Location originalLoc = player.getLocation().clone();
+        if (configHandler.getTeleportDelay() > 0 && configHandler.isCanceledOnMove()) {
+            player.sendMessage(configHandler.getInitTeleportDelay());
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    Location currentLoc = player.getLocation();
+                    if (originalLoc.getX() != currentLoc.getX() || originalLoc.getY() != currentLoc.getY() || originalLoc.getZ() != currentLoc.getZ()) {
+                        player.sendMessage(configHandler.getCancelMessage());
+                        runnable.cancel();
+                        cancel();
+                    }
+                    if (isTeleportSuccess()) {
+                        cancel();
+                    }
+                }
+            }.runTaskTimer(plugin, 0, 20L);
+        }
 
     }
 
     private void drawWarpParticles(Player player) {
         Location spawnLoc = player.getEyeLocation().add(player.getLocation().getDirection());
         player.getWorld().spawnParticle(Particle.CLOUD, spawnLoc, 20);
+    }
+
+    private boolean isTeleportSuccess() {
+        return teleportSuccess;
     }
 }
