@@ -41,6 +41,13 @@ public class ConfigHandler {
         }
         return message;
     }
+    public String getDepletedQueueMessage() {
+        String message = plugin.getConfig().getString("message.depleted_queue", "&6Locations queue depleted... Forcing generation of a new location");
+        if(message != null){
+            message = ChatColor.translateAlternateColorCodes('&', message);
+        }
+        return message;
+    }
     public int getRadius(){
         return plugin.getConfig().getInt("size.radius");
     }
@@ -61,10 +68,10 @@ public class ConfigHandler {
     }
 
     public int getOffsetX(){
-        return plugin.getConfig().getInt("teleport.startX");
+        return plugin.getConfig().getInt("size.offsetX");
     }
     public int getOffsetZ(){
-        return plugin.getConfig().getInt("teleport.startZ");
+        return plugin.getConfig().getInt("size.offsetZ");
     }
     public Vector getStartLocation(){
         return new Vector((double) getOffsetX(), 0,(double)getOffsetZ());
@@ -94,6 +101,10 @@ public class ConfigHandler {
     public List<World> getWorldsBlacklist(){
         List<String> strings = plugin.getConfig().getStringList("blacklist.worlds");
         return strings.stream().map(Bukkit::getWorld).collect(Collectors.toList());
+    }
+
+    public int initDelay(){
+        return plugin.getConfig().getInt("queue.init_delay", 90);
     }
 
     public long getCooldown() {

@@ -33,10 +33,9 @@ public final class RandomTeleport extends JavaPlugin {
         manager = new PaperCommandManager(this);
         configHandler = new ConfigHandler(this);
         locationHelper = new LocationSearcher(this, configHandler.useWorldBorder());
-
         //check if the first argument is a world or player
         worldQueueMap = new HashMap<>();
-        manager.getCommandContexts().registerIssuerAwareContext(PlayerWorldContext.class, c -> {
+        manager.getCommandContexts().registerContext(PlayerWorldContext.class, c -> {
             String arg1 = c.popFirstArg();
             World world = Bukkit.getWorld(arg1);
             Player player = Bukkit.getPlayer(arg1);

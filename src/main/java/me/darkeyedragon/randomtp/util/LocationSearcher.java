@@ -74,8 +74,8 @@ public class LocationSearcher {
 
     /* Will search through the chunk to find a location that is safe, returning null if none is found. */
     private Location getRandomLocationFromChunk(Chunk chunk) {
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
+        for (int x = 8; x < 16; x++) {
+            for (int z = 8; z < 16; z++) {
                 Block block = chunk.getWorld().getHighestBlockAt((chunk.getX() << 4) + x, (chunk.getZ() << 4) + z);
                 if (isSafeLocation(block.getLocation())) {
                     return block.getLocation();
@@ -98,10 +98,12 @@ public class LocationSearcher {
 
     private CompletableFuture<Chunk> getRandomChunkAsync(World world, int radius, int offsetX, int offsetZ) {
         ThreadLocalRandom rnd = ThreadLocalRandom.current();
-        int chunkRadius = radius / 16;
+        int chunkRadius = radius/16;
+        int chunkOffsetX = offsetX/16;
+        int chunkOffsetZ = offsetZ/16;
         int x = rnd.nextInt(-chunkRadius, chunkRadius);
         int z = rnd.nextInt(-chunkRadius, chunkRadius);
-        return PaperLib.getChunkAtAsync(world, x + offsetX, z + offsetZ);
+        return PaperLib.getChunkAtAsync(world, x + chunkOffsetX, z + chunkOffsetZ);
     }
 
     public boolean isSafeLocation(Location loc) {

@@ -118,7 +118,7 @@ public class TeleportCommand extends BaseCommand {
             radius = configHandler.getRadius();
         }
         if (loc == null) {
-            player.sendMessage(ChatColor.GOLD + "Locations queue depleted... Forcing generation of a new location");
+            player.sendMessage(configHandler.getDepletedQueueMessage());
             locationHelper.getRandomLocation(world, radius, offsetX, offsetZ).thenAccept(loc1 -> teleport(player, loc1, world));
         } else {
             teleport(player, loc, world);
