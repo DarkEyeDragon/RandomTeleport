@@ -81,6 +81,9 @@ public class TeleportCommand extends BaseCommand {
     }
 
     private void teleportSetup(Player player, World world, boolean force) {
+
+        boolean hasBypassPermission = player.hasPermission("rtp.teleportdelay.bypass");
+
         if (configHandler.getWorldsBlacklist().contains(world)) {
             if (!configHandler.isWhitelist()) {
                 player.sendMessage(configHandler.getBlacklistMessage());
@@ -96,7 +99,7 @@ public class TeleportCommand extends BaseCommand {
                 return;
             }
         }
-        if(configHandler.getTeleportDelay() > 0) {
+        if (configHandler.getTeleportDelay() > 0 && !hasBypassPermission) {
             player.sendMessage(configHandler.getInitTeleportDelay());
         }
         Queue<Location> locationQueue = plugin.getQueue(world);
@@ -126,6 +129,10 @@ public class TeleportCommand extends BaseCommand {
     }
 
     public void teleport(Player player, Location loc, World world) {
+
+        boolean hasBypassPermission = player.hasPermission("rtp.teleportdelay.bypass");
+        long teleportDelay = hasBypassPermission ? 1 : configHandler.getTeleportDelay();
+
         BukkitRunnable runnable = new BukkitRunnable() {
             @Override
             public void run() {
@@ -146,8 +153,9 @@ public class TeleportCommand extends BaseCommand {
                 }.runTaskLater(plugin, configHandler.getInitDelay());
             }
         };
-        runnable.runTaskLater(plugin, configHandler.getTeleportDelay());
 
+        runnable.runTaskLater(plugin, teleportDelay);
+        if (hasBypassPermission) return;
         Location originalLoc = player.getLocation().clone();
         if (configHandler.getTeleportDelay() > 0 && configHandler.isCanceledOnMove()) {
             new BukkitRunnable() {
@@ -155,7 +163,7 @@ public class TeleportCommand extends BaseCommand {
                 public void run() {
                     Location currentLoc = player.getLocation();
                     if (originalLoc.getX() != currentLoc.getX() || originalLoc.getY() != currentLoc.getY() || originalLoc.getZ() != currentLoc.getZ()) {
-                        if(!isTeleportSuccess())
+                        if (!isTeleportSuccess())
                             player.sendMessage(configHandler.getCancelMessage());
                         runnable.cancel();
                         cancel();
@@ -167,7 +175,6 @@ public class TeleportCommand extends BaseCommand {
                 }
             }.runTaskTimer(plugin, 0, 5L);
         }
-
     }
 
     private void drawWarpParticles(Player player) {

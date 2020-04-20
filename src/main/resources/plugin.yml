@@ -17,6 +17,7 @@ permissions:
       rtp.teleport.bypass: true
       rtp.teleport.world: true
       rtp.world.bypass: true
+      rtp.init.bypass: true
   rtp.teleport.self:
     description: random teleport yourself
   rtp.teleport.other:
@@ -25,3 +26,5 @@ permissions:
     description: random teleport to any desired non blacklisted world
   rtp.teleport.bypass:
     description: bypass the cooldown
+  rtp.teleportdelay.bypass:
+    description: bypass initial tp delay
