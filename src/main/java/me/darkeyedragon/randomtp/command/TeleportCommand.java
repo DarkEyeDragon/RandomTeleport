@@ -7,7 +7,8 @@ import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
-import me.darkeyedragon.randomtp.util.LocationSearcher;
+import me.darkeyedragon.randomtp.location.LocationSearcher;
+import me.darkeyedragon.randomtp.location.Offset;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -108,21 +109,10 @@ public class TeleportCommand extends BaseCommand {
             return;
         }
         Location loc = plugin.popLocation(world);
-        int offsetX;
-        int offsetZ;
-        int radius;
-        if (configHandler.useWorldBorder()) {
-            offsetX = world.getWorldBorder().getCenter().getBlockX();
-            offsetZ = world.getWorldBorder().getCenter().getBlockZ();
-            radius = (int) Math.floor(world.getWorldBorder().getSize() / 2);
-        } else {
-            offsetX = configHandler.getOffsetX();
-            offsetZ = configHandler.getOffsetZ();
-            radius = configHandler.getRadius();
-        }
+        Offset offset = plugin.getLocationFactory().getOffset(world);
         if (loc == null) {
             player.sendMessage(configHandler.getDepletedQueueMessage());
-            locationHelper.getRandomLocation(world, radius, offsetX, offsetZ).thenAccept(loc1 -> teleport(player, loc1, world));
+            locationHelper.getRandomLocation(world, offset.getRadius(), offset.getX(), offset.getZ()).thenAccept(loc1 -> teleport(player, loc1, world));
         } else {
             teleport(player, loc, world);
         }

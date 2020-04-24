@@ -5,7 +5,9 @@ import co.aikar.commands.PaperCommandManager;
 import me.darkeyedragon.randomtp.command.TeleportCommand;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
-import me.darkeyedragon.randomtp.util.LocationSearcher;
+import me.darkeyedragon.randomtp.location.LocationFactory;
+import me.darkeyedragon.randomtp.location.LocationSearcher;
+import me.darkeyedragon.randomtp.location.Offset;
 import me.darkeyedragon.randomtp.validator.ChunkValidator;
 import me.darkeyedragon.randomtp.validator.ValidatorFactory;
 import org.bukkit.Bukkit;
@@ -26,12 +28,14 @@ public final class RandomTeleport extends JavaPlugin {
     private Map<World, BlockingQueue<Location>> worldQueueMap;
     private ConfigHandler configHandler;
     private LocationSearcher locationHelper;
+    private LocationFactory locationFactory;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
         manager = new PaperCommandManager(this);
         configHandler = new ConfigHandler(this);
+        locationFactory = new LocationFactory(configHandler);
         locationHelper = new LocationSearcher(this, configHandler.useWorldBorder());
         //check if the first argument is a world or player
         worldQueueMap = new HashMap<>();
@@ -104,19 +108,8 @@ public final class RandomTeleport extends JavaPlugin {
     public void addToLocationQueue(int amount, World world) {
         for (int i = 0; i < amount; i++) {
             Queue<Location> queue = worldQueueMap.get(world);
-            int offsetX;
-            int offsetZ;
-            int radius;
-            if (configHandler.useWorldBorder()) {
-                offsetX = world.getWorldBorder().getCenter().getBlockX();
-                offsetZ = world.getWorldBorder().getCenter().getBlockZ();
-                radius = (int) Math.floor(world.getWorldBorder().getSize() / 2 - world.getWorldBorder().getWarningDistance());
-            } else {
-                offsetX = configHandler.getOffsetX();
-                offsetZ = configHandler.getOffsetZ();
-                radius = configHandler.getRadius();
-            }
-            locationHelper.getRandomLocation(world, radius, offsetX, offsetZ).thenAccept(location -> {
+            Offset offset = locationFactory.getOffset(world);
+            locationHelper.getRandomLocation(world, offset.getRadius(), offset.getX(), offset.getZ()).thenAccept(location -> {
                 queue.offer(location);
                 if(configHandler.getDebugShowQueuePopulation())
                     getLogger().info("Safe location added for " + world.getName() + "(" + queue.size() + "/" + configHandler.getQueueSize() + ")");
@@ -160,4 +153,11 @@ public final class RandomTeleport extends JavaPlugin {
         return locationHelper;
     }
 
+    public PaperCommandManager getManager() {
+        return manager;
+    }
+
+    public LocationFactory getLocationFactory() {
+        return locationFactory;
+    }
 }
