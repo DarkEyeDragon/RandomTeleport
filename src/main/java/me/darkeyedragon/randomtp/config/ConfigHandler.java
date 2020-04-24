@@ -1,14 +1,15 @@
 package me.darkeyedragon.randomtp.config;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
+import me.darkeyedragon.randomtp.location.Offset;
 import me.darkeyedragon.randomtp.util.CustomTime;
 import me.darkeyedragon.randomtp.util.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
-import org.bukkit.util.Vector;
+import org.bukkit.configuration.ConfigurationSection;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ConfigHandler {
@@ -62,14 +63,19 @@ public class ConfigHandler {
         return message;
     }
 
-    public int getOffsetX(){
-        return plugin.getConfig().getInt("size.offsetX");
-    }
-    public int getOffsetZ(){
-        return plugin.getConfig().getInt("size.offsetZ");
-    }
-    public Vector getStartLocation(){
-        return new Vector((double) getOffsetX(), 0,(double)getOffsetZ());
+    public Map<World, Offset> getOffsets(){
+        final ConfigurationSection section = plugin.getConfig().getConfigurationSection("size");
+        Set<String> keys = Objects.requireNonNull(section).getKeys(false);
+        Map<World, Offset> offsetMap = new HashMap<>(keys.size());
+        for (String key : keys) {
+            boolean useWorldBorder = section.getBoolean(key+".use_worldborder");
+            int radius = section.getInt(key+".radius");
+            int offsetX = section.getInt(key+".offsetX");
+            int offsetZ = section.getInt(key+".offsetZ");
+            World world = Bukkit.getWorld(key);
+            offsetMap.put(world, new Offset(offsetX, offsetZ, radius,world,useWorldBorder));
+        }
+        return offsetMap;
     }
 
     private long formatCooldown() throws NumberFormatException {
@@ -116,9 +122,6 @@ public class ConfigHandler {
 
     public int getQueueSize(){
         return plugin.getConfig().getInt("queue.size", 5);
-    }
-    public boolean useWorldBorder(){
-        return plugin.getConfig().getBoolean("size.use_worldborder");
     }
 
     public String getCancelMessage() {

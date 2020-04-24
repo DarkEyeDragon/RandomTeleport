@@ -4,20 +4,22 @@ import org.bukkit.World;
 
 public class Offset {
 
-    private final int X;
+    private final int x;
     private final int z;
     private final int radius;
     private final World world;
+    private final boolean useWorldBorder;
 
-    public Offset(int x, int z, int radius, World world) {
-        X = x;
+    public Offset(int x, int z, int radius, World world, boolean useWorldBorder) {
+        this.x = x;
         this.z = z;
         this.radius = radius;
         this.world = world;
+        this.useWorldBorder = useWorldBorder;
     }
 
     public int getX() {
-        return X;
+        return x;
     }
 
     public int getZ() {
@@ -30,5 +32,9 @@ public class Offset {
 
     public World getWorld() {
         return world;
+    }
+
+    public boolean useWorldBorder() {
+        return useWorldBorder;
     }
 }

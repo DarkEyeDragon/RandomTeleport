@@ -112,7 +112,7 @@ public class TeleportCommand extends BaseCommand {
         Offset offset = plugin.getLocationFactory().getOffset(world);
         if (loc == null) {
             player.sendMessage(configHandler.getDepletedQueueMessage());
-            locationHelper.getRandomLocation(world, offset.getRadius(), offset.getX(), offset.getZ()).thenAccept(loc1 -> teleport(player, loc1, world));
+            locationHelper.getRandomLocation(offset).thenAccept(loc1 -> teleport(player, loc1, world));
         } else {
             teleport(player, loc, world);
         }

@@ -17,12 +17,13 @@ queue:
   #can be heavy on the server, if the player that just got teleported also needs to generate chunks. So generally not a bad idea to delay it a least a little bit
   init_delay: 60
 size:
-  #Use the worldborder (if set) for offset. This is the vanilla worldborder.
-  use_worldborder: true
-  #Will be ignored if use_worldborder is true
-  radius: 21474836
-  offsetX: 0
-  offsetZ: 0
+  world:
+    #Use the worldborder (if set) for offset. This is the vanilla worldborder.
+    use_worldborder: true
+    #Will be ignored if use_worldborder is true
+    radius: 21474836
+    offsetX: 0
+    offsetZ: 0
 teleport:
   #m = minutes, s = seconds
   #default: "60m"

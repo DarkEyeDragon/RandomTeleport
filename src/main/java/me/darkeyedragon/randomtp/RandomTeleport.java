@@ -36,7 +36,7 @@ public final class RandomTeleport extends JavaPlugin {
         manager = new PaperCommandManager(this);
         configHandler = new ConfigHandler(this);
         locationFactory = new LocationFactory(configHandler);
-        locationHelper = new LocationSearcher(this, configHandler.useWorldBorder());
+        locationHelper = new LocationSearcher(this);
         //check if the first argument is a world or player
         worldQueueMap = new HashMap<>();
         manager.getCommandContexts().registerContext(PlayerWorldContext.class, c -> {
@@ -109,7 +109,7 @@ public final class RandomTeleport extends JavaPlugin {
         for (int i = 0; i < amount; i++) {
             Queue<Location> queue = worldQueueMap.get(world);
             Offset offset = locationFactory.getOffset(world);
-            locationHelper.getRandomLocation(world, offset.getRadius(), offset.getX(), offset.getZ()).thenAccept(location -> {
+            locationHelper.getRandomLocation(offset).thenAccept(location -> {
                 queue.offer(location);
                 if(configHandler.getDebugShowQueuePopulation())
                     getLogger().info("Safe location added for " + world.getName() + "(" + queue.size() + "/" + configHandler.getQueueSize() + ")");
