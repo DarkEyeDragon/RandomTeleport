@@ -106,13 +106,17 @@ public final class RandomTeleport extends JavaPlugin {
     }
 
     public void addToLocationQueue(int amount, World world) {
+        Queue<Location> queue = worldQueueMap.get(world);
+        Offset offset = locationFactory.getOffset(world);
+        if(queue.size()+amount > configHandler.getQueueSize()){
+            getLogger().info("Skipped searching for location in " + world.getName() + " queue already full.");
+            return;
+        }
         for (int i = 0; i < amount; i++) {
-            Queue<Location> queue = worldQueueMap.get(world);
-            Offset offset = locationFactory.getOffset(world);
             locationHelper.getRandomLocation(offset).thenAccept(location -> {
                 queue.offer(location);
                 if(configHandler.getDebugShowQueuePopulation())
-                    getLogger().info("Safe location added for " + world.getName() + "(" + queue.size() + "/" + configHandler.getQueueSize() + ")");
+                    getLogger().info("Safe location added for " + world.getName() + " (" + queue.size() + "/" + configHandler.getQueueSize() + ")");
             });
         }
     }
