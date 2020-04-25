@@ -80,7 +80,27 @@ public class TeleportCommand extends BaseCommand {
         plugin.populateQueue();
         commandSender.sendMessage(ChatColor.GREEN + "Reloaded config");
     }
-
+    @Subcommand("addworld")
+    @CommandPermission("rtp.addworld")
+    @CommandCompletion("@worlds true|false <Integer> <Integer> <Integer>")
+    public void onAddWorld(CommandSender commandSender, World world, boolean useWorldBorder, @Optional Integer radius, @Optional Integer offsetX, @Optional Integer offsetZ){
+        if(!useWorldBorder && (radius == null || offsetX == null || offsetZ == null)){
+            commandSender.sendMessage(ChatColor.GOLD + "If "+ ChatColor.AQUA +"useWorldBorder" + ChatColor.GOLD + " is false you need to provide the other parameters.");
+            return;
+        }
+        if(!configHandler.getWorlds().contains(world)){
+            if(radius == null) radius = 0;
+            if(offsetX == null) offsetX = 0;
+            if(offsetZ == null) offsetZ = 0;
+            if(configHandler.addWorld(new Offset(offsetX, offsetZ, radius, world, useWorldBorder))){
+                commandSender.sendMessage(ChatColor.GREEN + "Successfully added to config.");
+            }else{
+                commandSender.sendMessage(ChatColor.RED + "Size section not present in the config! Add it or recreate your config.");
+            }
+        }else{
+            commandSender.sendMessage(ChatColor.RED + "That world is already added to the list!");
+        }
+    }
     private void teleportSetup(Player player, World world, boolean force) {
 
         boolean hasBypassPermission = player.hasPermission("rtp.teleportdelay.bypass");

@@ -78,6 +78,25 @@ public class ConfigHandler {
         return offsetMap;
     }
 
+    public Set<World> getWorlds(){
+        final ConfigurationSection section = plugin.getConfig().getConfigurationSection("size");
+        Set<String> keys = Objects.requireNonNull(section).getKeys(false);
+        return keys.stream().map(Bukkit::getWorld).collect(Collectors.toSet());
+    }
+
+    public boolean addWorld(Offset offset){
+        final ConfigurationSection section = plugin.getConfig().getConfigurationSection("size");
+        if(section == null) {
+            return false;
+        }
+        section.set(offset.getWorld().getName()+".use_worldborder", offset.useWorldBorder());
+        section.set(offset.getWorld().getName()+".radius", offset.getRadius());
+        section.set(offset.getWorld().getName()+".offsetX", offset.getX());
+        section.set(offset.getWorld().getName()+".offsetZ", offset.getZ());
+        plugin.saveConfig();
+        return true;
+    }
+
     private long formatCooldown() throws NumberFormatException {
         String message = plugin.getConfig().getString("teleport.cooldown");
         if (message != null) {

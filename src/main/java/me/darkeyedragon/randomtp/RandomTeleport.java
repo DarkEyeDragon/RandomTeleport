@@ -51,7 +51,7 @@ public final class RandomTeleport extends JavaPlugin {
                 PlayerWorldContext context = new PlayerWorldContext();
                 context.setPlayer(player);
                 return context;
-            }else{
+            } else {
                 throw new InvalidCommandArgument(true);
             }
         });
@@ -79,16 +79,8 @@ public final class RandomTeleport extends JavaPlugin {
     }
 
     private void populateWorldQueue() {
-        for (World world : Bukkit.getWorlds()) {
-            if (configHandler.getWorldsBlacklist().contains(world)) {
-                if (configHandler.isWhitelist()) {
-                    worldQueueMap.put(world, new ArrayBlockingQueue<>(configHandler.getQueueSize()));
-                }
-            } else {
-                if (!configHandler.isWhitelist()) {
-                    worldQueueMap.put(world, new ArrayBlockingQueue<>(configHandler.getQueueSize()));
-                }
-            }
+        for (World world : configHandler.getWorlds()) {
+            worldQueueMap.put(world, new ArrayBlockingQueue<>(configHandler.getQueueSize()));
         }
     }
 
@@ -108,14 +100,14 @@ public final class RandomTeleport extends JavaPlugin {
     public void addToLocationQueue(int amount, World world) {
         Queue<Location> queue = worldQueueMap.get(world);
         Offset offset = locationFactory.getOffset(world);
-        if(queue.size()+amount > configHandler.getQueueSize()){
+        if (queue.size() + amount > configHandler.getQueueSize()) {
             getLogger().info("Skipped searching for location in " + world.getName() + " queue already full.");
             return;
         }
         for (int i = 0; i < amount; i++) {
             locationHelper.getRandomLocation(offset).thenAccept(location -> {
                 queue.offer(location);
-                if(configHandler.getDebugShowQueuePopulation())
+                if (configHandler.getDebugShowQueuePopulation())
                     getLogger().info("Safe location added for " + world.getName() + " (" + queue.size() + "/" + configHandler.getQueueSize() + ")");
             });
         }
@@ -144,7 +136,7 @@ public final class RandomTeleport extends JavaPlugin {
     public Location popLocation(World world) {
         Queue<Location> queue = getQueue(world);
         Location location = queue.poll();
-        if(configHandler.getDebugShowQueuePopulation())
+        if (configHandler.getDebugShowQueuePopulation())
             getLogger().info("Location removed from " + world.getName() + "(" + queue.size() + "/" + configHandler.getQueueSize() + ")");
         return location;
     }
