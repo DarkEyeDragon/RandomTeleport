@@ -154,7 +154,7 @@ public class ConfigHandler {
         return message;
     }
     public String getInitTeleportDelay() {
-        String message = plugin.getConfig().getString("message.teleport_delay", "&aYou will be teleported in &6%s seconds. Do not move");
+        String message = plugin.getConfig().getString("message.initteleport_delay", "&aYou will be teleported in &6%s seconds. Do not move");
         if(message != null){
             message = ChatColor.translateAlternateColorCodes('&', message);
             CustomTime time = TimeUtil.formatTime(getTeleportDelay()*50);
