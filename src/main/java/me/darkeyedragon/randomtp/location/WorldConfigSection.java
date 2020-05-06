@@ -2,20 +2,22 @@ package me.darkeyedragon.randomtp.location;
 
 import org.bukkit.World;
 
-public class Offset {
+public class WorldConfigSection {
 
     private final int x;
     private final int z;
     private final int radius;
     private final World world;
     private final boolean useWorldBorder;
+    private final boolean needsWorldPermission;
 
-    public Offset(int x, int z, int radius, World world, boolean useWorldBorder) {
+    public WorldConfigSection(int x, int z, int radius, World world, boolean useWorldBorder,boolean needsWorldPermission) {
         this.x = x;
         this.z = z;
         this.radius = radius;
         this.world = world;
         this.useWorldBorder = useWorldBorder;
+        this.needsWorldPermission = needsWorldPermission;
     }
 
     public int getX() {
@@ -36,5 +38,9 @@ public class Offset {
 
     public boolean useWorldBorder() {
         return useWorldBorder;
+    }
+
+    public boolean needsWorldPermission() {
+        return needsWorldPermission;
     }
 }

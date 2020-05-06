@@ -9,17 +9,20 @@ message:
   #valid placeholders: %hp (hours partial) %mp (minutes partial) %sp (seconds partial) %h (total hours) %m (total minutes) %s(total seconds)
   countdown: "&cYou cannot teleport for another &6%mp minutes %sp seconds"
   nopermission: "&cYou do not have permission to execute this command!"
-  blacklisted: "&cI am sorry, that world is blacklisted!"
+  #valid placeholders: %world
+  no_world_permission: "&cI am sorry, you do not have permission to rtp in %world"
 #The amount of pre-generated locations in the queue
 queue:
   size: 5
   #The delay in ticks (20 ticks = 1 second) for the queue to kick in, lower is faster but searching at the same time as teleporting the player
   #can be heavy on the server, if the player that just got teleported also needs to generate chunks. So generally not a bad idea to delay it a least a little bit
   init_delay: 60
-size:
+worlds:
   world:
     #Use the worldborder (if set) for offset. This is the vanilla worldborder.
     use_worldborder: true
+    #Wether or not the user needs the rtp.world.<worldname> permission
+    needs_world_permission: false
     #Will be ignored if use_worldborder is true
     radius: 21474836
     offsetX: 0
@@ -31,11 +34,6 @@ teleport:
   #default: "0s"
   delay: "0s"
   cancel_on_move: true
-blacklist:
-  isWhitelist: false
-  worlds:
-    - "world_nether"
-    - "world_the_end"
 #Plugins to take into consideration when teleporting. A player will not be teleported in those regions
 #Currently supports Factions (FactionsUUID), WorldGuard, GriefPrevention
 #If you want more plugins to be supported: https://github.com/DarkEyeDragon/RandomTeleport/issues

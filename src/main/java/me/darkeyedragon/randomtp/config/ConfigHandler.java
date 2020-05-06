@@ -1,7 +1,7 @@
 package me.darkeyedragon.randomtp.config;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
-import me.darkeyedragon.randomtp.location.Offset;
+import me.darkeyedragon.randomtp.location.WorldConfigSection;
 import me.darkeyedragon.randomtp.util.CustomTime;
 import me.darkeyedragon.randomtp.util.TimeUtil;
 import org.bukkit.Bukkit;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class ConfigHandler {
 
-    private RandomTeleport plugin;
+    private final RandomTeleport plugin;
     private long cooldown = -1;
 
     public ConfigHandler(RandomTeleport plugin) {
@@ -27,7 +27,13 @@ public class ConfigHandler {
             message = ChatColor.translateAlternateColorCodes('&', message);
         return message;
     }
-
+    public String getNoWorldPermissionMessage(World world){
+        String message = plugin.getConfig().getString("message.no_world_permission");
+        if (message != null)
+            message = message.replace("%world",world.getName());
+            message = ChatColor.translateAlternateColorCodes('&', message);
+        return message;
+    }
     public String getTeleportMessage(){
         String message = plugin.getConfig().getString("message.teleport");
         if(message != null){
@@ -49,10 +55,6 @@ public class ConfigHandler {
         }
         return message;
     }
-    public int getRadius(){
-        return plugin.getConfig().getInt("size.radius");
-    }
-
     public String getCountdownRemainingMessage(long remainingTime) {
         String message = plugin.getConfig().getString("message.countdown");
         if (message != null) {
@@ -63,36 +65,37 @@ public class ConfigHandler {
         return message;
     }
 
-    public Map<World, Offset> getOffsets(){
-        final ConfigurationSection section = plugin.getConfig().getConfigurationSection("size");
+    public Map<World, WorldConfigSection> getOffsets(){
+        final ConfigurationSection section = plugin.getConfig().getConfigurationSection("worlds");
         Set<String> keys = Objects.requireNonNull(section).getKeys(false);
-        Map<World, Offset> offsetMap = new HashMap<>(keys.size());
+        Map<World, WorldConfigSection> offsetMap = new HashMap<>(keys.size());
         for (String key : keys) {
             boolean useWorldBorder = section.getBoolean(key+".use_worldborder");
+            boolean needsWorldPermission = section.getBoolean(key+".needs_world_permission");
             int radius = section.getInt(key+".radius");
             int offsetX = section.getInt(key+".offsetX");
             int offsetZ = section.getInt(key+".offsetZ");
             World world = Bukkit.getWorld(key);
-            offsetMap.put(world, new Offset(offsetX, offsetZ, radius,world,useWorldBorder));
+            offsetMap.put(world, new WorldConfigSection(offsetX, offsetZ, radius,world,useWorldBorder,needsWorldPermission));
         }
         return offsetMap;
     }
 
     public Set<World> getWorlds(){
-        final ConfigurationSection section = plugin.getConfig().getConfigurationSection("size");
+        final ConfigurationSection section = plugin.getConfig().getConfigurationSection("worlds");
         Set<String> keys = Objects.requireNonNull(section).getKeys(false);
         return keys.stream().map(Bukkit::getWorld).collect(Collectors.toSet());
     }
 
-    public boolean addWorld(Offset offset){
-        final ConfigurationSection section = plugin.getConfig().getConfigurationSection("size");
+    public boolean addWorld(WorldConfigSection worldConfigSection){
+        final ConfigurationSection section = plugin.getConfig().getConfigurationSection("worlds");
         if(section == null) {
             return false;
         }
-        section.set(offset.getWorld().getName()+".use_worldborder", offset.useWorldBorder());
-        section.set(offset.getWorld().getName()+".radius", offset.getRadius());
-        section.set(offset.getWorld().getName()+".offsetX", offset.getX());
-        section.set(offset.getWorld().getName()+".offsetZ", offset.getZ());
+        section.set(worldConfigSection.getWorld().getName()+".use_worldborder", worldConfigSection.useWorldBorder());
+        section.set(worldConfigSection.getWorld().getName()+".radius", worldConfigSection.getRadius());
+        section.set(worldConfigSection.getWorld().getName()+".offsetX", worldConfigSection.getX());
+        section.set(worldConfigSection.getWorld().getName()+".offsetZ", worldConfigSection.getZ());
         plugin.saveConfig();
         return true;
     }

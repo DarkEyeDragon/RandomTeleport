@@ -56,18 +56,18 @@ public class LocationSearcher {
     }
 
     /* This is the final method that will be called from the other end, to get a location */
-    public CompletableFuture<Location> getRandomLocation(Offset offset) {
-        CompletableFuture<Location> location = pickRandomLocation(offset);
+    public CompletableFuture<Location> getRandomLocation(WorldConfigSection worldConfigSection) {
+        CompletableFuture<Location> location = pickRandomLocation(worldConfigSection);
         return location.thenCompose((loc) -> {
             if (loc == null) {
-                return getRandomLocation(offset);
+                return getRandomLocation(worldConfigSection);
             } else return CompletableFuture.completedFuture(loc);
         });
     }
 
     /*Pick a random location based on chunks*/
-    private CompletableFuture<Location> pickRandomLocation(Offset offset) {
-        CompletableFuture<Chunk> chunk = getRandomChunk(offset);
+    private CompletableFuture<Location> pickRandomLocation(WorldConfigSection worldConfigSection) {
+        CompletableFuture<Chunk> chunk = getRandomChunk(worldConfigSection);
         return chunk.thenApply(this::getRandomLocationFromChunk);
     }
 
@@ -85,24 +85,24 @@ public class LocationSearcher {
         return null;
     }
 
-    private CompletableFuture<Chunk> getRandomChunk(Offset offset) {
-        CompletableFuture<Chunk> chunkFuture = getRandomChunkAsync(offset);
+    private CompletableFuture<Chunk> getRandomChunk(WorldConfigSection worldConfigSection) {
+        CompletableFuture<Chunk> chunkFuture = getRandomChunkAsync(worldConfigSection);
         return chunkFuture.thenCompose((chunk) -> {
             boolean isSafe = isSafeChunk(chunk);
             if (!isSafe) {
-                return getRandomChunk(offset);
+                return getRandomChunk(worldConfigSection);
             } else return CompletableFuture.completedFuture(chunk);
         });
     }
 
-    private CompletableFuture<Chunk> getRandomChunkAsync(Offset offset) {
+    private CompletableFuture<Chunk> getRandomChunkAsync(WorldConfigSection worldConfigSection) {
         ThreadLocalRandom rnd = ThreadLocalRandom.current();
-        int chunkRadius = offset.getRadius()/16;
-        int chunkOffsetX = offset.getX()/16;
-        int chunkOffsetZ = offset.getZ()/16;
+        int chunkRadius = worldConfigSection.getRadius()/16;
+        int chunkOffsetX = worldConfigSection.getX()/16;
+        int chunkOffsetZ = worldConfigSection.getZ()/16;
         int x = rnd.nextInt(-chunkRadius, chunkRadius);
         int z = rnd.nextInt(-chunkRadius, chunkRadius);
-        return PaperLib.getChunkAtAsync(offset.getWorld(), x + chunkOffsetX, z + chunkOffsetZ);
+        return PaperLib.getChunkAtAsync(worldConfigSection.getWorld(), x + chunkOffsetX, z + chunkOffsetZ);
     }
 
     public boolean isSafeLocation(Location loc) {

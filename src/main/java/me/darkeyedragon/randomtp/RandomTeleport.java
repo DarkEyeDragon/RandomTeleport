@@ -7,7 +7,7 @@ import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
 import me.darkeyedragon.randomtp.location.LocationFactory;
 import me.darkeyedragon.randomtp.location.LocationSearcher;
-import me.darkeyedragon.randomtp.location.Offset;
+import me.darkeyedragon.randomtp.location.WorldConfigSection;
 import me.darkeyedragon.randomtp.validator.ChunkValidator;
 import me.darkeyedragon.randomtp.validator.ValidatorFactory;
 import org.bukkit.Bukkit;
@@ -33,6 +33,7 @@ public final class RandomTeleport extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
+        saveDefaultConfig();
         manager = new PaperCommandManager(this);
         configHandler = new ConfigHandler(this);
         locationFactory = new LocationFactory(configHandler);
@@ -56,7 +57,6 @@ public final class RandomTeleport extends JavaPlugin {
             }
         });
         cooldowns = new HashMap<>();
-        saveDefaultConfig();
         manager.registerCommand(new TeleportCommand(this));
         validatorList = new ArrayList<>();
         configHandler.getPlugins().forEach(s -> {
@@ -99,13 +99,14 @@ public final class RandomTeleport extends JavaPlugin {
 
     public void addToLocationQueue(int amount, World world) {
         Queue<Location> queue = worldQueueMap.get(world);
-        Offset offset = locationFactory.getOffset(world);
+        WorldConfigSection worldConfigSection = locationFactory.getWorldConfigSection(world);
+        if(worldConfigSection == null) return;
         if (queue.size() + amount > configHandler.getQueueSize()) {
             getLogger().info("Skipped searching for location in " + world.getName() + " queue already full.");
             return;
         }
         for (int i = 0; i < amount; i++) {
-            locationHelper.getRandomLocation(offset).thenAccept(location -> {
+            locationHelper.getRandomLocation(worldConfigSection).thenAccept(location -> {
                 queue.offer(location);
                 if (configHandler.getDebugShowQueuePopulation())
                     getLogger().info("Safe location added for " + world.getName() + " (" + queue.size() + "/" + configHandler.getQueueSize() + ")");
