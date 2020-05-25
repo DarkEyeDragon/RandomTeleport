@@ -1,4 +1,4 @@
-package me.darkeyedragon.randomtp.util;
+package me.darkeyedragon.randomtp.location;
 
 import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.RandomTeleport;
@@ -27,9 +27,8 @@ public class LocationSearcher {
     /**
      * A simple utility class to help with {@link Location}
      */
-    public LocationSearcher(RandomTeleport plugin, boolean useWorldBorder) {
+    public LocationSearcher(RandomTeleport plugin) {
         this.plugin = plugin;
-        this.useWorldBorder = useWorldBorder;
         //Illegal material types
         blacklistMaterial = EnumSet.of(
                 Material.LAVA,
@@ -57,18 +56,18 @@ public class LocationSearcher {
     }
 
     /* This is the final method that will be called from the other end, to get a location */
-    public CompletableFuture<Location> getRandomLocation(World world, int radius, int offsetX, int offsetZ) {
-        CompletableFuture<Location> location = pickRandomLocation(world, radius, offsetX, offsetZ);
+    public CompletableFuture<Location> getRandomLocation(WorldConfigSection worldConfigSection) {
+        CompletableFuture<Location> location = pickRandomLocation(worldConfigSection);
         return location.thenCompose((loc) -> {
             if (loc == null) {
-                return getRandomLocation(world, radius, offsetX, offsetZ);
+                return getRandomLocation(worldConfigSection);
             } else return CompletableFuture.completedFuture(loc);
         });
     }
 
     /*Pick a random location based on chunks*/
-    private CompletableFuture<Location> pickRandomLocation(World world, int radius, int offsetX, int offsetZ) {
-        CompletableFuture<Chunk> chunk = getRandomChunk(world, radius, offsetX, offsetZ);
+    private CompletableFuture<Location> pickRandomLocation(WorldConfigSection worldConfigSection) {
+        CompletableFuture<Chunk> chunk = getRandomChunk(worldConfigSection);
         return chunk.thenApply(this::getRandomLocationFromChunk);
     }
 
@@ -86,24 +85,24 @@ public class LocationSearcher {
         return null;
     }
 
-    private CompletableFuture<Chunk> getRandomChunk(World world, int radius, int offsetX, int offsetZ) {
-        CompletableFuture<Chunk> chunkFuture = getRandomChunkAsync(world, radius, offsetX, offsetZ);
+    private CompletableFuture<Chunk> getRandomChunk(WorldConfigSection worldConfigSection) {
+        CompletableFuture<Chunk> chunkFuture = getRandomChunkAsync(worldConfigSection);
         return chunkFuture.thenCompose((chunk) -> {
             boolean isSafe = isSafeChunk(chunk);
             if (!isSafe) {
-                return getRandomChunk(world, radius, offsetX, offsetZ);
+                return getRandomChunk(worldConfigSection);
             } else return CompletableFuture.completedFuture(chunk);
         });
     }
 
-    private CompletableFuture<Chunk> getRandomChunkAsync(World world, int radius, int offsetX, int offsetZ) {
+    private CompletableFuture<Chunk> getRandomChunkAsync(WorldConfigSection worldConfigSection) {
         ThreadLocalRandom rnd = ThreadLocalRandom.current();
-        int chunkRadius = radius/16;
-        int chunkOffsetX = offsetX/16;
-        int chunkOffsetZ = offsetZ/16;
+        int chunkRadius = worldConfigSection.getRadius()/16;
+        int chunkOffsetX = worldConfigSection.getX()/16;
+        int chunkOffsetZ = worldConfigSection.getZ()/16;
         int x = rnd.nextInt(-chunkRadius, chunkRadius);
         int z = rnd.nextInt(-chunkRadius, chunkRadius);
-        return PaperLib.getChunkAtAsync(world, x + chunkOffsetX, z + chunkOffsetZ);
+        return PaperLib.getChunkAtAsync(worldConfigSection.getWorld(), x + chunkOffsetX, z + chunkOffsetZ);
     }
 
     public boolean isSafeLocation(Location loc) {

@@ -7,7 +7,8 @@ import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
-import me.darkeyedragon.randomtp.util.LocationSearcher;
+import me.darkeyedragon.randomtp.location.LocationSearcher;
+import me.darkeyedragon.randomtp.location.WorldConfigSection;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -64,7 +65,6 @@ public class TeleportCommand extends BaseCommand {
         }
         final World finalWorld = newWorld;
         teleportSetup(player, finalWorld, sender.hasPermission("rtp.teleport.bypass"));
-
     }
 
     @Subcommand("reload")
@@ -79,9 +79,33 @@ public class TeleportCommand extends BaseCommand {
         plugin.populateQueue();
         commandSender.sendMessage(ChatColor.GREEN + "Reloaded config");
     }
-
+    @Subcommand("addworld")
+    @CommandPermission("rtp.addworld")
+    @CommandCompletion("@worlds true|false true|false <Integer> <Integer> <Integer>")
+    public void onAddWorld(CommandSender commandSender, World world, boolean useWorldBorder, boolean needsWorldPermission ,@Optional Integer radius, @Optional Integer offsetX, @Optional Integer offsetZ){
+        if(!useWorldBorder && (radius == null || offsetX == null || offsetZ == null)){
+            commandSender.sendMessage(ChatColor.GOLD + "If "+ ChatColor.AQUA +"useWorldBorder" + ChatColor.GOLD + " is false you need to provide the other parameters.");
+            return;
+        }
+        if(!configHandler.getWorlds().contains(world)){
+            if(radius == null) radius = 0;
+            if(offsetX == null) offsetX = 0;
+            if(offsetZ == null) offsetZ = 0;
+            if(configHandler.addWorld(new WorldConfigSection(offsetX, offsetZ, radius, world, useWorldBorder, needsWorldPermission))){
+                commandSender.sendMessage(ChatColor.GREEN + "Successfully added to config.");
+            }else{
+                commandSender.sendMessage(ChatColor.RED + "Size section not present in the config! Add it or recreate your config.");
+            }
+        }else{
+            commandSender.sendMessage(ChatColor.RED + "That world is already added to the list!");
+        }
+    }
     private void teleportSetup(Player player, World world, boolean force) {
-
+        WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(world);
+        if(worldConfigSection == null || ((!player.hasPermission("rtp.world."+world.getName())) && worldConfigSection.needsWorldPermission())){
+            player.sendMessage(configHandler.getNoWorldPermissionMessage(world));
+            return;
+        }
         boolean hasBypassPermission = player.hasPermission("rtp.teleportdelay.bypass");
 
         if (configHandler.getWorldsBlacklist().contains(world)) {
@@ -104,25 +128,13 @@ public class TeleportCommand extends BaseCommand {
         }
         Queue<Location> locationQueue = plugin.getQueue(world);
         if (locationQueue == null) {
-            player.sendMessage(configHandler.getBlacklistMessage());
+            player.sendMessage(configHandler.getNoWorldPermissionMessage(world));
             return;
         }
         Location loc = plugin.popLocation(world);
-        int offsetX;
-        int offsetZ;
-        int radius;
-        if (configHandler.useWorldBorder()) {
-            offsetX = world.getWorldBorder().getCenter().getBlockX();
-            offsetZ = world.getWorldBorder().getCenter().getBlockZ();
-            radius = (int) Math.floor(world.getWorldBorder().getSize() / 2);
-        } else {
-            offsetX = configHandler.getOffsetX();
-            offsetZ = configHandler.getOffsetZ();
-            radius = configHandler.getRadius();
-        }
         if (loc == null) {
             player.sendMessage(configHandler.getDepletedQueueMessage());
-            locationHelper.getRandomLocation(world, radius, offsetX, offsetZ).thenAccept(loc1 -> teleport(player, loc1, world));
+            locationHelper.getRandomLocation(worldConfigSection).thenAccept(loc1 -> teleport(player, loc1, world));
         } else {
             teleport(player, loc, world);
         }

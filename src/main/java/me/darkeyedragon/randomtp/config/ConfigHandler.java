@@ -1,19 +1,20 @@
 package me.darkeyedragon.randomtp.config;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
+import me.darkeyedragon.randomtp.location.WorldConfigSection;
 import me.darkeyedragon.randomtp.util.CustomTime;
 import me.darkeyedragon.randomtp.util.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
-import org.bukkit.util.Vector;
+import org.bukkit.configuration.ConfigurationSection;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ConfigHandler {
 
-    private RandomTeleport plugin;
+    private final RandomTeleport plugin;
     private long cooldown = -1;
 
     public ConfigHandler(RandomTeleport plugin) {
@@ -26,7 +27,13 @@ public class ConfigHandler {
             message = ChatColor.translateAlternateColorCodes('&', message);
         return message;
     }
-
+    public String getNoWorldPermissionMessage(World world){
+        String message = plugin.getConfig().getString("message.no_world_permission");
+        if (message != null)
+            message = message.replace("%world",world.getName());
+            message = ChatColor.translateAlternateColorCodes('&', message);
+        return message;
+    }
     public String getTeleportMessage(){
         String message = plugin.getConfig().getString("message.teleport");
         if(message != null){
@@ -48,10 +55,6 @@ public class ConfigHandler {
         }
         return message;
     }
-    public int getRadius(){
-        return plugin.getConfig().getInt("size.radius");
-    }
-
     public String getCountdownRemainingMessage(long remainingTime) {
         String message = plugin.getConfig().getString("message.countdown");
         if (message != null) {
@@ -62,14 +65,39 @@ public class ConfigHandler {
         return message;
     }
 
-    public int getOffsetX(){
-        return plugin.getConfig().getInt("size.offsetX");
+    public Map<World, WorldConfigSection> getOffsets(){
+        final ConfigurationSection section = plugin.getConfig().getConfigurationSection("worlds");
+        Set<String> keys = Objects.requireNonNull(section).getKeys(false);
+        Map<World, WorldConfigSection> offsetMap = new HashMap<>(keys.size());
+        for (String key : keys) {
+            boolean useWorldBorder = section.getBoolean(key+".use_worldborder");
+            boolean needsWorldPermission = section.getBoolean(key+".needs_world_permission");
+            int radius = section.getInt(key+".radius");
+            int offsetX = section.getInt(key+".offsetX");
+            int offsetZ = section.getInt(key+".offsetZ");
+            World world = Bukkit.getWorld(key);
+            offsetMap.put(world, new WorldConfigSection(offsetX, offsetZ, radius,world,useWorldBorder,needsWorldPermission));
+        }
+        return offsetMap;
     }
-    public int getOffsetZ(){
-        return plugin.getConfig().getInt("size.offsetZ");
+
+    public Set<World> getWorlds(){
+        final ConfigurationSection section = plugin.getConfig().getConfigurationSection("worlds");
+        Set<String> keys = Objects.requireNonNull(section).getKeys(false);
+        return keys.stream().map(Bukkit::getWorld).collect(Collectors.toSet());
     }
-    public Vector getStartLocation(){
-        return new Vector((double) getOffsetX(), 0,(double)getOffsetZ());
+
+    public boolean addWorld(WorldConfigSection worldConfigSection){
+        final ConfigurationSection section = plugin.getConfig().getConfigurationSection("worlds");
+        if(section == null) {
+            return false;
+        }
+        section.set(worldConfigSection.getWorld().getName()+".use_worldborder", worldConfigSection.useWorldBorder());
+        section.set(worldConfigSection.getWorld().getName()+".radius", worldConfigSection.getRadius());
+        section.set(worldConfigSection.getWorld().getName()+".offsetX", worldConfigSection.getX());
+        section.set(worldConfigSection.getWorld().getName()+".offsetZ", worldConfigSection.getZ());
+        plugin.saveConfig();
+        return true;
     }
 
     private long formatCooldown() throws NumberFormatException {
@@ -117,9 +145,6 @@ public class ConfigHandler {
     public int getQueueSize(){
         return plugin.getConfig().getInt("queue.size", 5);
     }
-    public boolean useWorldBorder(){
-        return plugin.getConfig().getBoolean("size.use_worldborder");
-    }
 
     public String getCancelMessage() {
         String message = plugin.getConfig().getString("message.teleport_canceled", "&cYou moved! Teleportation canceled");
@@ -129,7 +154,7 @@ public class ConfigHandler {
         return message;
     }
     public String getInitTeleportDelay() {
-        String message = plugin.getConfig().getString("message.teleport_delay", "&aYou will be teleported in &6%s seconds. Do not move");
+        String message = plugin.getConfig().getString("message.initteleport_delay", "&aYou will be teleported in &6%s seconds. Do not move");
         if(message != null){
             message = ChatColor.translateAlternateColorCodes('&', message);
             CustomTime time = TimeUtil.formatTime(getTeleportDelay()*50);

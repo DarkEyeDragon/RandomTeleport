@@ -5,7 +5,9 @@ import co.aikar.commands.PaperCommandManager;
 import me.darkeyedragon.randomtp.command.TeleportCommand;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
-import me.darkeyedragon.randomtp.util.LocationSearcher;
+import me.darkeyedragon.randomtp.location.LocationFactory;
+import me.darkeyedragon.randomtp.location.LocationSearcher;
+import me.darkeyedragon.randomtp.location.WorldConfigSection;
 import me.darkeyedragon.randomtp.validator.ChunkValidator;
 import me.darkeyedragon.randomtp.validator.ValidatorFactory;
 import org.bukkit.Bukkit;
@@ -26,13 +28,16 @@ public final class RandomTeleport extends JavaPlugin {
     private Map<World, BlockingQueue<Location>> worldQueueMap;
     private ConfigHandler configHandler;
     private LocationSearcher locationHelper;
+    private LocationFactory locationFactory;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
+        saveDefaultConfig();
         manager = new PaperCommandManager(this);
         configHandler = new ConfigHandler(this);
-        locationHelper = new LocationSearcher(this, configHandler.useWorldBorder());
+        locationFactory = new LocationFactory(configHandler);
+        locationHelper = new LocationSearcher(this);
         //check if the first argument is a world or player
         worldQueueMap = new HashMap<>();
         manager.getCommandContexts().registerContext(PlayerWorldContext.class, c -> {
@@ -47,12 +52,11 @@ public final class RandomTeleport extends JavaPlugin {
                 PlayerWorldContext context = new PlayerWorldContext();
                 context.setPlayer(player);
                 return context;
-            }else{
+            } else {
                 throw new InvalidCommandArgument(true);
             }
         });
         cooldowns = new HashMap<>();
-        saveDefaultConfig();
         manager.registerCommand(new TeleportCommand(this));
         validatorList = new ArrayList<>();
         configHandler.getPlugins().forEach(s -> {
@@ -75,16 +79,8 @@ public final class RandomTeleport extends JavaPlugin {
     }
 
     private void populateWorldQueue() {
-        for (World world : Bukkit.getWorlds()) {
-            if (configHandler.getWorldsBlacklist().contains(world)) {
-                if (configHandler.isWhitelist()) {
-                    worldQueueMap.put(world, new ArrayBlockingQueue<>(configHandler.getQueueSize()));
-                }
-            } else {
-                if (!configHandler.isWhitelist()) {
-                    worldQueueMap.put(world, new ArrayBlockingQueue<>(configHandler.getQueueSize()));
-                }
-            }
+        for (World world : configHandler.getWorlds()) {
+            worldQueueMap.put(world, new ArrayBlockingQueue<>(configHandler.getQueueSize()));
         }
     }
 
@@ -102,24 +98,18 @@ public final class RandomTeleport extends JavaPlugin {
     }
 
     public void addToLocationQueue(int amount, World world) {
+        Queue<Location> queue = worldQueueMap.get(world);
+        WorldConfigSection worldConfigSection = locationFactory.getWorldConfigSection(world);
+        if(worldConfigSection == null) return;
+        if (queue.size() + amount > configHandler.getQueueSize()) {
+            getLogger().info("Skipped searching for location in " + world.getName() + " queue already full.");
+            return;
+        }
         for (int i = 0; i < amount; i++) {
-            Queue<Location> queue = worldQueueMap.get(world);
-            int offsetX;
-            int offsetZ;
-            int radius;
-            if (configHandler.useWorldBorder()) {
-                offsetX = world.getWorldBorder().getCenter().getBlockX();
-                offsetZ = world.getWorldBorder().getCenter().getBlockZ();
-                radius = (int) Math.floor(world.getWorldBorder().getSize() / 2 - world.getWorldBorder().getWarningDistance());
-            } else {
-                offsetX = configHandler.getOffsetX();
-                offsetZ = configHandler.getOffsetZ();
-                radius = configHandler.getRadius();
-            }
-            locationHelper.getRandomLocation(world, radius, offsetX, offsetZ).thenAccept(location -> {
+            locationHelper.getRandomLocation(worldConfigSection).thenAccept(location -> {
                 queue.offer(location);
-                if(configHandler.getDebugShowQueuePopulation())
-                    getLogger().info("Safe location added for " + world.getName() + "(" + queue.size() + "/" + configHandler.getQueueSize() + ")");
+                if (configHandler.getDebugShowQueuePopulation())
+                    getLogger().info("Safe location added for " + world.getName() + " (" + queue.size() + "/" + configHandler.getQueueSize() + ")");
             });
         }
     }
@@ -147,7 +137,7 @@ public final class RandomTeleport extends JavaPlugin {
     public Location popLocation(World world) {
         Queue<Location> queue = getQueue(world);
         Location location = queue.poll();
-        if(configHandler.getDebugShowQueuePopulation())
+        if (configHandler.getDebugShowQueuePopulation())
             getLogger().info("Location removed from " + world.getName() + "(" + queue.size() + "/" + configHandler.getQueueSize() + ")");
         return location;
     }
@@ -160,4 +150,11 @@ public final class RandomTeleport extends JavaPlugin {
         return locationHelper;
     }
 
+    public PaperCommandManager getManager() {
+        return manager;
+    }
+
+    public LocationFactory getLocationFactory() {
+        return locationFactory;
+    }
 }
