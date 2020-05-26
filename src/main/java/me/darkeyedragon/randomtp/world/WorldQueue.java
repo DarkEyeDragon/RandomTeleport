@@ -1,11 +1,9 @@
 package me.darkeyedragon.randomtp.world;
 
 import me.darkeyedragon.randomtp.location.LocationSearcher;
-import me.darkeyedragon.randomtp.location.WorldConfigSection;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,20 +18,8 @@ public class WorldQueue{
         this.locationSearcher = locationSearcher;
     }
 
-    public void populate(Collection<WorldConfigSection> worldConfigSections, int amount) {
-        for (WorldConfigSection worldConfig : worldConfigSections) {
-            put(worldConfig, amount);
-        }
-    }
-
     public LocationQueue put(World world, LocationQueue locationQueue) {
         return worldQueueMap.put(world, locationQueue);
-    }
-
-    public void put(WorldConfigSection worldConfigSection, int amount) {
-        LocationQueue locationQueue = new LocationQueue(amount, locationSearcher);
-        locationQueue.generate(worldConfigSection);
-        worldQueueMap.put(worldConfigSection.getWorld(), locationQueue);
     }
 
     public LocationQueue get(World world) {
@@ -44,7 +30,10 @@ public class WorldQueue{
         worldQueueMap.clear();
     }
 
-    public Location popLocation(World world) throws InterruptedException {
-        return worldQueueMap.get(world).poll();
+    public Location popLocation(World world){
+        Location location = worldQueueMap.get(world).poll();
+        System.out.println(location);
+        return  location;
     }
+
 }

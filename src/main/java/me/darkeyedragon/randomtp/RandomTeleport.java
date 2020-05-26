@@ -10,6 +10,8 @@ import me.darkeyedragon.randomtp.location.LocationFactory;
 import me.darkeyedragon.randomtp.location.LocationSearcher;
 import me.darkeyedragon.randomtp.validator.ChunkValidator;
 import me.darkeyedragon.randomtp.validator.ValidatorFactory;
+import me.darkeyedragon.randomtp.world.LocationQueue;
+import me.darkeyedragon.randomtp.world.QueueListener;
 import me.darkeyedragon.randomtp.world.WorldQueue;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -17,7 +19,10 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 public final class RandomTeleport extends JavaPlugin {
 
@@ -76,6 +81,7 @@ public final class RandomTeleport extends JavaPlugin {
                 getLogger().warning(s + " is not a valid plugin or is not loaded!");
             }
         });
+        populateWorldQueue();
     }
     @Override
     public void onDisable() {
@@ -85,33 +91,32 @@ public final class RandomTeleport extends JavaPlugin {
         worldQueue.clear();
     }
 
-    /*private void populateWorldQueue() {
+    public void populateWorldQueue() {
         for (World world : configHandler.getWorlds()) {
-            worldQueue.put(world, new ArrayBlockingQueue<>(configHandler.getQueueSize()));
+            //Add a new world to the world queue and generate random locations
+            LocationQueue locationQueue = new LocationQueue(configHandler.getQueueSize(), getLocationSearcher());
+            //Subscribe to the locationqueue to be notified of changes
+            subscribe(locationQueue, world);
+            locationQueue.generate(getLocationFactory().getWorldConfigSection(world));
+            getWorldQueue().put(world, locationQueue);
+
         }
     }
+    private void subscribe(LocationQueue locationQueue, World world){
+        if(configHandler.getDebugShowQueuePopulation()) {
+            locationQueue.subscribe(new QueueListener<Location>() {
+                @Override
+                public void onAdd(Location element) {
+                    getLogger().info("Safe location added for " + world.getName() + " (" + locationQueue.size() + "/" + configHandler.getQueueSize() + ")");
+                }
 
-    public void populateQueue() {
-        populateWorldQueue();
-        worldQueueMap.forEach((world, locations) -> addToLocationQueue(configHandler.getQueueSize(), world));
-    }
-
-    public void addToLocationQueue(int amount, World world) {
-        Queue<Location> queue = worldQueueMap.get(world);
-        WorldConfigSection worldConfigSection = locationFactory.getWorldConfigSection(world);
-        if(worldConfigSection == null) return;
-        if (queue.size() + amount > configHandler.getQueueSize()) {
-            getLogger().info("Skipped searching for location in " + world.getName() + " queue already full.");
-            return;
-        }
-        for (int i = 0; i < amount; i++) {
-            locationHelper.getRandomLocation(worldConfigSection).thenAccept(location -> {
-                queue.offer(location);
-                if (configHandler.getDebugShowQueuePopulation())
-                    getLogger().info("Safe location added for " + world.getName() + " (" + queue.size() + "/" + configHandler.getQueueSize() + ")");
+                @Override
+                public void onRemove(Location element) {
+                    getLogger().info("Safe location consumed for " + world.getName() + " (" + locationQueue.size() + "/" + configHandler.getQueueSize() + ")");
+                }
             });
         }
-    }*/
+    }
 
     public HashMap<UUID, Long> getCooldowns() {
         return cooldowns;
@@ -129,23 +134,7 @@ public final class RandomTeleport extends JavaPlugin {
         return worldQueue;
     }
 
-    /*public Map<World, BlockingQueue<Location>> getWorldQueueMap() {
-        return worldQueueMap;
-    }
-
-    public void clearWorldQueueMap() {
-        worldQueueMap.clear();
-    }
-
-    public Location popLocation(World world) {
-        Queue<Location> queue = getQueue(world);
-        Location location = queue.poll();
-        if (configHandler.getDebugShowQueuePopulation())
-            getLogger().info("Location removed from " + world.getName() + "(" + queue.size() + "/" + configHandler.getQueueSize() + ")");
-        return location;
-    }*/
-
-    public Queue<Location> getQueue(World world) {
+    public LocationQueue getQueue(World world) {
         return worldQueue.get(world);
     }
 

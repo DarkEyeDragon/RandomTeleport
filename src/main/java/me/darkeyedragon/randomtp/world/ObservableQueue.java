@@ -1,5 +1,6 @@
 package me.darkeyedragon.randomtp.world;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -10,6 +11,7 @@ class ObservableQueue<T> extends ArrayBlockingQueue<T> {
 
     public ObservableQueue(int capacity) {
         super(capacity);
+        listeners = new ArrayList<>();
     }
 
     public ObservableQueue(int capacity, boolean fair) {
@@ -32,7 +34,7 @@ class ObservableQueue<T> extends ArrayBlockingQueue<T> {
     @Override
     public T poll(){
         T element = super.poll();
-        listeners.forEach(listener -> listener.onAdd(element));
+        listeners.forEach(listener -> listener.onRemove(element));
         return element;
     }
 }

@@ -21,6 +21,11 @@ public class LocationQueue extends ObservableQueue<Location> {
     }
 
     public void generate(WorldConfigSection worldConfigSection) {
-        locationSearcher.getRandomLocation(worldConfigSection).thenAccept(this::offer);
+        generate(worldConfigSection, super.remainingCapacity());
+    }
+    public void generate(WorldConfigSection worldConfigSection, int amount){
+        for(int i = 0; i < amount; i++){
+            locationSearcher.getRandomLocation(worldConfigSection).thenAccept(this::offer);
+        }
     }
 }
