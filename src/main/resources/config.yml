@@ -41,6 +41,7 @@ plugins:
   - "Factions"
   - "WorldGuard"
   - "GriefPrevention"
+  - "WorldBorder"
 debug:
   #Safe location added for world(3/5)
   #Location removed from world(2/5)

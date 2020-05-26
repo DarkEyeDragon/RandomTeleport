@@ -7,8 +7,9 @@ import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
-import me.darkeyedragon.randomtp.location.LocationSearcher;
+import me.darkeyedragon.randomtp.location.LocationFactory;
 import me.darkeyedragon.randomtp.location.WorldConfigSection;
+import me.darkeyedragon.randomtp.world.WorldQueue;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -20,19 +21,25 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Queue;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @CommandAlias("rtp|randomtp|randomteleport")
 public class TeleportCommand extends BaseCommand {
 
-    private LocationSearcher locationHelper;
+    //private LocationSearcher locationHelper;
     private ConfigHandler configHandler;
     private RandomTeleport plugin;
+    private WorldQueue worldQueue;
+    private LocationFactory locationFactory;
     private boolean teleportSuccess;
 
     public TeleportCommand(RandomTeleport plugin) {
         this.plugin = plugin;
         configHandler = plugin.getConfigHandler();
-        locationHelper = plugin.getLocationHelper();
+        this.locationFactory = plugin.getLocationFactory();
+        //locationHelper = plugin.getLocationSearcher();
+        worldQueue = plugin.getWorldQueue();
     }
 
     @Default
@@ -74,9 +81,10 @@ public class TeleportCommand extends BaseCommand {
         plugin.saveDefaultConfig();
         plugin.reloadConfig();
         commandSender.sendMessage(ChatColor.GREEN + "Clearing queue...");
-        plugin.clearWorldQueueMap();
+        worldQueue.clear();
         commandSender.sendMessage(ChatColor.GREEN + "Repopulating queue, this can take a while.");
-        plugin.populateQueue();
+        Set<WorldConfigSection> worldConfigSectionSet = configHandler.getWorlds().stream().map(world -> locationFactory.getWorldConfigSection(world)).collect(Collectors.toSet());
+        worldQueue.populate(worldConfigSectionSet, configHandler.getQueueSize());
         commandSender.sendMessage(ChatColor.GREEN + "Reloaded config");
     }
     @Subcommand("addworld")
@@ -131,13 +139,20 @@ public class TeleportCommand extends BaseCommand {
             player.sendMessage(configHandler.getNoWorldPermissionMessage(world));
             return;
         }
-        Location loc = plugin.popLocation(world);
-        if (loc == null) {
+        Location loc = null;
+        try {
+            loc = worldQueue.popLocation(world);
+            teleport(player, loc, world);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        /*if (loc == null) {
             player.sendMessage(configHandler.getDepletedQueueMessage());
+            worldQueue.popLocation(world);
             locationHelper.getRandomLocation(worldConfigSection).thenAccept(loc1 -> teleport(player, loc1, world));
         } else {
             teleport(player, loc, world);
-        }
+        }*/
     }
 
     public void teleport(Player player, Location loc, World world) {
@@ -160,7 +175,8 @@ public class TeleportCommand extends BaseCommand {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        plugin.addToLocationQueue(1, world);
+                        worldQueue.put(locationFactory.getWorldConfigSection(world), 1);
+                        //plugin.addToLocationQueue(1, world);
                     }
                 }.runTaskLater(plugin, configHandler.getInitDelay());
             }
