@@ -112,7 +112,7 @@ public class TeleportCommand extends BaseCommand {
     }
 
     private void teleportSetup(Player player, World world, boolean force) {
-        boolean useEco = configHandler.useEco();
+        boolean useEco = configHandler.useEco() || !player.hasPermission("rtp.eco.bypass");
         if(useEco){
             double price =  configHandler.getPrice();
             if(!ecoHandler.hasEnough(player, price)){
