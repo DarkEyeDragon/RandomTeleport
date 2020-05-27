@@ -7,8 +7,10 @@ import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
-import me.darkeyedragon.randomtp.location.LocationSearcher;
+import me.darkeyedragon.randomtp.location.LocationFactory;
 import me.darkeyedragon.randomtp.location.WorldConfigSection;
+import me.darkeyedragon.randomtp.world.LocationQueue;
+import me.darkeyedragon.randomtp.world.WorldQueue;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -19,20 +21,22 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Queue;
-
 @CommandAlias("rtp|randomtp|randomteleport")
 public class TeleportCommand extends BaseCommand {
 
-    private LocationSearcher locationHelper;
+    //private LocationSearcher locationHelper;
     private ConfigHandler configHandler;
     private RandomTeleport plugin;
+    private WorldQueue worldQueue;
+    private LocationFactory locationFactory;
     private boolean teleportSuccess;
 
     public TeleportCommand(RandomTeleport plugin) {
         this.plugin = plugin;
         configHandler = plugin.getConfigHandler();
-        locationHelper = plugin.getLocationHelper();
+        this.locationFactory = plugin.getLocationFactory();
+        //locationHelper = plugin.getLocationSearcher();
+        worldQueue = plugin.getWorldQueue();
     }
 
     @Default
@@ -74,35 +78,37 @@ public class TeleportCommand extends BaseCommand {
         plugin.saveDefaultConfig();
         plugin.reloadConfig();
         commandSender.sendMessage(ChatColor.GREEN + "Clearing queue...");
-        plugin.clearWorldQueueMap();
+        worldQueue.clear();
         commandSender.sendMessage(ChatColor.GREEN + "Repopulating queue, this can take a while.");
-        plugin.populateQueue();
+        plugin.populateWorldQueue();
         commandSender.sendMessage(ChatColor.GREEN + "Reloaded config");
     }
+
     @Subcommand("addworld")
     @CommandPermission("rtp.addworld")
     @CommandCompletion("@worlds true|false true|false <Integer> <Integer> <Integer>")
-    public void onAddWorld(CommandSender commandSender, World world, boolean useWorldBorder, boolean needsWorldPermission ,@Optional Integer radius, @Optional Integer offsetX, @Optional Integer offsetZ){
-        if(!useWorldBorder && (radius == null || offsetX == null || offsetZ == null)){
-            commandSender.sendMessage(ChatColor.GOLD + "If "+ ChatColor.AQUA +"useWorldBorder" + ChatColor.GOLD + " is false you need to provide the other parameters.");
+    public void onAddWorld(CommandSender commandSender, World world, boolean useWorldBorder, boolean needsWorldPermission, @Optional Integer radius, @Optional Integer offsetX, @Optional Integer offsetZ) {
+        if (!useWorldBorder && (radius == null || offsetX == null || offsetZ == null)) {
+            commandSender.sendMessage(ChatColor.GOLD + "If " + ChatColor.AQUA + "useWorldBorder" + ChatColor.GOLD + " is false you need to provide the other parameters.");
             return;
         }
-        if(!configHandler.getWorlds().contains(world)){
-            if(radius == null) radius = 0;
-            if(offsetX == null) offsetX = 0;
-            if(offsetZ == null) offsetZ = 0;
-            if(configHandler.addWorld(new WorldConfigSection(offsetX, offsetZ, radius, world, useWorldBorder, needsWorldPermission))){
+        if (!configHandler.getWorlds().contains(world)) {
+            if (radius == null) radius = 0;
+            if (offsetX == null) offsetX = 0;
+            if (offsetZ == null) offsetZ = 0;
+            if (configHandler.addWorld(new WorldConfigSection(offsetX, offsetZ, radius, world, useWorldBorder, needsWorldPermission))) {
                 commandSender.sendMessage(ChatColor.GREEN + "Successfully added to config.");
-            }else{
+            } else {
                 commandSender.sendMessage(ChatColor.RED + "Size section not present in the config! Add it or recreate your config.");
             }
-        }else{
+        } else {
             commandSender.sendMessage(ChatColor.RED + "That world is already added to the list!");
         }
     }
+
     private void teleportSetup(Player player, World world, boolean force) {
         WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(world);
-        if(worldConfigSection == null || ((!player.hasPermission("rtp.world."+world.getName())) && worldConfigSection.needsWorldPermission())){
+        if (worldConfigSection == null || ((!player.hasPermission("rtp.world." + world.getName())) && worldConfigSection.needsWorldPermission())) {
             player.sendMessage(configHandler.getNoWorldPermissionMessage(world));
             return;
         }
@@ -126,22 +132,21 @@ public class TeleportCommand extends BaseCommand {
         if (configHandler.getTeleportDelay() > 0 && !hasBypassPermission) {
             player.sendMessage(configHandler.getInitTeleportDelay());
         }
-        Queue<Location> locationQueue = plugin.getQueue(world);
-        if (locationQueue == null) {
-            player.sendMessage(configHandler.getNoWorldPermissionMessage(world));
-            return;
-        }
-        Location loc = plugin.popLocation(world);
-        if (loc == null) {
+        LocationQueue locationQueue = worldQueue.get(world);
+        Location loc = worldQueue.get(world).poll();
+        System.out.println(locationQueue.size());
+        teleport(player, loc, world);
+
+        /*if (loc == null) {
             player.sendMessage(configHandler.getDepletedQueueMessage());
+            worldQueue.popLocation(world);
             locationHelper.getRandomLocation(worldConfigSection).thenAccept(loc1 -> teleport(player, loc1, world));
         } else {
             teleport(player, loc, world);
-        }
+        }*/
     }
 
     public void teleport(Player player, Location loc, World world) {
-
         boolean hasBypassPermission = player.hasPermission("rtp.teleportdelay.bypass");
         long teleportDelay = hasBypassPermission ? 1 : configHandler.getTeleportDelay();
 
@@ -160,7 +165,10 @@ public class TeleportCommand extends BaseCommand {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        plugin.addToLocationQueue(1, world);
+                        //LocationQueue locationQueue = new LocationQueue(configHandler.getQueueSize(), plugin.getLocationSearcher());
+                        WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(world);
+                        //plugin.subscribe(locationQueue, world);
+                        worldQueue.get(world).generate(worldConfigSection, 1);
                     }
                 }.runTaskLater(plugin, configHandler.getInitDelay());
             }
