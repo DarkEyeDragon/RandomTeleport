@@ -48,3 +48,5 @@ debug:
   #Safe location added for world(3/5)
   #Location removed from world(2/5)
   show_queue_population: true
+economy:
+  price: 0
