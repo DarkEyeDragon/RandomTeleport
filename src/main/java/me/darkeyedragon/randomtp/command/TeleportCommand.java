@@ -33,7 +33,7 @@ public class TeleportCommand extends BaseCommand {
     private boolean teleportSuccess;
 
     //Economy
-    private EcoHandler ecoHandler;
+    private final EcoHandler ecoHandler;
 
     public TeleportCommand(RandomTeleport plugin) {
         this.plugin = plugin;

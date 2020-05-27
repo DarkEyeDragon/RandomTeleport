@@ -69,6 +69,12 @@ public final class RandomTeleport extends JavaPlugin {
             }
         });
         cooldowns = new HashMap<>();
+        if(setupEconomy()){
+            getLogger().info("Vault found. Hooking into it.");
+            ecoHandler = new EcoHandler(econ);
+        }else{
+            getLogger().info("Vault not found. Currency based options are disabled.");
+        }
         manager.registerCommand(new TeleportCommand(this));
         getServer().getPluginManager().registerEvents(new WorldLoadListener(this), this);
         validatorList = new ArrayList<>();
@@ -88,12 +94,6 @@ public final class RandomTeleport extends JavaPlugin {
                 getLogger().warning(s + " is not a valid plugin or is not loaded!");
             }
         });
-        if(setupEconomy()){
-            getLogger().info("Vault found. Hooking into it.");
-            ecoHandler = new EcoHandler(econ);
-        }else{
-            getLogger().info("Vault not found. Currency based options are disabled.");
-        }
         populateWorldQueue();
     }
     @Override
