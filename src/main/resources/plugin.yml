@@ -26,7 +26,7 @@ permissions:
   rtp.teleport.other:
     description: random teleport others
   rtp.teleport.world:
-    description: random teleport to any desired non blacklisted world
+    description: random teleport to any world that doesnt require extra permissions
   rtp.teleport.bypass:
     description: bypass the cooldown
   rtp.teleportdelay.bypass:
