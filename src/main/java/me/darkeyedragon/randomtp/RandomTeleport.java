@@ -88,13 +88,13 @@ public final class RandomTeleport extends JavaPlugin {
                 getLogger().warning(s + " is not a valid plugin or is not loaded!");
             }
         });
-        populateWorldQueue();
         if(setupEconomy()){
             getLogger().info("Vault found. Hooking into it.");
             ecoHandler = new EcoHandler(econ);
         }else{
             getLogger().info("Vault not found. Currency based options are disabled.");
         }
+        populateWorldQueue();
     }
     @Override
     public void onDisable() {
