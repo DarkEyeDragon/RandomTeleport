@@ -5,6 +5,7 @@ import co.aikar.commands.PaperCommandManager;
 import me.darkeyedragon.randomtp.command.TeleportCommand;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
+import me.darkeyedragon.randomtp.eco.EcoHandler;
 import me.darkeyedragon.randomtp.listener.WorldLoadListener;
 import me.darkeyedragon.randomtp.location.LocationFactory;
 import me.darkeyedragon.randomtp.location.LocationSearcher;
@@ -13,10 +14,12 @@ import me.darkeyedragon.randomtp.validator.ValidatorFactory;
 import me.darkeyedragon.randomtp.world.LocationQueue;
 import me.darkeyedragon.randomtp.world.QueueListener;
 import me.darkeyedragon.randomtp.world.WorldQueue;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -34,6 +37,10 @@ public final class RandomTeleport extends JavaPlugin {
     private ConfigHandler configHandler;
     private LocationSearcher locationSearcher;
     private LocationFactory locationFactory;
+
+    //Economy
+    private Economy econ;
+    private EcoHandler ecoHandler;
 
     @Override
     public void onEnable() {
@@ -62,6 +69,12 @@ public final class RandomTeleport extends JavaPlugin {
             }
         });
         cooldowns = new HashMap<>();
+        if(setupEconomy()){
+            getLogger().info("Vault found. Hooking into it.");
+            ecoHandler = new EcoHandler(econ);
+        }else{
+            getLogger().info("Vault not found. Currency based options are disabled.");
+        }
         manager.registerCommand(new TeleportCommand(this));
         getServer().getPluginManager().registerEvents(new WorldLoadListener(this), this);
         validatorList = new ArrayList<>();
@@ -118,6 +131,19 @@ public final class RandomTeleport extends JavaPlugin {
         }
     }
 
+    //Economy logic
+    private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        econ = rsp.getProvider();
+        return econ != null;
+    }
+
     public HashMap<UUID, Long> getCooldowns() {
         return cooldowns;
     }
@@ -148,5 +174,9 @@ public final class RandomTeleport extends JavaPlugin {
 
     public LocationFactory getLocationFactory() {
         return locationFactory;
+    }
+
+    public EcoHandler getEcoHandler() {
+        return ecoHandler;
     }
 }

@@ -11,6 +11,9 @@ message:
   nopermission: "&cYou do not have permission to execute this command!"
   #valid placeholders: %world
   no_world_permission: "&cI am sorry, you do not have permission to rtp in %world"
+  economy:
+    insufficient_funds: "&cYou do not have enough money to rtp!"
+    payment: "&aYou just paid &b%price &ato rtp!"
 #The amount of pre-generated locations in the queue
 queue:
   size: 5
@@ -45,3 +48,5 @@ debug:
   #Safe location added for world(3/5)
   #Location removed from world(2/5)
   show_queue_population: true
+economy:
+  price: 0

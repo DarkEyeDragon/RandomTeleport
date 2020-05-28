@@ -7,6 +7,7 @@ import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
+import me.darkeyedragon.randomtp.eco.EcoHandler;
 import me.darkeyedragon.randomtp.location.LocationFactory;
 import me.darkeyedragon.randomtp.location.WorldConfigSection;
 import me.darkeyedragon.randomtp.world.LocationQueue;
@@ -31,12 +32,16 @@ public class TeleportCommand extends BaseCommand {
     private LocationFactory locationFactory;
     private boolean teleportSuccess;
 
+    //Economy
+    private final EcoHandler ecoHandler;
+
     public TeleportCommand(RandomTeleport plugin) {
         this.plugin = plugin;
         configHandler = plugin.getConfigHandler();
         this.locationFactory = plugin.getLocationFactory();
         //locationHelper = plugin.getLocationSearcher();
         worldQueue = plugin.getWorldQueue();
+        this.ecoHandler = plugin.getEcoHandler();
     }
 
     @Default
@@ -107,6 +112,15 @@ public class TeleportCommand extends BaseCommand {
     }
 
     private void teleportSetup(Player player, World world, boolean force) {
+        boolean useEco = configHandler.useEco() && !player.hasPermission("rtp.eco.bypass");
+        if(useEco){
+            double price =  configHandler.getPrice();
+            if(!ecoHandler.hasEnough(player, price)){
+                player.sendMessage(configHandler.getInsufficientFundsMessage());
+                return;
+            }
+        }
+
         WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(world);
         if (worldConfigSection == null || ((!player.hasPermission("rtp.world." + world.getName())) && worldConfigSection.needsWorldPermission())) {
             player.sendMessage(configHandler.getNoWorldPermissionMessage(world));
@@ -135,7 +149,7 @@ public class TeleportCommand extends BaseCommand {
         LocationQueue locationQueue = worldQueue.get(world);
         Location loc = worldQueue.get(world).poll();
         System.out.println(locationQueue.size());
-        teleport(player, loc, world);
+        teleport(player, loc, world, useEco);
 
         /*if (loc == null) {
             player.sendMessage(configHandler.getDepletedQueueMessage());
@@ -146,7 +160,7 @@ public class TeleportCommand extends BaseCommand {
         }*/
     }
 
-    public void teleport(Player player, Location loc, World world) {
+    public void teleport(Player player, Location loc, World world, boolean useEco) {
         boolean hasBypassPermission = player.hasPermission("rtp.teleportdelay.bypass");
         long teleportDelay = hasBypassPermission ? 1 : configHandler.getTeleportDelay();
 
@@ -159,6 +173,10 @@ public class TeleportCommand extends BaseCommand {
                 plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
                 drawWarpParticles(player);
                 PaperLib.teleportAsync(player, location);
+                if(useEco){
+                    ecoHandler.makePayment(player, configHandler.getPrice());
+                    player.sendMessage(configHandler.getPaymentMessage());
+                }
                 drawWarpParticles(player);
                 player.sendMessage(configHandler.getTeleportMessage());
                 teleportSuccess = true;
