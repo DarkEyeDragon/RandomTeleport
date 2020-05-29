@@ -31,8 +31,7 @@ public class WorldQueue{
     }
 
     public Location popLocation(World world){
-        Location location = worldQueueMap.get(world).poll();
-        System.out.println(location);
+        Location location = get(world).poll();
         return  location;
     }
 

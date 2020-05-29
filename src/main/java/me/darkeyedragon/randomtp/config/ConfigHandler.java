@@ -1,8 +1,8 @@
 package me.darkeyedragon.randomtp.config;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
+import me.darkeyedragon.randomtp.config.data.*;
 import me.darkeyedragon.randomtp.location.WorldConfigSection;
-import me.darkeyedragon.randomtp.util.CustomTime;
 import me.darkeyedragon.randomtp.util.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -10,67 +10,136 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ConfigHandler {
 
     private final RandomTeleport plugin;
+    private ConfigMessage configMessage;
+    private ConfigQueue configQueue;
+    private ConfigWorld configWorld;
+    private ConfigTeleport configTeleport;
+    private ConfigPlugin configPlugin;
+    private ConfigEconomy configEconomy;
+    private ConfigDebug configDebug;
+
     private long cooldown = -1;
 
     public ConfigHandler(RandomTeleport plugin) {
         this.plugin = plugin;
+        reload();
     }
 
-    public String getInitTeleportMessage() {
-        String message = plugin.getConfig().getString("message.initteleport");
-        if (message != null)
-            message = ChatColor.translateAlternateColorCodes('&', message);
-        return message;
+    public void reload() {
+        populateConfigMessage();
+        populateConfigQueue();
+        populateWorldConfigSection();
+        populateConfigTeleport();
+        populateConfigPlugins();
+        populateConfigDebug();
+        populateConfigEconomy();
     }
 
-    public String getNoWorldPermissionMessage(World world) {
-        String message = plugin.getConfig().getString("message.no_world_permission");
-        if (message != null)
-            message = message.replace("%world", world.getName());
-        message = ChatColor.translateAlternateColorCodes('&', message);
-        return message;
+    public void populateConfigMessage() {
+        configMessage = new ConfigMessage()
+                .init(getInitTeleportMessage())
+                .initTeleportDelay(getInitTeleportDelay())
+                .teleportCanceled(getCancelMessage())
+                .teleport(getTeleportMessage())
+                .depletedQueue(getDepletedQueueMessage())
+                .countdown(getCountdownRemainingMessage())
+                .noWorldPermission(getNoWorldPermissionMessage())
+                .emptyQueue(getEmptyQueueMessage());
+        configMessage.getEconomy()
+                .insufficientFunds(getInsufficientFundsMessage())
+                .payment(getPaymentMessage());
     }
 
-    public String getTeleportMessage() {
-        String message = plugin.getConfig().getString("message.teleport");
-        if (message != null) {
-            message = ChatColor.translateAlternateColorCodes('&', message);
-        }
-        return message;
+    public void populateConfigQueue() {
+        configQueue = new ConfigQueue()
+                .size(getQueueSize())
+                .initDelay(getInitDelay());
     }
 
-    public String getBlacklistMessage() {
-        String message = plugin.getConfig().getString("message.blacklisted");
-        if (message != null) {
-            message = ChatColor.translateAlternateColorCodes('&', message);
-        }
-        return message;
+    public void populateWorldConfigSection() {
+        configWorld = new ConfigWorld(plugin).set(getOffsets());
     }
 
-    public String getDepletedQueueMessage() {
-        String message = plugin.getConfig().getString("message.depleted_queue", "&6Locations queue depleted... Forcing generation of a new location");
-        if (message != null) {
-            message = ChatColor.translateAlternateColorCodes('&', message);
-        }
-        return message;
+    public void populateConfigTeleport() {
+        configTeleport = new ConfigTeleport()
+                .cooldown(getCooldown())
+                .delay(getInitDelay())
+                .cancelOnMove(isCanceledOnMove());
     }
 
-    public String getCountdownRemainingMessage(long remainingTime) {
-        String message = plugin.getConfig().getString("message.countdown");
-        if (message != null) {
-            message = ChatColor.translateAlternateColorCodes('&', message);
-            CustomTime duration = TimeUtil.formatTime(remainingTime);
-            message = TimeUtil.toFormattedString(message, duration);
-        }
-        return message;
+    public void populateConfigDebug() {
+        configDebug = new ConfigDebug()
+                .showQueuePopulation(getDebugShowQueuePopulation());
     }
 
-    public Map<World, WorldConfigSection> getOffsets() {
+    public void populateConfigPlugins() {
+        configPlugin = new ConfigPlugin()
+                .addAll(getPlugins());
+    }
+
+
+    public void populateConfigEconomy() {
+        configEconomy = new ConfigEconomy()
+                .price(getPrice());
+    }
+
+    public RandomTeleport getPlugin() {
+        return plugin;
+    }
+
+    public ConfigMessage getConfigMessage() {
+        return configMessage;
+    }
+
+    public ConfigQueue getConfigQueue() {
+        return configQueue;
+    }
+
+    public ConfigWorld getConfigWorld() {
+        return configWorld;
+    }
+
+    public ConfigTeleport getConfigTeleport() {
+        return configTeleport;
+    }
+
+    public ConfigPlugin getConfigPlugin() {
+        return configPlugin;
+    }
+
+    public ConfigDebug getConfigDebug() {
+        return configDebug;
+    }
+
+    public ConfigEconomy getConfigEconomy() {
+        return configEconomy;
+    }
+
+    private String getInitTeleportMessage() {
+        return plugin.getConfig().getString("message.initteleport");
+    }
+
+    private String getNoWorldPermissionMessage() {
+        return plugin.getConfig().getString("message.no_world_permission");
+    }
+
+    private String getTeleportMessage() {
+        return plugin.getConfig().getString("message.teleport");
+    }
+
+    private String getDepletedQueueMessage() {
+        return plugin.getConfig().getString("message.depleted_queue", "&6Locations queue depleted... Forcing generation of a new location");
+    }
+
+    private String getCountdownRemainingMessage() {
+        return plugin.getConfig().getString("message.countdown");
+    }
+
+    private Map<World, WorldConfigSection> getOffsets() {
         final ConfigurationSection section = plugin.getConfig().getConfigurationSection("worlds");
         Set<String> keys = Objects.requireNonNull(section).getKeys(false);
         Map<World, WorldConfigSection> offsetMap = new HashMap<>(keys.size());
@@ -86,45 +155,22 @@ public class ConfigHandler {
         return offsetMap;
     }
 
-    public Set<World> getWorlds() {
-        final ConfigurationSection section = plugin.getConfig().getConfigurationSection("worlds");
-        Set<String> keys = Objects.requireNonNull(section).getKeys(false);
-        return keys.stream().map(Bukkit::getWorld).collect(Collectors.toSet());
-    }
-
-    public String getInsufficientFundsMessage() {
+    private String getInsufficientFundsMessage() {
         return plugin.getConfig().getString("message.economy.insufficient_funds");
     }
 
-    public double getPrice() {
+    private double getPrice() {
         return plugin.getConfig().getDouble("economy.price", 0);
     }
 
-    public String getPaymentMessage() {
+    private String getPaymentMessage() {
         String message = plugin.getConfig().getString("message.economy.payment", "&aYou just paid &b%price &ato rtp!");
-        if(message == null){
+        if (message == null) {
             return "";
         }
         message = ChatColor.translateAlternateColorCodes('&', message);
-        message = message.replaceAll("%price", getPrice()+"");
+        message = message.replaceAll("%price", getPrice() + "");
         return message;
-    }
-
-    public boolean useEco() {
-        return getPrice() > 0;
-    }
-
-    public boolean addWorld(WorldConfigSection worldConfigSection) {
-        final ConfigurationSection section = plugin.getConfig().getConfigurationSection("worlds");
-        if (section == null) {
-            return false;
-        }
-        section.set(worldConfigSection.getWorld().getName() + ".use_worldborder", worldConfigSection.useWorldBorder());
-        section.set(worldConfigSection.getWorld().getName() + ".radius", worldConfigSection.getRadius());
-        section.set(worldConfigSection.getWorld().getName() + ".offsetX", worldConfigSection.getX());
-        section.set(worldConfigSection.getWorld().getName() + ".offsetZ", worldConfigSection.getZ());
-        plugin.saveConfig();
-        return true;
     }
 
     private long formatCooldown() throws NumberFormatException {
@@ -135,7 +181,7 @@ public class ConfigHandler {
         throw new NumberFormatException("Not a valid format");
     }
 
-    public long getTeleportDelay() {
+    private long getTeleportDelay() {
         String message = plugin.getConfig().getString("teleport.delay", "0s");
         if (message != null) {
             return TimeUtil.stringToTicks(message);
@@ -143,57 +189,44 @@ public class ConfigHandler {
         throw new NumberFormatException("Not a valid number");
     }
 
-    public List<World> getWorldsBlacklist() {
-        List<String> strings = plugin.getConfig().getStringList("blacklist.worlds");
-        return strings.stream().map(Bukkit::getWorld).collect(Collectors.toList());
-    }
-
-    public int getInitDelay() {
+    private int getInitDelay() {
         return plugin.getConfig().getInt("queue.init_delay", 60);
     }
 
-    public boolean getDebugShowQueuePopulation() {
+    private boolean getDebugShowQueuePopulation() {
         return plugin.getConfig().getBoolean("debug.show_queue_population", true);
     }
 
-    public long getCooldown() {
+    private long getCooldown() {
         if (cooldown == -1) {
             cooldown = formatCooldown();
         }
         return cooldown;
     }
 
-    public List<String> getPlugins() {
+    private List<String> getPlugins() {
         return plugin.getConfig().getStringList("plugins");
     }
 
-    public boolean isWhitelist() {
-        return plugin.getConfig().getBoolean("blacklist.isWhitelist");
-    }
-
-    public int getQueueSize() {
+    private int getQueueSize() {
         return plugin.getConfig().getInt("queue.size", 5);
     }
 
-    public String getCancelMessage() {
-        String message = plugin.getConfig().getString("message.teleport_canceled", "&cYou moved! Teleportation canceled");
-        if (message != null) {
-            message = ChatColor.translateAlternateColorCodes('&', message);
-        }
-        return message;
+    private String getCancelMessage() {
+        return plugin.getConfig().getString("message.teleport_canceled", "&cYou moved! Teleportation canceled");
     }
 
-    public String getInitTeleportDelay() {
-        String message = plugin.getConfig().getString("message.initteleport_delay", "&aYou will be teleported in &6%s seconds. Do not move");
-        if (message != null) {
-            message = ChatColor.translateAlternateColorCodes('&', message);
-            CustomTime time = TimeUtil.formatTime(getTeleportDelay() * 50);
-            message = TimeUtil.toFormattedString(message, time);
-        }
-        return message;
+    private String getInitTeleportDelay() {
+        return plugin.getConfig().getString("message.initteleport_delay", "&aYou will be teleported in &6%s seconds. Do not move");
     }
 
-    public boolean isCanceledOnMove() {
+    private boolean isCanceledOnMove() {
         return plugin.getConfig().getBoolean("teleport.cancel_on_move", false);
     }
+
+    private String getEmptyQueueMessage() {
+        return plugin.getConfig().getString("message.empty_queue", "&cThere are no locations available for this world! Try again in a bit or ask an admin to reload the config.");
+    }
+
+
 }

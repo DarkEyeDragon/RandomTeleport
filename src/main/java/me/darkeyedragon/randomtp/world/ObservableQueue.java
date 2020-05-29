@@ -37,4 +37,8 @@ class ObservableQueue<T> extends ArrayBlockingQueue<T> {
         listeners.forEach(listener -> listener.onRemove(element));
         return element;
     }
+
+    public void unsubscribe(QueueListener<T> listener) {
+        listeners.remove(listener);
+    }
 }

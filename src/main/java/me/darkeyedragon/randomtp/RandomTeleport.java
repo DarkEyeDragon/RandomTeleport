@@ -78,7 +78,7 @@ public final class RandomTeleport extends JavaPlugin {
         manager.registerCommand(new TeleportCommand(this));
         getServer().getPluginManager().registerEvents(new WorldLoadListener(this), this);
         validatorList = new ArrayList<>();
-        configHandler.getPlugins().forEach(s -> {
+        configHandler.getConfigPlugin().getPlugins().forEach(s -> {
             if (getServer().getPluginManager().getPlugin(s) != null) {
                 try {
                     ChunkValidator validator = ValidatorFactory.createFrom(s);
@@ -105,9 +105,9 @@ public final class RandomTeleport extends JavaPlugin {
     }
 
     public void populateWorldQueue() {
-        for (World world : configHandler.getWorlds()) {
+        for (World world : configHandler.getConfigWorld().getWorlds()) {
             //Add a new world to the world queue and generate random locations
-            LocationQueue locationQueue = new LocationQueue(configHandler.getQueueSize(), getLocationSearcher());
+            LocationQueue locationQueue = new LocationQueue(configHandler.getConfigQueue().getSize(), getLocationSearcher());
             //Subscribe to the locationqueue to be notified of changes
             subscribe(locationQueue, world);
             locationQueue.generate(getLocationFactory().getWorldConfigSection(world));
@@ -115,17 +115,18 @@ public final class RandomTeleport extends JavaPlugin {
 
         }
     }
-    private void subscribe(LocationQueue locationQueue, World world){
-        if(configHandler.getDebugShowQueuePopulation()) {
+    public void subscribe(LocationQueue locationQueue, World world){
+        if(configHandler.getConfigDebug().isShowQueuePopulation()) {
+            int size = configHandler.getConfigQueue().getSize();
             locationQueue.subscribe(new QueueListener<Location>() {
                 @Override
                 public void onAdd(Location element) {
-                    getLogger().info("Safe location added for " + world.getName() + " (" + locationQueue.size() + "/" + configHandler.getQueueSize() + ")");
+                    getLogger().info("Safe location added for " + world.getName() + " (" + locationQueue.size() + "/" + size + ")");
                 }
 
                 @Override
                 public void onRemove(Location element) {
-                    getLogger().info("Safe location consumed for " + world.getName() + " (" + locationQueue.size() + "/" + configHandler.getQueueSize() + ")");
+                    getLogger().info("Safe location consumed for " + world.getName() + " (" + locationQueue.size() + "/" + size + ")");
                 }
             });
         }

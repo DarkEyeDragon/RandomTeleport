@@ -14,7 +14,7 @@ public class LocationFactory {
     }
 
     public WorldConfigSection getWorldConfigSection(World world){
-        Map<World, WorldConfigSection> worldOffsetMap = configHandler.getOffsets();
+        Map<World, WorldConfigSection> worldOffsetMap = configHandler.getConfigWorld().getWorldConfigSectionMap();
         WorldConfigSection worldConfigSection = worldOffsetMap.get(world);
         int offsetX;
         int offsetZ;

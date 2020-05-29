@@ -7,16 +7,21 @@ import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
+import me.darkeyedragon.randomtp.config.data.ConfigMessage;
+import me.darkeyedragon.randomtp.config.data.ConfigQueue;
+import me.darkeyedragon.randomtp.config.data.ConfigWorld;
 import me.darkeyedragon.randomtp.eco.EcoHandler;
 import me.darkeyedragon.randomtp.location.LocationFactory;
 import me.darkeyedragon.randomtp.location.WorldConfigSection;
 import me.darkeyedragon.randomtp.world.LocationQueue;
+import me.darkeyedragon.randomtp.world.QueueListener;
 import me.darkeyedragon.randomtp.world.WorldQueue;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -35,13 +40,24 @@ public class TeleportCommand extends BaseCommand {
     //Economy
     private final EcoHandler ecoHandler;
 
+    //Config sections
+    private ConfigMessage configMessage;
+    private ConfigQueue configQueue;
+    private ConfigWorld configWorld;
+
     public TeleportCommand(RandomTeleport plugin) {
         this.plugin = plugin;
-        configHandler = plugin.getConfigHandler();
-        this.locationFactory = plugin.getLocationFactory();
-        //locationHelper = plugin.getLocationSearcher();
-        worldQueue = plugin.getWorldQueue();
         this.ecoHandler = plugin.getEcoHandler();
+        setConfigs();
+    }
+
+    private void setConfigs(){
+        this.configHandler = plugin.getConfigHandler();
+        this.configMessage = configHandler.getConfigMessage();
+        this.configQueue = configHandler.getConfigQueue();
+        this.configWorld = configHandler.getConfigWorld();
+        this.locationFactory = plugin.getLocationFactory();
+        this.worldQueue = plugin.getWorldQueue();
     }
 
     @Default
@@ -82,6 +98,9 @@ public class TeleportCommand extends BaseCommand {
         commandSender.sendMessage(ChatColor.GREEN + "Reloading config...");
         plugin.saveDefaultConfig();
         plugin.reloadConfig();
+        plugin.getConfigHandler().reload();
+        //Set the new config object references
+        setConfigs();
         commandSender.sendMessage(ChatColor.GREEN + "Clearing queue...");
         worldQueue.clear();
         commandSender.sendMessage(ChatColor.GREEN + "Repopulating queue, this can take a while.");
@@ -95,14 +114,35 @@ public class TeleportCommand extends BaseCommand {
     public void onAddWorld(CommandSender commandSender, World world, boolean useWorldBorder, boolean needsWorldPermission, @Optional Integer radius, @Optional Integer offsetX, @Optional Integer offsetZ) {
         if (!useWorldBorder && (radius == null || offsetX == null || offsetZ == null)) {
             commandSender.sendMessage(ChatColor.GOLD + "If " + ChatColor.AQUA + "useWorldBorder" + ChatColor.GOLD + " is false you need to provide the other parameters.");
+            //TODO show syntax
+            //showSyntax(commandSender, );
             return;
         }
-        if (!configHandler.getWorlds().contains(world)) {
-            if (radius == null) radius = 0;
-            if (offsetX == null) offsetX = 0;
-            if (offsetZ == null) offsetZ = 0;
-            if (configHandler.addWorld(new WorldConfigSection(offsetX, offsetZ, radius, world, useWorldBorder, needsWorldPermission))) {
+        if (!configWorld.contains(world)) {
+            if(useWorldBorder) {
+                if (radius == null) radius = 0;
+                if (offsetX == null) offsetX = 0;
+                if (offsetZ == null) offsetZ = 0;
+            }
+            LocationQueue locationQueue = configWorld.add(new WorldConfigSection(offsetX, offsetZ, radius, world, useWorldBorder, needsWorldPermission));
+            if (locationQueue != null) {
                 commandSender.sendMessage(ChatColor.GREEN + "Successfully added to config.");
+                if(!(commandSender instanceof ConsoleCommandSender)) {
+                    locationQueue.subscribe(new QueueListener<Location>() {
+                        @Override
+                        public void onAdd(Location element) {
+                            commandSender.sendMessage("Safe location added for " + world.getName() + " (" + locationQueue.size() + "/" + configQueue.getSize() + ")");
+                            if (locationQueue.size() == configQueue.getSize()) {
+                                locationQueue.unsubscribe(this);
+                            }
+                        }
+
+                        @Override
+                        public void onRemove(Location element) {
+                            //ignored
+                        }
+                    });
+                }
             } else {
                 commandSender.sendMessage(ChatColor.RED + "Size section not present in the config! Add it or recreate your config.");
             }
@@ -112,43 +152,41 @@ public class TeleportCommand extends BaseCommand {
     }
 
     private void teleportSetup(Player player, World world, boolean force) {
-        boolean useEco = configHandler.useEco() && !player.hasPermission("rtp.eco.bypass");
-        if(useEco){
-            double price =  configHandler.getPrice();
-            if(!ecoHandler.hasEnough(player, price)){
-                player.sendMessage(configHandler.getInsufficientFundsMessage());
+        boolean useEco = configHandler.getConfigEconomy().useEco() && !player.hasPermission("rtp.eco.bypass");
+        if (useEco) {
+            double price = configHandler.getConfigEconomy().getPrice();
+            if (!ecoHandler.hasEnough(player, price)) {
+                player.sendMessage(configMessage.getEconomy().getInsufficientFunds());
                 return;
             }
         }
 
         WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(world);
         if (worldConfigSection == null || ((!player.hasPermission("rtp.world." + world.getName())) && worldConfigSection.needsWorldPermission())) {
-            player.sendMessage(configHandler.getNoWorldPermissionMessage(world));
+            player.sendMessage(configMessage.getNoWorldPermission(world));
             return;
         }
         boolean hasBypassPermission = player.hasPermission("rtp.teleportdelay.bypass");
 
-        if (configHandler.getWorldsBlacklist().contains(world)) {
-            if (!configHandler.isWhitelist()) {
-                player.sendMessage(configHandler.getBlacklistMessage());
-                return;
-            }
-        }
         if (plugin.getCooldowns().containsKey(player.getUniqueId()) && !player.hasPermission("rtp.teleport.bypass")) {
             long lasttp = plugin.getCooldowns().get(player.getUniqueId());
-            long remaining = lasttp + configHandler.getCooldown() - System.currentTimeMillis();
+            long remaining = lasttp + configHandler.getConfigTeleport().getCooldown() - System.currentTimeMillis();
             boolean ableToTp = remaining < 0;
             if (!ableToTp && !force) {
-                player.sendMessage(configHandler.getCountdownRemainingMessage(remaining));
+                player.sendMessage(configMessage.getCountdown(remaining));
                 return;
             }
         }
-        if (configHandler.getTeleportDelay() > 0 && !hasBypassPermission) {
-            player.sendMessage(configHandler.getInitTeleportDelay());
+        long delay = configHandler.getConfigTeleport().getDelay();
+        if (delay > 0 && !hasBypassPermission) {
+            player.sendMessage(configMessage.getInitTeleportDelay(delay));
         }
         LocationQueue locationQueue = worldQueue.get(world);
-        Location loc = worldQueue.get(world).poll();
-        System.out.println(locationQueue.size());
+        Location loc = worldQueue.popLocation(world);
+        if (loc == null) {
+            player.sendMessage(configMessage.getEmptyQueue());
+            return;
+        }
         teleport(player, loc, world, useEco);
 
         /*if (loc == null) {
@@ -162,23 +200,23 @@ public class TeleportCommand extends BaseCommand {
 
     public void teleport(Player player, Location loc, World world, boolean useEco) {
         boolean hasBypassPermission = player.hasPermission("rtp.teleportdelay.bypass");
-        long teleportDelay = hasBypassPermission ? 1 : configHandler.getTeleportDelay();
+        long teleportDelay = hasBypassPermission ? 1 : configHandler.getConfigTeleport().getDelay();
 
         BukkitRunnable runnable = new BukkitRunnable() {
             @Override
             public void run() {
-                player.sendMessage(configHandler.getInitTeleportMessage());
+                player.sendMessage(configHandler.getConfigMessage().getInit());
                 player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 3, 5, false, false));
                 Location location = loc.getWorld().getHighestBlockAt(loc).getLocation().add(0.5, 2, 0.5);
                 plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
                 drawWarpParticles(player);
                 PaperLib.teleportAsync(player, location);
-                if(useEco){
-                    ecoHandler.makePayment(player, configHandler.getPrice());
-                    player.sendMessage(configHandler.getPaymentMessage());
+                if (useEco) {
+                    ecoHandler.makePayment(player, configHandler.getConfigEconomy().getPrice());
+                    player.sendMessage(configMessage.getEconomy().getPayment());
                 }
                 drawWarpParticles(player);
-                player.sendMessage(configHandler.getTeleportMessage());
+                player.sendMessage(configMessage.getTeleport());
                 teleportSuccess = true;
                 new BukkitRunnable() {
                     @Override
@@ -188,21 +226,21 @@ public class TeleportCommand extends BaseCommand {
                         //plugin.subscribe(locationQueue, world);
                         worldQueue.get(world).generate(worldConfigSection, 1);
                     }
-                }.runTaskLater(plugin, configHandler.getInitDelay());
+                }.runTaskLater(plugin, configHandler.getConfigQueue().getInitDelay());
             }
         };
 
         runnable.runTaskLater(plugin, teleportDelay);
         if (hasBypassPermission) return;
         Location originalLoc = player.getLocation().clone();
-        if (configHandler.getTeleportDelay() > 0 && configHandler.isCanceledOnMove()) {
+        if (teleportDelay > 0 && configHandler.getConfigTeleport().isCancelOnMove()) {
             new BukkitRunnable() {
                 @Override
                 public void run() {
                     Location currentLoc = player.getLocation();
                     if (originalLoc.getX() != currentLoc.getX() || originalLoc.getY() != currentLoc.getY() || originalLoc.getZ() != currentLoc.getZ()) {
                         if (!isTeleportSuccess())
-                            player.sendMessage(configHandler.getCancelMessage());
+                            player.sendMessage(configMessage.getTeleportCanceled());
                         runnable.cancel();
                         cancel();
                     }
