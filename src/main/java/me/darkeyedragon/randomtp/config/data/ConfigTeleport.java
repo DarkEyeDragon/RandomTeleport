@@ -12,7 +12,7 @@ public class ConfigTeleport {
         return this;
     }
 
-    public ConfigTeleport delay(int delay){
+    public ConfigTeleport delay(long delay){
         this.delay = delay;
         return this;
     }

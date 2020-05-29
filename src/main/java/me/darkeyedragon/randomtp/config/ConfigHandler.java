@@ -67,7 +67,7 @@ public class ConfigHandler {
     public void populateConfigTeleport() {
         configTeleport = new ConfigTeleport()
                 .cooldown(getCooldown())
-                .delay(getInitDelay())
+                .delay(getTeleportDelay())
                 .cancelOnMove(isCanceledOnMove());
     }
 
