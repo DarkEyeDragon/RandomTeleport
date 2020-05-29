@@ -46,3 +46,7 @@ permissions:
   rtp.teleportdelay.bypass:
     description: bypass initial tp delay
 ```
+
+### Known issues
+- Config files will lose comments when adding/removing worlds through commands (SnakeYML limitation). Might or might not fix.
+- Setting a radius with all unsafe locations will cause the plugin to search indefinitely. There is no search limit.
