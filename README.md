@@ -35,6 +35,11 @@ permissions:
     children:
       rtp.teleport.*: true
       rtp.teleportdelay.bypass: true
+      rtp.eco.*: true
+  rtp.eco.*:
+    description: bypass all economy restrictions
+    children:
+      rtp.eco.bypass: true
   rtp.teleport.self:
     description: random teleport yourself
   rtp.teleport.other:
@@ -45,6 +50,8 @@ permissions:
     description: bypass the cooldown
   rtp.teleportdelay.bypass:
     description: bypass initial tp delay
+  rtp.eco.bypass:
+    description: bypass economy costs
 ```
 
 ### Known issues
