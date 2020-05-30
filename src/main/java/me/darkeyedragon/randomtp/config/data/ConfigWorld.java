@@ -22,27 +22,28 @@ public class ConfigWorld {
     }
 
 
-    public ConfigWorld set(Map<World, WorldConfigSection> worldConfigSectionMap){
+    public ConfigWorld set(Map<World, WorldConfigSection> worldConfigSectionMap) {
         this.worldConfigSectionMap = worldConfigSectionMap;
         return this;
     }
 
-    public WorldConfigSection get(World world){
+    public WorldConfigSection get(World world) {
         return worldConfigSectionMap.get(world);
     }
 
-    public Map<World, WorldConfigSection> getWorldConfigSectionMap(){
-        return  worldConfigSectionMap;
+    public Map<World, WorldConfigSection> getWorldConfigSectionMap() {
+        return worldConfigSectionMap;
     }
 
-    public Set<World> getWorlds(){
+    public Set<World> getWorlds() {
         return worldConfigSectionMap.keySet();
     }
 
-    public boolean contains(World world){
+    public boolean contains(World world) {
         return worldConfigSectionMap.containsKey(world);
     }
-    public boolean contains(WorldConfigSection worldConfigSection){
+
+    public boolean contains(WorldConfigSection worldConfigSection) {
         return worldConfigSectionMap.containsKey(worldConfigSection.getWorld());
     }
 
@@ -60,7 +61,7 @@ public class ConfigWorld {
         return generateLocations(worldConfigSection.getWorld());
     }
 
-    private LocationQueue generateLocations(World world){
+    private LocationQueue generateLocations(World world) {
         WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(world);
         ConfigQueue configQueue = plugin.getConfigHandler().getConfigQueue();
         LocationQueue locationQueue = new LocationQueue(configQueue.getSize(), plugin.getLocationSearcher());
@@ -71,11 +72,10 @@ public class ConfigWorld {
     }
 
     public boolean remove(World world) {
-        if(section == null){
+        if (section == null || !section.contains(world.getName())) {
             return false;
         }
-        section.set(world.getName(), "");
-        worldConfigSectionMap.remove(world);
+        section.set(world.getName(), null);
         plugin.saveConfig();
         plugin.getWorldQueue().remove(world);
         return true;

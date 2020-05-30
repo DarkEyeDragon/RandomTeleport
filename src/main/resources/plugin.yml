@@ -26,6 +26,11 @@ permissions:
     description: bypass all economy restrictions
     children:
       rtp.eco.bypass: true
+  rtp.admin.*:
+    description: give all admin commands
+    children:
+      rtp.admin.removeworld: true
+      rtp.admin.addworld: true
   rtp.teleport.self:
     description: random teleport yourself
   rtp.teleport.other:
@@ -38,3 +43,9 @@ permissions:
     description: bypass initial tp delay
   rtp.eco.bypass:
     description: bypass economy costs
+  rtp.admin.removeworld:
+    description: allow admins to remove worlds from the config
+  rtp.admin.addworld:
+    description: allow admins to add worlds to the config
+  rtp.admin.resetcooldown:
+    description: allow admins to reset the cooldown timer of players
