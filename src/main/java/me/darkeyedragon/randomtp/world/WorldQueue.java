@@ -22,6 +22,10 @@ public class WorldQueue{
         return worldQueueMap.put(world, locationQueue);
     }
 
+    public LocationQueue remove(World world){
+        return worldQueueMap.remove(world);
+    }
+
     public LocationQueue get(World world) {
         return worldQueueMap.get(world);
     }
@@ -31,9 +35,11 @@ public class WorldQueue{
     }
 
     public Location popLocation(World world){
-        Location location = worldQueueMap.get(world).poll();
-        System.out.println(location);
-        return  location;
+        LocationQueue locationQueue = get(world);
+        if(locationQueue == null){
+            return null;
+        }
+        return locationQueue.poll();
     }
 
 }

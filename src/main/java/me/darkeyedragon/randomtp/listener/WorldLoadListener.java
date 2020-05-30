@@ -14,28 +14,30 @@ public class WorldLoadListener implements Listener {
 
     private final ConfigHandler configHandler;
     private final RandomTeleport plugin;
+
     public WorldLoadListener(RandomTeleport plugin) {
         this.plugin = plugin;
         this.configHandler = plugin.getConfigHandler();
     }
 
     @EventHandler
-    public void onWorldLoad(WorldLoadEvent event){
+    public void onWorldLoad(WorldLoadEvent event) {
         World world = event.getWorld();
-        if(configHandler.getWorlds().contains(world)){
+        if (configHandler.getConfigWorld().getWorlds().contains(world)) {
             //Add a new world to the world queue and generate random locations
-            LocationQueue locationQueue = new LocationQueue(configHandler.getQueueSize(), plugin.getLocationSearcher());
+            LocationQueue locationQueue = new LocationQueue(configHandler.getConfigQueue().getSize(), plugin.getLocationSearcher());
             //Subscribe to the locationqueue to be notified of changes
-            if(configHandler.getDebugShowQueuePopulation()) {
+            if (configHandler.getConfigDebug().isShowQueuePopulation()) {
+                int size = configHandler.getConfigQueue().getSize();
                 locationQueue.subscribe(new QueueListener<Location>() {
                     @Override
                     public void onAdd(Location element) {
-                        plugin.getLogger().info("Safe location added for " + world.getName() + " (" + locationQueue.size() + "/" + configHandler.getQueueSize() + ")");
+                        plugin.getLogger().info("Safe location added for " + world.getName() + " (" + locationQueue.size() + "/" + size + ")");
                     }
 
                     @Override
                     public void onRemove(Location element) {
-                        plugin.getLogger().info("Safe location consumed for " + world.getName() + " (" + locationQueue.size() + "/" + configHandler.getQueueSize() + ")");
+                        plugin.getLogger().info("Safe location consumed for " + world.getName() + " (" + locationQueue.size() + "/" + size + ")");
                     }
                 });
             }

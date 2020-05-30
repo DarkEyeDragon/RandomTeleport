@@ -2,15 +2,18 @@ message:
   initteleport: "&aSearching for safe location to teleport to..."
   #Used when teleport delay is larger than 0. This supports placeholders
   #valid placeholders: %hp (hours partial) %mp (minutes partial) %sp (seconds partial) %h (total hours) %m (total minutes) %s(total seconds)
-  initteleport_delay: "&aYou will be teleported in &6%s seconds. Do not move"
+  initteleport_delay: "&aYou will be teleported in &6%s seconds. &aDo not move!"
   teleport_canceled: "&aYou moved! Teleportation canceled"
   teleport: "&bA safe place has been found! Teleporting..."
   depleted_queue: "&6Locations queue depleted... Forcing generation of a new location"
   #valid placeholders: %hp (hours partial) %mp (minutes partial) %sp (seconds partial) %h (total hours) %m (total minutes) %s(total seconds)
   countdown: "&cYou cannot teleport for another &6%mp minutes %sp seconds"
-  nopermission: "&cYou do not have permission to execute this command!"
   #valid placeholders: %world
-  no_world_permission: "&cI am sorry, you do not have permission to rtp in %world"
+  no_world_permission: "&cI am sorry, you cannot rtp in %world"
+  empty_queue: "&cThere are no locations available for this world! Try again in a bit or ask an admin to reload the config."
+  economy:
+    insufficient_funds: "&cYou do not have enough money to rtp!"
+    payment: "&aYou just paid &b%price &ato rtp!"
 #The amount of pre-generated locations in the queue
 queue:
   size: 5
@@ -23,7 +26,7 @@ worlds:
     use_worldborder: true
     #Wether or not the user needs the rtp.world.<worldname> permission
     needs_world_permission: false
-    #Will be ignored if use_worldborder is true
+    #Radus and offset will be ignored if use_worldborder is true.
     radius: 21474836
     offsetX: 0
     offsetZ: 0
@@ -45,3 +48,5 @@ debug:
   #Safe location added for world(3/5)
   #Location removed from world(2/5)
   show_queue_population: true
+economy:
+  price: 0

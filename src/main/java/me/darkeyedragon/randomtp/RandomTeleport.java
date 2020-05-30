@@ -5,6 +5,7 @@ import co.aikar.commands.PaperCommandManager;
 import me.darkeyedragon.randomtp.command.TeleportCommand;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
+import me.darkeyedragon.randomtp.eco.EcoHandler;
 import me.darkeyedragon.randomtp.listener.WorldLoadListener;
 import me.darkeyedragon.randomtp.location.LocationFactory;
 import me.darkeyedragon.randomtp.location.LocationSearcher;
@@ -13,10 +14,12 @@ import me.darkeyedragon.randomtp.validator.ValidatorFactory;
 import me.darkeyedragon.randomtp.world.LocationQueue;
 import me.darkeyedragon.randomtp.world.QueueListener;
 import me.darkeyedragon.randomtp.world.WorldQueue;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -34,6 +37,10 @@ public final class RandomTeleport extends JavaPlugin {
     private ConfigHandler configHandler;
     private LocationSearcher locationSearcher;
     private LocationFactory locationFactory;
+
+    //Economy
+    private Economy econ;
+    private EcoHandler ecoHandler;
 
     @Override
     public void onEnable() {
@@ -62,10 +69,16 @@ public final class RandomTeleport extends JavaPlugin {
             }
         });
         cooldowns = new HashMap<>();
+        if(setupEconomy()){
+            getLogger().info("Vault found. Hooking into it.");
+            ecoHandler = new EcoHandler(econ);
+        }else{
+            getLogger().info("Vault not found. Currency based options are disabled.");
+        }
         manager.registerCommand(new TeleportCommand(this));
         getServer().getPluginManager().registerEvents(new WorldLoadListener(this), this);
         validatorList = new ArrayList<>();
-        configHandler.getPlugins().forEach(s -> {
+        configHandler.getConfigPlugin().getPlugins().forEach(s -> {
             if (getServer().getPluginManager().getPlugin(s) != null) {
                 try {
                     ChunkValidator validator = ValidatorFactory.createFrom(s);
@@ -92,9 +105,9 @@ public final class RandomTeleport extends JavaPlugin {
     }
 
     public void populateWorldQueue() {
-        for (World world : configHandler.getWorlds()) {
+        for (World world : configHandler.getConfigWorld().getWorlds()) {
             //Add a new world to the world queue and generate random locations
-            LocationQueue locationQueue = new LocationQueue(configHandler.getQueueSize(), getLocationSearcher());
+            LocationQueue locationQueue = new LocationQueue(configHandler.getConfigQueue().getSize(), getLocationSearcher());
             //Subscribe to the locationqueue to be notified of changes
             subscribe(locationQueue, world);
             locationQueue.generate(getLocationFactory().getWorldConfigSection(world));
@@ -102,20 +115,34 @@ public final class RandomTeleport extends JavaPlugin {
 
         }
     }
-    private void subscribe(LocationQueue locationQueue, World world){
-        if(configHandler.getDebugShowQueuePopulation()) {
+    public void subscribe(LocationQueue locationQueue, World world){
+        if(configHandler.getConfigDebug().isShowQueuePopulation()) {
+            int size = configHandler.getConfigQueue().getSize();
             locationQueue.subscribe(new QueueListener<Location>() {
                 @Override
                 public void onAdd(Location element) {
-                    getLogger().info("Safe location added for " + world.getName() + " (" + locationQueue.size() + "/" + configHandler.getQueueSize() + ")");
+                    getLogger().info("Safe location added for " + world.getName() + " (" + locationQueue.size() + "/" + size + ")");
                 }
 
                 @Override
                 public void onRemove(Location element) {
-                    getLogger().info("Safe location consumed for " + world.getName() + " (" + locationQueue.size() + "/" + configHandler.getQueueSize() + ")");
+                    getLogger().info("Safe location consumed for " + world.getName() + " (" + locationQueue.size() + "/" + size + ")");
                 }
             });
         }
+    }
+
+    //Economy logic
+    private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        econ = rsp.getProvider();
+        return econ != null;
     }
 
     public HashMap<UUID, Long> getCooldowns() {
@@ -148,5 +175,9 @@ public final class RandomTeleport extends JavaPlugin {
 
     public LocationFactory getLocationFactory() {
         return locationFactory;
+    }
+
+    public EcoHandler getEcoHandler() {
+        return ecoHandler;
     }
 }

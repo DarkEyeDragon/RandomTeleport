@@ -10,16 +10,8 @@ Teleport a player to a random (safe) location in the Minecraft world.
 - Full async chunkloading support for Paper servers.
 - Choose if a world requires a permission or not
 
-### Permissions
-|Permission|Description|
-|----------|-------|
-|``rtp.teleport.self``| Allows you to use the `/rtp` base command |
-|``rtp.teleport.other``| Allows you to teleport other players with `/rtp <playername>`|
-|``rtp.teleport.bypass``| Lets you to bypass the cooldown timer|
-|``rtp.teleport.world``| Random teleport to any world that doesnt require extra permissions
-|``rtp.teleport.*``| Give all permissions. Including bypass|
 
-### For the more tech savvy people the plugin.yml permissions
+### Permissions
 
 ```yml
 permissions:
@@ -35,6 +27,19 @@ permissions:
     children:
       rtp.teleport.*: true
       rtp.teleportdelay.bypass: true
+      rtp.eco.*: true
+  rtp.eco.*:
+    description: bypass all economy restrictions
+    children:
+      rtp.eco.bypass: true
+  rtp.admin.*:
+    description: give all admin commands
+    children:
+      rtp.admin.removeworld: true
+      rtp.admin.addworld: true
+      rtp.admin.resetcooldown: true
+      rtp.admin.reload: true
+      rtp.admin.setprice: true
   rtp.teleport.self:
     description: random teleport yourself
   rtp.teleport.other:
@@ -45,4 +50,27 @@ permissions:
     description: bypass the cooldown
   rtp.teleportdelay.bypass:
     description: bypass initial tp delay
+  rtp.eco.bypass:
+    description: bypass economy costs
+  rtp.admin.removeworld:
+    description: allow admins to remove worlds from the config
+  rtp.admin.addworld:
+    description: allow admins to add worlds to the config
+  rtp.admin.resetcooldown:
+    description: allow admins to reset the cooldown timer of players
+  rtp.admin.reload:
+    description: allow admins to reload the plugin configs and repopulate queues
+  rtp.admin.setprice:
+    description: allow admins to set the teleport costs
 ```
+![alt text](https://i.imgur.com/78pXgKp.png "commands")
+![alt text](https://i.imgur.com/dhdUE8i.png "rtp")
+![alt text](https://i.imgur.com/9JCz30l.png "async world ")
+### Known issues
+- Config files will lose comments when adding/removing worlds through commands (SnakeYML limitation). Might or might not fix.
+- Setting a radius with all unsafe locations will cause the plugin to search indefinitely. There is no search limit.
+
+### Platforms
+- [x] Spigot 
+- [X] Paper
+- [ ] Sponge (coming soon)
