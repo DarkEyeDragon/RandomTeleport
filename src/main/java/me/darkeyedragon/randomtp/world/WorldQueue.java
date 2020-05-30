@@ -35,8 +35,11 @@ public class WorldQueue{
     }
 
     public Location popLocation(World world){
-        Location location = get(world).poll();
-        return  location;
+        LocationQueue locationQueue = get(world);
+        if(locationQueue == null){
+            return null;
+        }
+        return locationQueue.poll();
     }
 
 }

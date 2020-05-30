@@ -74,6 +74,10 @@ public class TeleportCommand extends BaseCommand {
                 throw new InvalidCommandArgument(true);
             }
         } else {
+            if(!configWorld.contains(world)){
+                sender.sendMessage(configMessage.getNoWorldPermission(world));
+                return;
+            }
             if (target.isPlayer()) {
                 player = target.getPlayer();
                 newWorld = world;
@@ -217,7 +221,6 @@ public class TeleportCommand extends BaseCommand {
         if (delay > 0 && !hasBypassPermission) {
             player.sendMessage(configMessage.getInitTeleportDelay(delay));
         }
-        LocationQueue locationQueue = worldQueue.get(world);
         Location loc = worldQueue.popLocation(world);
         if (loc == null) {
             player.sendMessage(configMessage.getEmptyQueue());
