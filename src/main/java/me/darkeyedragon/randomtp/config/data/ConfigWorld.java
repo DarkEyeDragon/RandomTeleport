@@ -14,9 +14,13 @@ public class ConfigWorld {
 
     private Map<World, WorldConfigSection> worldConfigSectionMap;
     private final RandomTeleport plugin;
+    private final ConfigurationSection section;
+
     public ConfigWorld(RandomTeleport plugin) {
         this.plugin = plugin;
+        section = plugin.getConfig().getConfigurationSection("worlds");
     }
+
 
     public ConfigWorld set(Map<World, WorldConfigSection> worldConfigSectionMap){
         this.worldConfigSectionMap = worldConfigSectionMap;
@@ -43,7 +47,6 @@ public class ConfigWorld {
     }
 
     public LocationQueue add(WorldConfigSection worldConfigSection) {
-        final ConfigurationSection section = plugin.getConfig().getConfigurationSection("worlds");
         if (section == null) {
             return null;
         }
@@ -65,5 +68,16 @@ public class ConfigWorld {
         locationQueue.generate(worldConfigSection, configQueue.getSize());
         plugin.getWorldQueue().put(world, locationQueue);
         return locationQueue;
+    }
+
+    public boolean remove(World world) {
+        if(section == null){
+            return false;
+        }
+        section.set(world.getName(), "");
+        worldConfigSectionMap.remove(world);
+        plugin.saveConfig();
+        plugin.getWorldQueue().remove(world);
+        return true;
     }
 }

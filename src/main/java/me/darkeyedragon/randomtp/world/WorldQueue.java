@@ -22,6 +22,10 @@ public class WorldQueue{
         return worldQueueMap.put(world, locationQueue);
     }
 
+    public LocationQueue remove(World world){
+        return worldQueueMap.remove(world);
+    }
+
     public LocationQueue get(World world) {
         return worldQueueMap.get(world);
     }

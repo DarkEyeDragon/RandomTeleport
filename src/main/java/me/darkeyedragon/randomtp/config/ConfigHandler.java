@@ -229,4 +229,8 @@ public class ConfigHandler {
     }
 
 
+    public void setTeleportPrice(double price) {
+        plugin.getConfig().set("economy.price", price);
+        plugin.saveConfig();
+    }
 }
