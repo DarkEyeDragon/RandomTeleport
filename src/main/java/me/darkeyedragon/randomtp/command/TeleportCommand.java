@@ -118,9 +118,7 @@ public class TeleportCommand extends BaseCommand {
     public void onAddWorld(CommandSender commandSender, World world, boolean useWorldBorder, boolean needsWorldPermission, @Optional Integer radius, @Optional Integer offsetX, @Optional Integer offsetZ) {
         if (!useWorldBorder && (radius == null || offsetX == null || offsetZ == null)) {
             commandSender.sendMessage(ChatColor.GOLD + "If " + ChatColor.AQUA + "useWorldBorder" + ChatColor.GOLD + " is false you need to provide the other parameters.");
-            //TODO show syntax
-            //showSyntax(commandSender, );
-            return;
+            throw new InvalidCommandArgument(true);
         }
         if (!configWorld.contains(world)) {
             if (useWorldBorder) {
