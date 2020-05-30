@@ -31,6 +31,9 @@ permissions:
     children:
       rtp.admin.removeworld: true
       rtp.admin.addworld: true
+      rtp.admin.resetcooldown: true
+      rtp.admin.reload: true
+      rtp.admin.setprice: true
   rtp.teleport.self:
     description: random teleport yourself
   rtp.teleport.other:
@@ -49,3 +52,7 @@ permissions:
     description: allow admins to add worlds to the config
   rtp.admin.resetcooldown:
     description: allow admins to reset the cooldown timer of players
+  rtp.admin.reload:
+    description: allow admins to reload the plugin configs and repopulate queues
+  rtp.admin.setprice:
+    description: allow admins to set the teleport costs

@@ -97,7 +97,7 @@ public class TeleportCommand extends BaseCommand {
     }
 
     @Subcommand("reload")
-    @CommandPermission("rtp.reload")
+    @CommandPermission("rtp.admin.reload")
     public void onReload(CommandSender commandSender) {
         commandSender.sendMessage(ChatColor.GREEN + "Reloading config...");
         plugin.saveDefaultConfig();
@@ -258,9 +258,7 @@ public class TeleportCommand extends BaseCommand {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        //LocationQueue locationQueue = new LocationQueue(configHandler.getQueueSize(), plugin.getLocationSearcher());
                         WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(world);
-                        //plugin.subscribe(locationQueue, world);
                         worldQueue.get(world).generate(worldConfigSection, 1);
                     }
                 }.runTaskLater(plugin, configHandler.getConfigQueue().getInitDelay());
