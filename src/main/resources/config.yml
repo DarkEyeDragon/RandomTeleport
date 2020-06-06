@@ -9,7 +9,7 @@ message:
   #valid placeholders: %hp (hours partial) %mp (minutes partial) %sp (seconds partial) %h (total hours) %m (total minutes) %s(total seconds)
   countdown: "&cYou cannot teleport for another &6%mp minutes %sp seconds"
   #valid placeholders: %world
-  no_world_permission: "&cI am sorry, you cannot rtp in %world"
+  no_world_permission: "&cI'm sorry, you cannot rtp in %world"
   empty_queue: "&cThere are no locations available for this world! Try again in a bit or ask an admin to reload the config."
   economy:
     insufficient_funds: "&cYou do not have enough money to rtp!"
