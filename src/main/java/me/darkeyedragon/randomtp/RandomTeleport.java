@@ -56,12 +56,11 @@ public final class RandomTeleport extends JavaPlugin {
             String arg1 = c.popFirstArg();
             World world = Bukkit.getWorld(arg1);
             Player player = Bukkit.getPlayer(arg1);
+            PlayerWorldContext context = new PlayerWorldContext();
             if (world != null) {
-                PlayerWorldContext context = new PlayerWorldContext();
                 context.setWorld(world);
                 return context;
             } else if (player != null) {
-                PlayerWorldContext context = new PlayerWorldContext();
                 context.setPlayer(player);
                 return context;
             } else {

@@ -63,28 +63,47 @@ public class TeleportCommand extends BaseCommand {
     @Default
     @CommandPermission("rtp.teleport.self")
     @CommandCompletion("@players|@worlds")
-    public void onTeleport(CommandSender sender, @Optional @CommandPermission("rtp.teleport.other") PlayerWorldContext target, @Optional @CommandPermission("rtp.teleport.world") World world) {
+    public void onTeleport(CommandSender sender, @Optional PlayerWorldContext target, @Optional @CommandPermission("rtp.teleport.world") World world) {
         Player player;
         World newWorld;
         if (target == null) {
             if (sender instanceof Player) {
                 player = (Player) sender;
                 newWorld = player.getWorld();
+                if(!configWorld.contains(newWorld)){
+                    sender.sendMessage(configMessage.getNoWorldPermission(newWorld));
+                    return;
+                }
             } else {
                 throw new InvalidCommandArgument(true);
             }
         } else {
-            if(!configWorld.contains(world)){
-                sender.sendMessage(configMessage.getNoWorldPermission(world));
-                return;
-            }
             if (target.isPlayer()) {
-                player = target.getPlayer();
-                newWorld = world;
+                if(sender.hasPermission("rtp.teleport.other")) {
+                    player = target.getPlayer();
+                    newWorld = world;
+                    if(!configWorld.contains(newWorld)){
+                        sender.sendMessage(configMessage.getNoWorldPermission(newWorld));
+                        return;
+                    }
+                }else{
+                    sender.sendMessage(ChatColor.RED + "I'm sorry, you do not have permission to perform this command!");
+                    return;
+                }
             } else if (target.isWorld()) {
                 if (sender instanceof Player) {
                     player = (Player) sender;
                     newWorld = target.getWorld();
+                    if(!configWorld.contains(newWorld)){
+                        sender.sendMessage(configMessage.getNoWorldPermission(newWorld));
+                        return;
+                    }
+                    WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(newWorld);
+                    if (worldConfigSection == null || ((!sender.hasPermission("rtp.world." + newWorld.getName())) && worldConfigSection.needsWorldPermission())) {
+                        sender.sendMessage(configMessage.getNoWorldPermission(newWorld));
+                        return;
+                    }
+
                 } else {
                     throw new InvalidCommandArgument(true);
                 }
@@ -197,12 +216,6 @@ public class TeleportCommand extends BaseCommand {
                 player.sendMessage(configMessage.getEconomy().getInsufficientFunds());
                 return;
             }
-        }
-
-        WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(world);
-        if (worldConfigSection == null || ((!player.hasPermission("rtp.world." + world.getName())) && worldConfigSection.needsWorldPermission())) {
-            player.sendMessage(configMessage.getNoWorldPermission(world));
-            return;
         }
         boolean hasBypassPermission = player.hasPermission("rtp.teleportdelay.bypass");
 
