@@ -16,6 +16,7 @@ import me.darkeyedragon.randomtp.world.QueueListener;
 import me.darkeyedragon.randomtp.world.WorldQueue;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -68,33 +69,36 @@ public final class RandomTeleport extends JavaPlugin {
             }
         });
         cooldowns = new HashMap<>();
-        if(setupEconomy()){
+        if (setupEconomy()) {
             getLogger().info("Vault found. Hooking into it.");
             ecoHandler = new EcoHandler(econ);
-        }else{
+        } else {
             getLogger().info("Vault not found. Currency based options are disabled.");
         }
         manager.registerCommand(new TeleportCommand(this));
         getServer().getPluginManager().registerEvents(new WorldLoadListener(this), this);
         validatorList = new ArrayList<>();
+        getLogger().info(ChatColor.AQUA + "======== [Loading validators] ========");
         configHandler.getConfigPlugin().getPlugins().forEach(s -> {
             if (getServer().getPluginManager().getPlugin(s) != null) {
                 try {
                     ChunkValidator validator = ValidatorFactory.createFrom(s);
                     if (validator != null) {
                         validatorList.add(validator);
-                        getLogger().info(s + " loaded as validator.");
+                        getLogger().info(ChatColor.GREEN + s + " -- Successfully loaded");
                     }
                 } catch (IllegalArgumentException ignored) {
-                    getLogger().warning(s + " is not a valid validator. Make sure it is spelled correctly.");
+                    getLogger().warning(ChatColor.RED + s + " -- Not Found");
                 }
 
             } else {
-                getLogger().warning(s + " is not a valid plugin or is not loaded!");
+                getLogger().warning(ChatColor.RED + s + " -- Not Found");
             }
         });
+        getLogger().info(ChatColor.AQUA + "======================================");
         populateWorldQueue();
     }
+
     @Override
     public void onDisable() {
         // Plugin shutdown logic
@@ -114,8 +118,9 @@ public final class RandomTeleport extends JavaPlugin {
 
         }
     }
-    public void subscribe(LocationQueue locationQueue, World world){
-        if(configHandler.getConfigDebug().isShowQueuePopulation()) {
+
+    public void subscribe(LocationQueue locationQueue, World world) {
+        if (configHandler.getConfigDebug().isShowQueuePopulation()) {
             int size = configHandler.getConfigQueue().getSize();
             locationQueue.subscribe(new QueueListener<Location>() {
                 @Override

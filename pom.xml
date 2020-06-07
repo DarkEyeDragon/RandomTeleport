@@ -156,5 +156,11 @@
             <version>1.7</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.griefdefender</groupId>
+            <artifactId>api</artifactId>
+            <version>1.0.0-snapshot</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>

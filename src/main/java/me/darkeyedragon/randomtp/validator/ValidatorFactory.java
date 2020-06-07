@@ -14,6 +14,8 @@ public class ValidatorFactory {
                 return new WorldGuardValidator();
             case GRIEF_PREVENTION:
                 return new GriefPreventionValidator();
+            case GRIEF_DEFENDER:
+                return new GriefDefenderValidator();
         }
         return null;
     }
