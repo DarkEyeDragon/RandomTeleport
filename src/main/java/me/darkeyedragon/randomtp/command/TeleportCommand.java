@@ -22,7 +22,6 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -122,12 +121,8 @@ public class TeleportCommand extends BaseCommand {
         commandSender.sendMessage(ChatColor.GREEN + "Reloading config...");
         plugin.saveDefaultConfig();
         plugin.reloadConfig();
-        try {
-            plugin.getConfigHandler().reload();
-        } catch (InvalidConfigurationException e) {
-            commandSender.sendMessage(ChatColor.RED + "Could not reload config! Your config is not configured correctly. Check the console for details.");
-            e.printStackTrace();
-        }
+        plugin.getConfigHandler().reload();
+        commandSender.sendMessage(ChatColor.RED + "Could not reload config! Your config is not configured correctly. Check the console for details.");
         //Set the new config object references
         setConfigs();
         commandSender.sendMessage(ChatColor.GREEN + "Clearing queue...");
