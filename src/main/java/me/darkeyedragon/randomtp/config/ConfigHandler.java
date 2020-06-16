@@ -39,7 +39,11 @@ public class ConfigHandler {
         populateConfigPlugins();
         populateConfigMessage();
         populateConfigQueue();
-        populateWorldConfigSection();
+        try {
+            populateWorldConfigSection();
+        } catch (InvalidConfigurationException e) {
+            plugin.getLogger().warning(e.getMessage());
+        }
         populateConfigTeleport();
         populateConfigDebug();
         populateConfigEconomy();
@@ -66,7 +70,7 @@ public class ConfigHandler {
                 .initDelay(getInitDelay());
     }
 
-    public void populateWorldConfigSection() {
+    public void populateWorldConfigSection() throws InvalidConfigurationException {
         configWorld = new ConfigWorld(plugin).set(getOffsets());
     }
 

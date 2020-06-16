@@ -71,7 +71,7 @@ public class TeleportCommand extends BaseCommand {
             if (sender instanceof Player) {
                 player = (Player) sender;
                 newWorld = player.getWorld();
-                if(!configWorld.contains(newWorld)){
+                if (!configWorld.contains(newWorld)) {
                     sender.sendMessage(configMessage.getNoWorldPermission(newWorld));
                     return;
                 }
@@ -80,14 +80,14 @@ public class TeleportCommand extends BaseCommand {
             }
         } else {
             if (target.isPlayer()) {
-                if(sender.hasPermission("rtp.teleport.other")) {
+                if (sender.hasPermission("rtp.teleport.other")) {
                     player = target.getPlayer();
                     newWorld = world;
-                    if(!configWorld.contains(newWorld)){
+                    if (!configWorld.contains(newWorld)) {
                         sender.sendMessage(configMessage.getNoWorldPermission(newWorld));
                         return;
                     }
-                }else{
+                } else {
                     sender.sendMessage(ChatColor.RED + "I'm sorry, you do not have permission to perform this command!");
                     return;
                 }
@@ -95,7 +95,7 @@ public class TeleportCommand extends BaseCommand {
                 if (sender instanceof Player) {
                     player = (Player) sender;
                     newWorld = target.getWorld();
-                    if(!configWorld.contains(newWorld)){
+                    if (!configWorld.contains(newWorld)) {
                         sender.sendMessage(configMessage.getNoWorldPermission(newWorld));
                         return;
                     }
@@ -182,11 +182,11 @@ public class TeleportCommand extends BaseCommand {
     @CommandCompletion("@worlds")
     @CommandPermission("rtp.admin.removeworld")
     public void removeWorld(CommandSender commandSender, World world) {
-        if(configWorld.contains(world)){
-            if(configWorld.remove(world)){
+        if (configWorld.contains(world)) {
+            if (configWorld.remove(world)) {
                 commandSender.sendMessage(ChatColor.GREEN + "Removed world from the config and queue!");
             }
-        }else{
+        } else {
             commandSender.sendMessage(ChatColor.RED + "That world is not not in the config!");
         }
     }
@@ -194,22 +194,23 @@ public class TeleportCommand extends BaseCommand {
     @Subcommand("resetcooldown")
     @CommandCompletion("@players")
     @CommandPermission("rtp.admin.resetcooldown")
-    public void resetCooldown(CommandSender commandSender, Player target){
-        if(target != null){
-            if(plugin.getCooldowns().remove(target.getUniqueId()) != null){
+    public void resetCooldown(CommandSender commandSender, Player target) {
+        if (target != null) {
+            if (plugin.getCooldowns().remove(target.getUniqueId()) != null) {
                 commandSender.sendMessage(ChatColor.GREEN + "Cooldown reset for " + target.getName());
-            }else{
+            } else {
                 commandSender.sendMessage(ChatColor.RED + "There was no cooldown for " + target.getName());
             }
         }
     }
+
     @Subcommand("setprice")
     @CommandCompletion("<price>")
     @CommandPermission("rtp.admin.setprice")
-    public void setPrice(CommandSender commandSender, double price){
-        if(price >= 0){
+    public void setPrice(CommandSender commandSender, double price) {
+        if (price >= 0) {
             plugin.getConfigHandler().setTeleportPrice(price);
-        }else{
+        } else {
             commandSender.sendMessage(ChatColor.RED + "Only positive numbers are allowed.");
         }
     }
@@ -263,24 +264,26 @@ public class TeleportCommand extends BaseCommand {
             public void run() {
                 player.sendMessage(configHandler.getConfigMessage().getInit());
                 player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 3, 5, false, false));
-                Location location = loc.getWorld().getHighestBlockAt(loc).getLocation().add(0.5, 2, 0.5);
-                plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
-                drawWarpParticles(player);
-                PaperLib.teleportAsync(player, location);
-                if (useEco) {
-                    ecoHandler.makePayment(player, configHandler.getConfigEconomy().getPrice());
-                    player.sendMessage(configMessage.getEconomy().getPayment());
-                }
-                drawWarpParticles(player);
-                player.sendMessage(configMessage.getTeleport());
-                teleportSuccess = true;
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(world);
-                        worldQueue.get(world).generate(worldConfigSection, 1);
+                PaperLib.getChunkAtAsync(loc).thenAccept(chunk -> {
+                    Location location = chunk.getWorld().getHighestBlockAt(loc).getLocation().add(0.5, 2, 0.5);
+                    plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
+                    drawWarpParticles(player);
+                    PaperLib.teleportAsync(player, location);
+                    if (useEco) {
+                        ecoHandler.makePayment(player, configHandler.getConfigEconomy().getPrice());
+                        player.sendMessage(configMessage.getEconomy().getPayment());
                     }
-                }.runTaskLater(plugin, configHandler.getConfigQueue().getInitDelay());
+                    drawWarpParticles(player);
+                    player.sendMessage(configMessage.getTeleport());
+                    teleportSuccess = true;
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(world);
+                            worldQueue.get(world).generate(worldConfigSection, 1);
+                        }
+                    }.runTaskLater(plugin, configHandler.getConfigQueue().getInitDelay());
+                });
             }
         };
 
