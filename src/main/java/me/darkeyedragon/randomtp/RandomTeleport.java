@@ -49,6 +49,7 @@ public final class RandomTeleport extends JavaPlugin {
         saveDefaultConfig();
         manager = new PaperCommandManager(this);
         configHandler = new ConfigHandler(this);
+        configHandler.reload();
         locationFactory = new LocationFactory(configHandler);
         locationSearcher = new LocationSearcher(this);
         //check if the first argument is a world or player

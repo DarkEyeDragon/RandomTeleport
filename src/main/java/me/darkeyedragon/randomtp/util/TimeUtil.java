@@ -11,7 +11,12 @@ public class TimeUtil {
         return new CustomTime(secs, secs / 60, secs / 3600);
     }
 
-    public static long stringToLong(String message) {
+    /**
+     * @param message the message to format. Valid suffixes are s and m
+     * @return A duration in milliseconds
+     * @throws NumberFormatException Thrown when non of the formats match
+     */
+    public static long stringToLong(String message) throws NumberFormatException {
         if(message == null || message.isEmpty())
             throw new IllegalArgumentException("String can not be null or empty");
         String suffix = message.substring(message.length() - 1);
