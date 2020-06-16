@@ -6,6 +6,7 @@ import me.darkeyedragon.randomtp.location.WorldConfigSection;
 import me.darkeyedragon.randomtp.util.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -31,10 +32,10 @@ public class ConfigHandler {
 
     /**
      * (re)loads the config.
-     * Load order is important.
-     * @throws InvalidConfigurationException when the config is not configured properly.
+     * When invalid fiels are found, they will be defaulted to prevent errors.
+     *
      */
-    public void reload() throws InvalidConfigurationException {
+    public void reload() {
         populateConfigPlugins();
         populateConfigMessage();
         populateConfigQueue();
@@ -144,7 +145,7 @@ public class ConfigHandler {
         return plugin.getConfig().getString("message.countdown");
     }
 
-    private Map<World, WorldConfigSection> getOffsets(){
+    private Map<World, WorldConfigSection> getOffsets() {
         final ConfigurationSection section = plugin.getConfig().getConfigurationSection("worlds");
         Set<String> keys = Objects.requireNonNull(section).getKeys(false);
         Map<World, WorldConfigSection> offsetMap = new HashMap<>(keys.size());
@@ -155,7 +156,7 @@ public class ConfigHandler {
             int offsetX = section.getInt(key + ".offsetX");
             int offsetZ = section.getInt(key + ".offsetZ");
             World world = Bukkit.getWorld(key);
-            if(world == null){
+            if (world == null) {
                 plugin.getLogger().warning("World " + key + " does not exist! Skipping...");
                 break;
             }
@@ -165,7 +166,7 @@ public class ConfigHandler {
     }
 
     private String getInsufficientFundsMessage() {
-        return plugin.getConfig().getString("message.economy.insufficient_funds");
+        return plugin.getConfig().getString("message.economy.insufficient_funds", "&cYou do not have enough money to rtp!");
     }
 
     private double getPrice() {
@@ -174,20 +175,14 @@ public class ConfigHandler {
 
     private String getPaymentMessage() {
         String message = plugin.getConfig().getString("message.economy.payment", "&aYou just paid &b%price &ato rtp!");
-        if (message == null) {
-            return "";
-        }
         message = ChatColor.translateAlternateColorCodes('&', message);
         message = message.replaceAll("%price", getPrice() + "");
         return message;
     }
 
     private long formatCooldown() throws NumberFormatException {
-        String message = plugin.getConfig().getString("teleport.cooldown");
-        if (message != null) {
-            return TimeUtil.stringToLong(message);
-        }
-        throw new NumberFormatException("Not a valid format");
+        String message = plugin.getConfig().getString("teleport.cooldown", "60m");
+        return TimeUtil.stringToLong(message);
     }
 
     private long getTeleportDelay() {

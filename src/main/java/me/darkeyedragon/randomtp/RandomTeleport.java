@@ -19,7 +19,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -50,11 +49,7 @@ public final class RandomTeleport extends JavaPlugin {
         saveDefaultConfig();
         manager = new PaperCommandManager(this);
         configHandler = new ConfigHandler(this);
-        try {
-            configHandler.reload();
-        } catch (InvalidConfigurationException e) {
-            e.printStackTrace();
-        }
+        configHandler.reload();
         locationFactory = new LocationFactory(configHandler);
         locationSearcher = new LocationSearcher(this);
         //check if the first argument is a world or player
