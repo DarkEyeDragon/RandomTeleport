@@ -6,7 +6,6 @@ import me.darkeyedragon.randomtp.location.WorldConfigSection;
 import me.darkeyedragon.randomtp.util.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
