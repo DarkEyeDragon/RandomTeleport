@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
 
 import java.util.*;
 
@@ -26,15 +27,19 @@ public class ConfigHandler {
 
     public ConfigHandler(RandomTeleport plugin) {
         this.plugin = plugin;
-        reload();
     }
 
-    public void reload() {
+    /**
+     * (re)loads the config.
+     * Load order is important.
+     * @throws InvalidConfigurationException when the config is not configured properly.
+     */
+    public void reload() throws InvalidConfigurationException {
+        populateConfigPlugins();
         populateConfigMessage();
         populateConfigQueue();
         populateWorldConfigSection();
         populateConfigTeleport();
-        populateConfigPlugins();
         populateConfigDebug();
         populateConfigEconomy();
     }
@@ -139,7 +144,7 @@ public class ConfigHandler {
         return plugin.getConfig().getString("message.countdown");
     }
 
-    private Map<World, WorldConfigSection> getOffsets() {
+    private Map<World, WorldConfigSection> getOffsets(){
         final ConfigurationSection section = plugin.getConfig().getConfigurationSection("worlds");
         Set<String> keys = Objects.requireNonNull(section).getKeys(false);
         Map<World, WorldConfigSection> offsetMap = new HashMap<>(keys.size());
@@ -150,6 +155,10 @@ public class ConfigHandler {
             int offsetX = section.getInt(key + ".offsetX");
             int offsetZ = section.getInt(key + ".offsetZ");
             World world = Bukkit.getWorld(key);
+            if(world == null){
+                plugin.getLogger().warning("World " + key + " does not exist! Skipping...");
+                break;
+            }
             offsetMap.put(world, new WorldConfigSection(offsetX, offsetZ, radius, world, useWorldBorder, needsWorldPermission));
         }
         return offsetMap;
