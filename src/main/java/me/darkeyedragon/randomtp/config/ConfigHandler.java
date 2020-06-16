@@ -8,6 +8,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.graalvm.util.CollectionsUtil;
 
 import java.util.*;
 
@@ -32,7 +34,11 @@ public class ConfigHandler {
     public void reload() {
         populateConfigMessage();
         populateConfigQueue();
-        populateWorldConfigSection();
+        try {
+            populateWorldConfigSection();
+        } catch (InvalidConfigurationException e) {
+            plugin.getLogger().warning(e.getMessage());
+        }
         populateConfigTeleport();
         populateConfigPlugins();
         populateConfigDebug();
@@ -60,7 +66,7 @@ public class ConfigHandler {
                 .initDelay(getInitDelay());
     }
 
-    public void populateWorldConfigSection() {
+    public void populateWorldConfigSection() throws InvalidConfigurationException {
         configWorld = new ConfigWorld(plugin).set(getOffsets());
     }
 
