@@ -17,4 +17,8 @@ public enum Validator {
         }
         throw new IllegalArgumentException("Invalid name");
     }
+
+    public String getName() {
+        return name;
+    }
 }

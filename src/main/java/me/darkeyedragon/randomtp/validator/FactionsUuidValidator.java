@@ -10,10 +10,33 @@ import org.bukkit.Location;
  */
 public class FactionsUuidValidator implements ChunkValidator {
 
+    private final Board instance;
+    private boolean isLoaded;
+
+    public FactionsUuidValidator() {
+        instance = Board.getInstance();
+        this.isLoaded = instance != null;
+    }
+
     @Override
     public boolean isValid(Location location) {
         FLocation fLocation = new FLocation(location);
-        Faction faction = Board.getInstance().getFactionAt(fLocation);
+        Faction faction = instance.getFactionAt(fLocation);
         return faction.isWilderness() || faction.isWarZone();
+    }
+
+    @Override
+    public boolean isLoaded() {
+        return isLoaded;
+    }
+
+    @Override
+    public void setLoaded(boolean loaded) {
+        this.isLoaded = loaded;
+    }
+
+    @Override
+    public Validator getValidator() {
+        return Validator.FACTIONS;
     }
 }

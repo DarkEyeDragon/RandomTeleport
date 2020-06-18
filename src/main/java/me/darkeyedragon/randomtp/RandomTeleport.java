@@ -6,6 +6,7 @@ import me.darkeyedragon.randomtp.command.TeleportCommand;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
 import me.darkeyedragon.randomtp.eco.EcoHandler;
+import me.darkeyedragon.randomtp.listener.PluginLoadListener;
 import me.darkeyedragon.randomtp.listener.WorldLoadListener;
 import me.darkeyedragon.randomtp.location.LocationFactory;
 import me.darkeyedragon.randomtp.location.LocationSearcher;
@@ -33,7 +34,6 @@ public final class RandomTeleport extends JavaPlugin {
     private HashMap<UUID, Long> cooldowns;
     private PaperCommandManager manager;
     private List<ChunkValidator> validatorList;
-    //private Map<World, BlockingQueue<Location>> worldQueueMap;
     private WorldQueue worldQueue;
     private ConfigHandler configHandler;
     private LocationSearcher locationSearcher;
@@ -82,20 +82,20 @@ public final class RandomTeleport extends JavaPlugin {
         getLogger().info(ChatColor.AQUA + "======== [Loading validators] ========");
         configHandler.getConfigPlugin().getPlugins().forEach(s -> {
             if (getServer().getPluginManager().getPlugin(s) != null) {
-                try {
-                    ChunkValidator validator = ValidatorFactory.createFrom(s);
-                    if (validator != null) {
-                        validatorList.add(validator);
+                ChunkValidator validator = ValidatorFactory.createFrom(s);
+                if (validator != null) {
+                    if (validator.isLoaded()) {
                         getLogger().info(ChatColor.GREEN + s + " -- Successfully loaded");
+                    } else {
+                        getLogger().warning(ChatColor.RED + s + " is not be loaded yet. Trying to fix by loading later...");
                     }
-                } catch (IllegalArgumentException ignored) {
-                    getLogger().warning(ChatColor.RED + s + " -- Not Found");
+                    validatorList.add(validator);
                 }
-
             } else {
-                getLogger().warning(ChatColor.RED + s + " -- Not Found");
+                getLogger().warning(ChatColor.RED + s + " -- Not Found.");
             }
         });
+        getServer().getPluginManager().registerEvents(new PluginLoadListener(this), this);
         getLogger().info(ChatColor.AQUA + "======================================");
         populateWorldQueue();
     }
@@ -185,4 +185,6 @@ public final class RandomTeleport extends JavaPlugin {
     public EcoHandler getEcoHandler() {
         return ecoHandler;
     }
+
+
 }
