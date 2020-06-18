@@ -8,7 +8,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.InvalidConfigurationException;
 
 import java.util.*;
 
@@ -23,8 +22,6 @@ public class ConfigHandler {
     private ConfigEconomy configEconomy;
     private ConfigDebug configDebug;
 
-    private long cooldown = -1;
-
     public ConfigHandler(RandomTeleport plugin) {
         this.plugin = plugin;
     }
@@ -32,17 +29,12 @@ public class ConfigHandler {
     /**
      * (re)loads the config.
      * When invalid fiels are found, they will be defaulted to prevent errors.
-     *
      */
     public void reload() {
         populateConfigPlugins();
         populateConfigMessage();
         populateConfigQueue();
-        try {
-            populateWorldConfigSection();
-        } catch (InvalidConfigurationException e) {
-            plugin.getLogger().warning(e.getMessage());
-        }
+        populateWorldConfigSection();
         populateConfigTeleport();
         populateConfigDebug();
         populateConfigEconomy();
@@ -69,7 +61,7 @@ public class ConfigHandler {
                 .initDelay(getInitDelay());
     }
 
-    public void populateWorldConfigSection() throws InvalidConfigurationException {
+    public void populateWorldConfigSection() {
         configWorld = new ConfigWorld(plugin).set(getOffsets());
     }
 
@@ -183,7 +175,7 @@ public class ConfigHandler {
         return message;
     }
 
-    private long formatCooldown() throws NumberFormatException {
+    private long getCooldown() throws NumberFormatException {
         String message = plugin.getConfig().getString("teleport.cooldown", "60m");
         return TimeUtil.stringToLong(message);
     }
@@ -202,13 +194,6 @@ public class ConfigHandler {
 
     private boolean getDebugShowQueuePopulation() {
         return plugin.getConfig().getBoolean("debug.show_queue_population", true);
-    }
-
-    private long getCooldown() {
-        if (cooldown == -1) {
-            cooldown = formatCooldown();
-        }
-        return cooldown;
     }
 
     private List<String> getPlugins() {

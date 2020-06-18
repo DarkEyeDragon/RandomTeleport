@@ -32,7 +32,7 @@ public class TeleportCommand extends BaseCommand {
 
     //private LocationSearcher locationHelper;
     private ConfigHandler configHandler;
-    private RandomTeleport plugin;
+    private final RandomTeleport plugin;
     private WorldQueue worldQueue;
     private LocationFactory locationFactory;
     private boolean teleportSuccess;
