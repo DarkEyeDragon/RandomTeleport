@@ -10,4 +10,10 @@ import org.bukkit.Location;
  */
 public interface ChunkValidator {
     boolean isValid(Location location);
+
+    boolean isLoaded();
+
+    void setLoaded(boolean loaded);
+
+    Validator getValidator();
 }

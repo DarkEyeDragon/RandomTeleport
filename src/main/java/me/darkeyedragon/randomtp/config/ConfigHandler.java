@@ -22,19 +22,20 @@ public class ConfigHandler {
     private ConfigEconomy configEconomy;
     private ConfigDebug configDebug;
 
-    private long cooldown = -1;
-
     public ConfigHandler(RandomTeleport plugin) {
         this.plugin = plugin;
-        reload();
     }
 
+    /**
+     * (re)loads the config.
+     * When invalid fiels are found, they will be defaulted to prevent errors.
+     */
     public void reload() {
+        populateConfigPlugins();
         populateConfigMessage();
         populateConfigQueue();
         populateWorldConfigSection();
         populateConfigTeleport();
-        populateConfigPlugins();
         populateConfigDebug();
         populateConfigEconomy();
     }
@@ -150,13 +151,17 @@ public class ConfigHandler {
             int offsetX = section.getInt(key + ".offsetX");
             int offsetZ = section.getInt(key + ".offsetZ");
             World world = Bukkit.getWorld(key);
+            if (world == null) {
+                plugin.getLogger().warning("World " + key + " does not exist! Skipping...");
+                break;
+            }
             offsetMap.put(world, new WorldConfigSection(offsetX, offsetZ, radius, world, useWorldBorder, needsWorldPermission));
         }
         return offsetMap;
     }
 
     private String getInsufficientFundsMessage() {
-        return plugin.getConfig().getString("message.economy.insufficient_funds");
+        return plugin.getConfig().getString("message.economy.insufficient_funds", "&cYou do not have enough money to rtp!");
     }
 
     private double getPrice() {
@@ -165,20 +170,14 @@ public class ConfigHandler {
 
     private String getPaymentMessage() {
         String message = plugin.getConfig().getString("message.economy.payment", "&aYou just paid &b%price &ato rtp!");
-        if (message == null) {
-            return "";
-        }
         message = ChatColor.translateAlternateColorCodes('&', message);
         message = message.replaceAll("%price", getPrice() + "");
         return message;
     }
 
-    private long formatCooldown() throws NumberFormatException {
-        String message = plugin.getConfig().getString("teleport.cooldown");
-        if (message != null) {
-            return TimeUtil.stringToLong(message);
-        }
-        throw new NumberFormatException("Not a valid format");
+    private long getCooldown() throws NumberFormatException {
+        String message = plugin.getConfig().getString("teleport.cooldown", "60m");
+        return TimeUtil.stringToLong(message);
     }
 
     private long getTeleportDelay() {
@@ -195,13 +194,6 @@ public class ConfigHandler {
 
     private boolean getDebugShowQueuePopulation() {
         return plugin.getConfig().getBoolean("debug.show_queue_population", true);
-    }
-
-    private long getCooldown() {
-        if (cooldown == -1) {
-            cooldown = formatCooldown();
-        }
-        return cooldown;
     }
 
     private List<String> getPlugins() {

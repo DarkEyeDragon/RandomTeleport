@@ -6,6 +6,7 @@ import me.darkeyedragon.randomtp.command.TeleportCommand;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
 import me.darkeyedragon.randomtp.eco.EcoHandler;
+import me.darkeyedragon.randomtp.listener.PluginLoadListener;
 import me.darkeyedragon.randomtp.listener.WorldLoadListener;
 import me.darkeyedragon.randomtp.location.LocationFactory;
 import me.darkeyedragon.randomtp.location.LocationSearcher;
@@ -16,6 +17,7 @@ import me.darkeyedragon.randomtp.world.QueueListener;
 import me.darkeyedragon.randomtp.world.WorldQueue;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -32,7 +34,6 @@ public final class RandomTeleport extends JavaPlugin {
     private HashMap<UUID, Long> cooldowns;
     private PaperCommandManager manager;
     private List<ChunkValidator> validatorList;
-    //private Map<World, BlockingQueue<Location>> worldQueueMap;
     private WorldQueue worldQueue;
     private ConfigHandler configHandler;
     private LocationSearcher locationSearcher;
@@ -48,6 +49,7 @@ public final class RandomTeleport extends JavaPlugin {
         saveDefaultConfig();
         manager = new PaperCommandManager(this);
         configHandler = new ConfigHandler(this);
+        configHandler.reload();
         locationFactory = new LocationFactory(configHandler);
         locationSearcher = new LocationSearcher(this);
         //check if the first argument is a world or player
@@ -68,33 +70,36 @@ public final class RandomTeleport extends JavaPlugin {
             }
         });
         cooldowns = new HashMap<>();
-        if(setupEconomy()){
+        if (setupEconomy()) {
             getLogger().info("Vault found. Hooking into it.");
             ecoHandler = new EcoHandler(econ);
-        }else{
+        } else {
             getLogger().info("Vault not found. Currency based options are disabled.");
         }
         manager.registerCommand(new TeleportCommand(this));
         getServer().getPluginManager().registerEvents(new WorldLoadListener(this), this);
         validatorList = new ArrayList<>();
+        getLogger().info(ChatColor.AQUA + "======== [Loading validators] ========");
         configHandler.getConfigPlugin().getPlugins().forEach(s -> {
             if (getServer().getPluginManager().getPlugin(s) != null) {
-                try {
-                    ChunkValidator validator = ValidatorFactory.createFrom(s);
-                    if (validator != null) {
-                        validatorList.add(validator);
-                        getLogger().info(s + " loaded as validator.");
+                ChunkValidator validator = ValidatorFactory.createFrom(s);
+                if (validator != null) {
+                    if (validator.isLoaded()) {
+                        getLogger().info(ChatColor.GREEN + s + " -- Successfully loaded");
+                    } else {
+                        getLogger().warning(ChatColor.RED + s + " is not be loaded yet. Trying to fix by loading later...");
                     }
-                } catch (IllegalArgumentException ignored) {
-                    getLogger().warning(s + " is not a valid validator. Make sure it is spelled correctly.");
+                    validatorList.add(validator);
                 }
-
             } else {
-                getLogger().warning(s + " is not a valid plugin or is not loaded!");
+                getLogger().warning(ChatColor.RED + s + " -- Not Found.");
             }
         });
+        getServer().getPluginManager().registerEvents(new PluginLoadListener(this), this);
+        getLogger().info(ChatColor.AQUA + "======================================");
         populateWorldQueue();
     }
+
     @Override
     public void onDisable() {
         // Plugin shutdown logic
@@ -114,8 +119,9 @@ public final class RandomTeleport extends JavaPlugin {
 
         }
     }
-    public void subscribe(LocationQueue locationQueue, World world){
-        if(configHandler.getConfigDebug().isShowQueuePopulation()) {
+
+    public void subscribe(LocationQueue locationQueue, World world) {
+        if (configHandler.getConfigDebug().isShowQueuePopulation()) {
             int size = configHandler.getConfigQueue().getSize();
             locationQueue.subscribe(new QueueListener<Location>() {
                 @Override
@@ -179,4 +185,6 @@ public final class RandomTeleport extends JavaPlugin {
     public EcoHandler getEcoHandler() {
         return ecoHandler;
     }
+
+
 }
