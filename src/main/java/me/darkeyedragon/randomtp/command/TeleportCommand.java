@@ -122,7 +122,6 @@ public class TeleportCommand extends BaseCommand {
         plugin.saveDefaultConfig();
         plugin.reloadConfig();
         plugin.getConfigHandler().reload();
-        commandSender.sendMessage(ChatColor.RED + "Could not reload config! Your config is not configured correctly. Check the console for details.");
         //Set the new config object references
         setConfigs();
         commandSender.sendMessage(ChatColor.GREEN + "Clearing queue...");
