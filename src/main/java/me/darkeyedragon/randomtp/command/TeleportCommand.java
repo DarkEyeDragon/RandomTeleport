@@ -71,7 +71,7 @@ public class TeleportCommand extends BaseCommand {
                 player = (Player) sender;
                 newWorld = player.getWorld();
                 if (!configWorld.contains(newWorld)) {
-                    sender.sendMessage(configMessage.getNoWorldPermission(newWorld));
+                    sender.spigot().sendMessage(configMessage.getNoWorldPermission(newWorld));
                     return;
                 }
             } else {
@@ -83,7 +83,7 @@ public class TeleportCommand extends BaseCommand {
                     player = target.getPlayer();
                     newWorld = world;
                     if (!configWorld.contains(newWorld)) {
-                        sender.sendMessage(configMessage.getNoWorldPermission(newWorld));
+                        sender.spigot().sendMessage(configMessage.getNoWorldPermission(newWorld));
                         return;
                     }
                 } else {
@@ -95,12 +95,12 @@ public class TeleportCommand extends BaseCommand {
                     player = (Player) sender;
                     newWorld = target.getWorld();
                     if (!configWorld.contains(newWorld)) {
-                        sender.sendMessage(configMessage.getNoWorldPermission(newWorld));
+                        sender.spigot().sendMessage(configMessage.getNoWorldPermission(newWorld));
                         return;
                     }
                     WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(newWorld);
                     if (worldConfigSection == null || ((!sender.hasPermission("rtp.world." + newWorld.getName())) && worldConfigSection.needsWorldPermission())) {
-                        sender.sendMessage(configMessage.getNoWorldPermission(newWorld));
+                        sender.spigot().sendMessage(configMessage.getNoWorldPermission(newWorld));
                         return;
                     }
 
@@ -215,7 +215,7 @@ public class TeleportCommand extends BaseCommand {
         if (useEco) {
             double price = configHandler.getConfigEconomy().getPrice();
             if (!ecoHandler.hasEnough(player, price)) {
-                player.sendMessage(configMessage.getEconomy().getInsufficientFunds());
+                player.spigot().sendMessage(configMessage.getEconomy().getInsufficientFunds());
                 return;
             }
         }
@@ -226,17 +226,17 @@ public class TeleportCommand extends BaseCommand {
             long remaining = lasttp + configHandler.getConfigTeleport().getCooldown() - System.currentTimeMillis();
             boolean ableToTp = remaining < 0;
             if (!ableToTp && !force) {
-                player.sendMessage(configMessage.getCountdown(remaining));
+                player.spigot().sendMessage(configMessage.getCountdown(remaining));
                 return;
             }
         }
         long delay = configHandler.getConfigTeleport().getDelay();
         if (delay > 0 && !hasBypassPermission) {
-            player.sendMessage(configMessage.getInitTeleportDelay(delay));
+            player.spigot().sendMessage(configMessage.getInitTeleportDelay(delay));
         }
         Location loc = worldQueue.popLocation(world);
         if (loc == null) {
-            player.sendMessage(configMessage.getEmptyQueue());
+            player.spigot().sendMessage(configMessage.getEmptyQueue());
             return;
         }
         teleport(player, loc, world, useEco);
@@ -257,7 +257,7 @@ public class TeleportCommand extends BaseCommand {
         BukkitRunnable runnable = new BukkitRunnable() {
             @Override
             public void run() {
-                player.sendMessage(configHandler.getConfigMessage().getInit());
+                player.spigot().sendMessage(configHandler.getConfigMessage().getInit());
                 player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 3, 5, false, false));
                 PaperLib.getChunkAtAsync(loc).thenAccept(chunk -> {
                     Location location = chunk.getWorld().getHighestBlockAt(loc).getLocation().add(0.5, 2, 0.5);
@@ -266,10 +266,10 @@ public class TeleportCommand extends BaseCommand {
                     PaperLib.teleportAsync(player, location);
                     if (useEco) {
                         ecoHandler.makePayment(player, configHandler.getConfigEconomy().getPrice());
-                        player.sendMessage(configMessage.getEconomy().getPayment());
+                        player.spigot().sendMessage(configMessage.getEconomy().getPayment());
                     }
                     drawWarpParticles(player);
-                    player.sendMessage(configMessage.getTeleport());
+                    player.spigot().sendMessage(configMessage.getTeleport());
                     teleportSuccess = true;
                     new BukkitRunnable() {
                         @Override
@@ -292,7 +292,7 @@ public class TeleportCommand extends BaseCommand {
                     Location currentLoc = player.getLocation();
                     if (originalLoc.getX() != currentLoc.getX() || originalLoc.getY() != currentLoc.getY() || originalLoc.getZ() != currentLoc.getZ()) {
                         if (!isTeleportSuccess())
-                            player.sendMessage(configMessage.getTeleportCanceled());
+                            player.spigot().sendMessage(configMessage.getTeleportCanceled());
                         runnable.cancel();
                         cancel();
                     }

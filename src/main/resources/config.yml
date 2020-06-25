@@ -1,5 +1,5 @@
 message:
-  initteleport: "&aSearching for safe location to teleport to..."
+  initteleport: "&aSearching for safe location to teleport to... [&xAA0000+YEET]"
   #Used when teleport delay is larger than 0. This supports placeholders
   #valid placeholders: %hp (hours partial) %mp (minutes partial) %sp (seconds partial) %h (total hours) %m (total minutes) %s(total seconds)
   initteleport_delay: "&aYou will be teleported in &6%s seconds. &aDo not move!"

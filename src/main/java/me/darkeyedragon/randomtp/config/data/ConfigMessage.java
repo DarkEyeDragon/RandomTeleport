@@ -1,7 +1,9 @@
 package me.darkeyedragon.randomtp.config.data;
 
 import me.darkeyedragon.randomtp.util.CustomTime;
+import me.darkeyedragon.randomtp.util.MessageUtil;
 import me.darkeyedragon.randomtp.util.TimeUtil;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 
@@ -14,7 +16,7 @@ public class ConfigMessage {
     private String depletedQueue;
     private String countdown;
     private String noWorldPermission;
-    private Economy economy;
+    private final Economy economy;
     private String emptyQueue;
 
 
@@ -65,69 +67,82 @@ public class ConfigMessage {
         return economy;
     }
 
-    public String getInit() {
+    public TextComponent getInit() {
         String message = init;
         if (message != null) {
             message = ChatColor.translateAlternateColorCodes('&', message);
+
+            return MessageUtil.getChatComponents(message);
         }
-        return message;
+        return null;
     }
 
-    public String getTeleport() {
+    public TextComponent getTeleport() {
         String message = teleport;
         if (message != null) {
             message = ChatColor.translateAlternateColorCodes('&', message);
+            return MessageUtil.getChatComponents(message);
         }
-        return message;
+        return null;
     }
 
-    public String getInitTeleportDelay(long millis) {
+    public TextComponent getInitTeleportDelay(long millis) {
         String message = initTeleportDelay;
         if (message != null) {
             message = ChatColor.translateAlternateColorCodes('&', message);
             CustomTime time = TimeUtil.formatTime(millis * 50);
             message = TimeUtil.toFormattedString(message, time);
+            return MessageUtil.getChatComponents(message);
         }
-        return message;
+        return null;
     }
 
-    public String getTeleportCanceled() {
+    public TextComponent getTeleportCanceled() {
         String message = teleportCanceled;
         if (message != null) {
             message = ChatColor.translateAlternateColorCodes('&', message);
+            return MessageUtil.getChatComponents(message);
         }
-        return message;
+        return null;
     }
 
-    public String getDepletedQueue() {
+    public TextComponent getDepletedQueue() {
         String message = depletedQueue;
         if (message != null) {
             message = ChatColor.translateAlternateColorCodes('&', message);
+            return MessageUtil.getChatComponents(message);
         }
-        return message;
+        return null;
     }
 
-    public String getCountdown(long remainingTime) {
+    public TextComponent getCountdown(long remainingTime) {
         String message = countdown;
         if (message != null) {
             message = ChatColor.translateAlternateColorCodes('&', message);
             CustomTime duration = TimeUtil.formatTime(remainingTime);
             message = TimeUtil.toFormattedString(message, duration);
+            return MessageUtil.getChatComponents(message);
         }
-        return message;
+        return null;
     }
 
-    public String getNoWorldPermission(World world) {
+    public TextComponent getNoWorldPermission(World world) {
         String message = noWorldPermission;
-        message = message.replace("%world", world.getName());
-        message = ChatColor.translateAlternateColorCodes('&', message);
-        return message;
+        if (message != null) {
+            message = message.replace("%world", world.getName());
+            message = ChatColor.translateAlternateColorCodes('&', message);
+            return MessageUtil.getChatComponents(message);
+        }
+        return null;
     }
 
-    public String getEmptyQueue() {
+    public TextComponent getEmptyQueue() {
         String message = emptyQueue;
-        message = ChatColor.translateAlternateColorCodes('&', message);
-        return message;
+        if (message != null) {
+            message = ChatColor.translateAlternateColorCodes('&', message);
+            return MessageUtil.getChatComponents(message);
+        }
+        return null;
     }
 
     public class Economy{
@@ -135,22 +150,22 @@ public class ConfigMessage {
         private String insufficientFunds;
         private String payment;
 
-        public Economy insufficientFunds(String insufficientFunds){
+        public Economy insufficientFunds(String insufficientFunds) {
             this.insufficientFunds = insufficientFunds;
             return this;
         }
 
-        public Economy payment(String payment){
+        public Economy payment(String payment) {
             this.payment = payment;
             return this;
         }
 
-        public String getInsufficientFunds() {
-            return insufficientFunds;
+        public TextComponent getInsufficientFunds() {
+            return MessageUtil.getChatComponents(insufficientFunds);
         }
 
-        public String getPayment() {
-            return payment;
+        public TextComponent getPayment() {
+            return MessageUtil.getChatComponents(payment);
         }
     }
 

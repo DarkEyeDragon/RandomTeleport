@@ -87,7 +87,7 @@ public final class RandomTeleport extends JavaPlugin {
                     if (validator.isLoaded()) {
                         getLogger().info(ChatColor.GREEN + s + " -- Successfully loaded");
                     } else {
-                        getLogger().warning(ChatColor.RED + s + " is not be loaded yet. Trying to fix by loading later...");
+                        getLogger().warning(ChatColor.RED + s + " is not loaded yet. Trying to fix by loading later...");
                     }
                     validatorList.add(validator);
                 }
