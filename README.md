@@ -10,6 +10,12 @@ Teleport a player to a random (safe) location in the Minecraft world.
 - Full async chunkloading support for Paper servers.
 - Choose if a world requires a permission or not
 
+### Supported plugins
+- FactionsUUID
+- WorldGuard
+- GriefPrevention
+- GriefDefender
+- RedProtect
 
 ### Permissions
 
