@@ -1,7 +1,7 @@
 package me.darkeyedragon.randomtp.world;
 
-import me.darkeyedragon.randomtp.location.LocationSearcher;
-import me.darkeyedragon.randomtp.location.WorldConfigSection;
+import me.darkeyedragon.randomtp.world.location.LocationSearcher;
+import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
 import org.bukkit.Location;
 
 public class LocationQueue extends ObservableQueue<Location> {

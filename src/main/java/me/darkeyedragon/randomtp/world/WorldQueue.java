@@ -1,6 +1,6 @@
 package me.darkeyedragon.randomtp.world;
 
-import me.darkeyedragon.randomtp.location.LocationSearcher;
+import me.darkeyedragon.randomtp.world.location.LocationSearcher;
 import org.bukkit.Location;
 import org.bukkit.World;
 

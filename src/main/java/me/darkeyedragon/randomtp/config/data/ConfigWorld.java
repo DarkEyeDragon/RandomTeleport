@@ -1,8 +1,8 @@
 package me.darkeyedragon.randomtp.config.data;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
-import me.darkeyedragon.randomtp.location.WorldConfigSection;
 import me.darkeyedragon.randomtp.world.LocationQueue;
+import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 

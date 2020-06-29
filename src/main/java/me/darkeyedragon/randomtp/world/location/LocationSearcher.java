@@ -1,4 +1,4 @@
-package me.darkeyedragon.randomtp.location;
+package me.darkeyedragon.randomtp.world.location;
 
 import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.RandomTeleport;
