@@ -259,7 +259,7 @@ public class TeleportCommand extends BaseCommand {
                 player.spigot().sendMessage(configHandler.getConfigMessage().getInit());
                 player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 3, 5, false, false));
                 PaperLib.getChunkAtAsync(loc).thenAccept(chunk -> {
-                    Location location = chunk.getWorld().getHighestBlockAt(loc).getLocation().add(0.5, 2, 0.5);
+                    Location location = chunk.getWorld().getBlockAt(loc).getLocation().add(0.5, 2, 0.5);
                     plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
                     drawWarpParticles(player);
                     PaperLib.teleportAsync(player, location);

@@ -1,6 +1,5 @@
 package me.darkeyedragon.randomtp.world;
 
-import me.darkeyedragon.randomtp.world.location.LocationSearcher;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -11,11 +10,9 @@ import java.util.Map;
 public class WorldQueue{
 
     private final Map<World, LocationQueue> worldQueueMap;
-    private final LocationSearcher locationSearcher;
 
-    public WorldQueue(LocationSearcher locationSearcher) {
+    public WorldQueue() {
         this.worldQueueMap = new HashMap<>();
-        this.locationSearcher = locationSearcher;
     }
 
     public LocationQueue put(World world, LocationQueue locationQueue) {

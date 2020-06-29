@@ -14,7 +14,7 @@ import me.darkeyedragon.randomtp.world.LocationQueue;
 import me.darkeyedragon.randomtp.world.QueueListener;
 import me.darkeyedragon.randomtp.world.WorldQueue;
 import me.darkeyedragon.randomtp.world.location.LocationFactory;
-import me.darkeyedragon.randomtp.world.location.LocationSearcher;
+import me.darkeyedragon.randomtp.world.location.LocationSearcherFactory;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -36,7 +36,7 @@ public final class RandomTeleport extends JavaPlugin {
     private List<ChunkValidator> validatorList;
     private WorldQueue worldQueue;
     private ConfigHandler configHandler;
-    private LocationSearcher locationSearcher;
+    //private LocationSearcher locationSearcher;
     private LocationFactory locationFactory;
 
     //Economy
@@ -51,9 +51,8 @@ public final class RandomTeleport extends JavaPlugin {
         configHandler = new ConfigHandler(this);
         configHandler.reload();
         locationFactory = new LocationFactory(configHandler);
-        locationSearcher = new LocationSearcher(this);
         //check if the first argument is a world or player
-        worldQueue = new WorldQueue(locationSearcher);
+        worldQueue = new WorldQueue();
         manager.getCommandContexts().registerContext(PlayerWorldContext.class, c -> {
             String arg1 = c.popFirstArg();
             World world = Bukkit.getWorld(arg1);
@@ -111,7 +110,7 @@ public final class RandomTeleport extends JavaPlugin {
     public void populateWorldQueue() {
         for (World world : configHandler.getConfigWorld().getWorlds()) {
             //Add a new world to the world queue and generate random locations
-            LocationQueue locationQueue = new LocationQueue(configHandler.getConfigQueue().getSize(), getLocationSearcher());
+            LocationQueue locationQueue = new LocationQueue(configHandler.getConfigQueue().getSize(), LocationSearcherFactory.getLocationSearcher(world, this));
             //Subscribe to the locationqueue to be notified of changes
             subscribe(locationQueue, world);
             locationQueue.generate(getLocationFactory().getWorldConfigSection(world));
@@ -168,10 +167,6 @@ public final class RandomTeleport extends JavaPlugin {
 
     public LocationQueue getQueue(World world) {
         return worldQueue.get(world);
-    }
-
-    public LocationSearcher getLocationSearcher() {
-        return locationSearcher;
     }
 
     public PaperCommandManager getManager() {
