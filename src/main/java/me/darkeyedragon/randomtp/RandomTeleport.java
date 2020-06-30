@@ -73,7 +73,7 @@ public final class RandomTeleport extends JavaPlugin {
             getLogger().info("Vault found. Hooking into it.");
             ecoHandler = new EcoHandler(econ);
         } else {
-            getLogger().info("Vault not found. Currency based options are disabled.");
+            getLogger().warning("Vault not found. Currency based options are disabled.");
         }
         manager.registerCommand(new TeleportCommand(this));
         getServer().getPluginManager().registerEvents(new WorldLoadListener(this), this);
@@ -146,7 +146,7 @@ public final class RandomTeleport extends JavaPlugin {
             return false;
         }
         econ = rsp.getProvider();
-        return econ != null;
+        return true;
     }
 
     public HashMap<UUID, Long> getCooldowns() {
