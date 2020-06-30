@@ -1,4 +1,4 @@
-package me.darkeyedragon.randomtp.location;
+package me.darkeyedragon.randomtp.world.location;
 
 import me.darkeyedragon.randomtp.config.ConfigHandler;
 import org.bukkit.World;

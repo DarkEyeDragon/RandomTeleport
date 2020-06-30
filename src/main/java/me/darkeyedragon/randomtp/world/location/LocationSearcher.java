@@ -1,4 +1,4 @@
-package me.darkeyedragon.randomtp.location;
+package me.darkeyedragon.randomtp.world.location;
 
 import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.RandomTeleport;
@@ -72,7 +72,7 @@ public class LocationSearcher {
     }
 
     /* Will search through the chunk to find a location that is safe, returning null if none is found. */
-    private Location getRandomLocationFromChunk(Chunk chunk) {
+    public Location getRandomLocationFromChunk(Chunk chunk) {
         for (int x = 8; x < 16; x++) {
             for (int z = 8; z < 16; z++) {
                 Block block = chunk.getWorld().getHighestBlockAt((chunk.getX() << 4) + x, (chunk.getZ() << 4) + z);
@@ -108,7 +108,8 @@ public class LocationSearcher {
     public boolean isSafeLocation(Location loc) {
         World world = loc.getWorld();
         if (world == null) return false;
-        if (loc.add(0, 2, 0).getBlock().getType() != Material.AIR) return false;
+        //Check 2 blocks to see if its safe for the player to stand. Since getHighestBlockAt doesnt include trees
+        if (loc.clone().add(0, 2, 0).getBlock().getType() != Material.AIR) return false;
         if (blacklistMaterial.contains(loc.getBlock().getType())) return false;
         for (ChunkValidator validator : plugin.getValidatorList()) {
             if (!validator.isValid(loc)) {
@@ -136,5 +137,9 @@ public class LocationSearcher {
 
     public void setUseWorldBorder(boolean useWorldBorder) {
         this.useWorldBorder = useWorldBorder;
+    }
+
+    public RandomTeleport getPlugin() {
+        return plugin;
     }
 }

@@ -11,11 +11,11 @@ import me.darkeyedragon.randomtp.config.data.ConfigMessage;
 import me.darkeyedragon.randomtp.config.data.ConfigQueue;
 import me.darkeyedragon.randomtp.config.data.ConfigWorld;
 import me.darkeyedragon.randomtp.eco.EcoHandler;
-import me.darkeyedragon.randomtp.location.LocationFactory;
-import me.darkeyedragon.randomtp.location.WorldConfigSection;
 import me.darkeyedragon.randomtp.world.LocationQueue;
 import me.darkeyedragon.randomtp.world.QueueListener;
 import me.darkeyedragon.randomtp.world.WorldQueue;
+import me.darkeyedragon.randomtp.world.location.LocationFactory;
+import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -259,7 +259,7 @@ public class TeleportCommand extends BaseCommand {
                 player.spigot().sendMessage(configHandler.getConfigMessage().getInit());
                 player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 3, 5, false, false));
                 PaperLib.getChunkAtAsync(loc).thenAccept(chunk -> {
-                    Location location = chunk.getWorld().getHighestBlockAt(loc).getLocation().add(0.5, 2, 0.5);
+                    Location location = chunk.getWorld().getBlockAt(loc).getLocation().add(0.5, 2, 0.5);
                     plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
                     drawWarpParticles(player);
                     PaperLib.teleportAsync(player, location);

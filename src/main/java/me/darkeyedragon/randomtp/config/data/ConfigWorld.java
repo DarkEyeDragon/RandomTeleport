@@ -1,8 +1,9 @@
 package me.darkeyedragon.randomtp.config.data;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
-import me.darkeyedragon.randomtp.location.WorldConfigSection;
 import me.darkeyedragon.randomtp.world.LocationQueue;
+import me.darkeyedragon.randomtp.world.location.LocationSearcherFactory;
+import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -64,7 +65,7 @@ public class ConfigWorld {
     private LocationQueue generateLocations(World world) {
         WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(world);
         ConfigQueue configQueue = plugin.getConfigHandler().getConfigQueue();
-        LocationQueue locationQueue = new LocationQueue(configQueue.getSize(), plugin.getLocationSearcher());
+        LocationQueue locationQueue = new LocationQueue(configQueue.getSize(), LocationSearcherFactory.getLocationSearcher(world, plugin));
         plugin.subscribe(locationQueue, world);
         locationQueue.generate(worldConfigSection, configQueue.getSize());
         plugin.getWorldQueue().put(world, locationQueue);
