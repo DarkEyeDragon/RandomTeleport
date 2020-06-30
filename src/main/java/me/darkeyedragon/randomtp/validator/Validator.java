@@ -1,7 +1,12 @@
 package me.darkeyedragon.randomtp.validator;
 
 public enum Validator {
-    FACTIONS("Factions"), WORLD_GUARD("WorldGuard"), GRIEF_PREVENTION("GriefPrevention"), GRIEF_DEFENDER("GriefDefender"), RED_PROTECT("RedProtect");
+    FACTIONS("Factions"),
+    WORLD_GUARD("WorldGuard"),
+    GRIEF_PREVENTION("GriefPrevention"),
+    GRIEF_DEFENDER("GriefDefender"),
+    TOWNY("Towny"),
+    RED_PROTECT("RedProtect");
 
     final String name;
 

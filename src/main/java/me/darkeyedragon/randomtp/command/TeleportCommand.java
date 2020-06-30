@@ -15,11 +15,14 @@ import me.darkeyedragon.randomtp.world.LocationQueue;
 import me.darkeyedragon.randomtp.world.QueueListener;
 import me.darkeyedragon.randomtp.world.WorldQueue;
 import me.darkeyedragon.randomtp.world.location.LocationFactory;
+import me.darkeyedragon.randomtp.world.location.LocationSearcher;
+import me.darkeyedragon.randomtp.world.location.LocationSearcherFactory;
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -238,7 +241,11 @@ public class TeleportCommand extends BaseCommand {
             player.spigot().sendMessage(configMessage.getEmptyQueue());
             return;
         }
-        teleport(player, loc, world, useEco);
+        Block block = world.getBlockAt(loc);
+        LocationSearcher locationSearcher = LocationSearcherFactory.getLocationSearcher(world, plugin);
+        if (locationSearcher != null && locationSearcher.isSafeLocation(block.getLocation())) {
+            teleport(player, loc, world, useEco);
+        }
 
         /*if (loc == null) {
             player.sendMessage(configHandler.getDepletedQueueMessage());
@@ -259,7 +266,12 @@ public class TeleportCommand extends BaseCommand {
                 player.spigot().sendMessage(configHandler.getConfigMessage().getInit());
                 player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 3, 5, false, false));
                 PaperLib.getChunkAtAsync(loc).thenAccept(chunk -> {
-                    Location location = chunk.getWorld().getBlockAt(loc).getLocation().add(0.5, 2, 0.5);
+                    Block block = chunk.getWorld().getBlockAt(loc);
+                    LocationSearcher locationSearcher = LocationSearcherFactory.getLocationSearcher(world, plugin);
+                    if (locationSearcher == null || !locationSearcher.isSafeLocation(block.getLocation())) {
+                        player.sendMessage("");
+                    }
+                    Location location = block.getLocation().add(0.5, 2, 0.5);
                     plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
                     drawWarpParticles(player);
                     PaperLib.teleportAsync(player, location);

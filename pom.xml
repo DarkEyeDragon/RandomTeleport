@@ -190,5 +190,10 @@
             <version>LATEST</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.TownyAdvanced</groupId>
+            <artifactId>Towny</artifactId>
+            <version>0.96.1.11</version>
+        </dependency>
     </dependencies>
 </project>

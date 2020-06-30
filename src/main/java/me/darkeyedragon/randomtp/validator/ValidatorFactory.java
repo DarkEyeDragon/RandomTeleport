@@ -18,6 +18,8 @@ public class ValidatorFactory {
                 return new GriefDefenderValidator();
             case RED_PROTECT:
                 return new RedProtectValidator();
+            case TOWNY:
+                return new TownyValidator();
         }
         return null;
     }
