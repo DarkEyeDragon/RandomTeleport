@@ -3,7 +3,6 @@ package me.darkeyedragon.randomtp.command;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.annotation.*;
-import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
@@ -11,24 +10,18 @@ import me.darkeyedragon.randomtp.config.data.ConfigMessage;
 import me.darkeyedragon.randomtp.config.data.ConfigQueue;
 import me.darkeyedragon.randomtp.config.data.ConfigWorld;
 import me.darkeyedragon.randomtp.eco.EcoHandler;
+import me.darkeyedragon.randomtp.teleport.Teleport;
 import me.darkeyedragon.randomtp.world.LocationQueue;
 import me.darkeyedragon.randomtp.world.QueueListener;
 import me.darkeyedragon.randomtp.world.WorldQueue;
 import me.darkeyedragon.randomtp.world.location.LocationFactory;
-import me.darkeyedragon.randomtp.world.location.LocationSearcher;
-import me.darkeyedragon.randomtp.world.location.LocationSearcherFactory;
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 
 @CommandAlias("rtp|randomtp|randomteleport")
 public class TeleportCommand extends BaseCommand {
@@ -115,7 +108,16 @@ public class TeleportCommand extends BaseCommand {
             }
         }
         final World finalWorld = newWorld;
-        teleportSetup(player, finalWorld, sender.hasPermission("rtp.teleport.bypass"));
+        Teleport teleport = new Teleport(plugin)
+                .commandSender(sender)
+                .configHandler(configHandler)
+                .ecoHandler(ecoHandler)
+                .world(finalWorld)
+                .player(player)
+                .cooldown(configHandler.getConfigTeleport().getCooldown())
+                .bypassCooldown(sender.hasPermission("rtp.teleport.bypass"))
+                .build();
+        teleport.random();
     }
 
     @Subcommand("reload")
@@ -210,118 +212,5 @@ public class TeleportCommand extends BaseCommand {
         } else {
             commandSender.sendMessage(ChatColor.RED + "Only positive numbers are allowed.");
         }
-    }
-
-    private void teleportSetup(Player player, World world, boolean force) {
-        boolean useEco = configHandler.getConfigEconomy().useEco() && !player.hasPermission("rtp.eco.bypass");
-        if (useEco) {
-            double price = configHandler.getConfigEconomy().getPrice();
-            if (!ecoHandler.hasEnough(player, price)) {
-                player.spigot().sendMessage(configMessage.getEconomy().getInsufficientFunds());
-                return;
-            }
-        }
-        boolean hasBypassPermission = player.hasPermission("rtp.teleportdelay.bypass");
-
-        if (plugin.getCooldowns().containsKey(player.getUniqueId()) && !player.hasPermission("rtp.teleport.bypass")) {
-            long lasttp = plugin.getCooldowns().get(player.getUniqueId());
-            long remaining = lasttp + configHandler.getConfigTeleport().getCooldown() - System.currentTimeMillis();
-            boolean ableToTp = remaining < 0;
-            if (!ableToTp && !force) {
-                player.spigot().sendMessage(configMessage.getCountdown(remaining));
-                return;
-            }
-        }
-        long delay = configHandler.getConfigTeleport().getDelay();
-        if (delay > 0 && !hasBypassPermission) {
-            player.spigot().sendMessage(configMessage.getInitTeleportDelay(delay));
-        }
-        Location loc = worldQueue.popLocation(world);
-        if (loc == null) {
-            player.spigot().sendMessage(configMessage.getEmptyQueue());
-            return;
-        }
-        Block block = world.getBlockAt(loc);
-        LocationSearcher locationSearcher = LocationSearcherFactory.getLocationSearcher(world, plugin);
-        if (locationSearcher != null && locationSearcher.isSafeLocation(block.getLocation())) {
-            teleport(player, loc, world, useEco);
-        }
-
-        /*if (loc == null) {
-            player.sendMessage(configHandler.getDepletedQueueMessage());
-            worldQueue.popLocation(world);
-            locationHelper.getRandomLocation(worldConfigSection).thenAccept(loc1 -> teleport(player, loc1, world));
-        } else {
-            teleport(player, loc, world);
-        }*/
-    }
-
-    public void teleport(Player player, Location loc, World world, boolean useEco) {
-        boolean hasBypassPermission = player.hasPermission("rtp.teleportdelay.bypass");
-        long teleportDelay = hasBypassPermission ? 1 : configHandler.getConfigTeleport().getDelay();
-
-        BukkitRunnable runnable = new BukkitRunnable() {
-            @Override
-            public void run() {
-                player.spigot().sendMessage(configHandler.getConfigMessage().getInit());
-                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 3, 5, false, false));
-                PaperLib.getChunkAtAsync(loc).thenAccept(chunk -> {
-                    Block block = chunk.getWorld().getBlockAt(loc);
-                    LocationSearcher locationSearcher = LocationSearcherFactory.getLocationSearcher(world, plugin);
-                    if (locationSearcher == null || !locationSearcher.isSafeLocation(block.getLocation())) {
-                        player.sendMessage("");
-                    }
-                    Location location = block.getLocation().add(0.5, 2, 0.5);
-                    plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
-                    drawWarpParticles(player);
-                    PaperLib.teleportAsync(player, location);
-                    if (useEco) {
-                        ecoHandler.makePayment(player, configHandler.getConfigEconomy().getPrice());
-                        player.spigot().sendMessage(configMessage.getEconomy().getPayment());
-                    }
-                    drawWarpParticles(player);
-                    player.spigot().sendMessage(configMessage.getTeleport());
-                    teleportSuccess = true;
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(world);
-                            worldQueue.get(world).generate(worldConfigSection, 1);
-                        }
-                    }.runTaskLater(plugin, configHandler.getConfigQueue().getInitDelay());
-                });
-            }
-        };
-
-        runnable.runTaskLater(plugin, teleportDelay);
-        if (hasBypassPermission) return;
-        Location originalLoc = player.getLocation().clone();
-        if (teleportDelay > 0 && configHandler.getConfigTeleport().isCancelOnMove()) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    Location currentLoc = player.getLocation();
-                    if (originalLoc.getX() != currentLoc.getX() || originalLoc.getY() != currentLoc.getY() || originalLoc.getZ() != currentLoc.getZ()) {
-                        if (!isTeleportSuccess())
-                            player.spigot().sendMessage(configMessage.getTeleportCanceled());
-                        runnable.cancel();
-                        cancel();
-                    }
-                    if (isTeleportSuccess()) {
-                        cancel();
-                        teleportSuccess = false;
-                    }
-                }
-            }.runTaskTimer(plugin, 0, 5L);
-        }
-    }
-
-    private void drawWarpParticles(Player player) {
-        Location spawnLoc = player.getEyeLocation().add(player.getLocation().getDirection());
-        player.getWorld().spawnParticle(Particle.CLOUD, spawnLoc, 20);
-    }
-
-    private boolean isTeleportSuccess() {
-        return teleportSuccess;
     }
 }

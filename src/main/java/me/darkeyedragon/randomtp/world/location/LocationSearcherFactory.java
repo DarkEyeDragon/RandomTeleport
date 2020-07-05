@@ -12,8 +12,8 @@ public class LocationSearcherFactory {
                 return new LocationSearcher(randomTeleport);
             case NETHER:
                 return new NetherLocationSearcher(randomTeleport);
+            default:
+                throw new UnsupportedOperationException("This location searcher is not implemented.");
         }
-        return null;
     }
-
 }
