@@ -115,6 +115,7 @@ public class TeleportCommand extends BaseCommand {
                 .world(finalWorld)
                 .player(player)
                 .cooldown(configHandler.getConfigTeleport().getCooldown())
+                .ignoreTeleportDelay(sender.hasPermission("rtp.teleportdelay.bypass"))
                 .bypassCooldown(sender.hasPermission("rtp.teleport.bypass"))
                 .build();
         teleport.random();

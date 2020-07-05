@@ -23,7 +23,6 @@ public class Teleport {
     private CommandSender commandSender;
     private Player player;
     private World world;
-    private Location location;
     private boolean ignoreTeleportDelay;
     private boolean useEco;
     private ConfigHandler configHandler;
@@ -57,6 +56,11 @@ public class Teleport {
 
     public Teleport ignoreTeleportDelay() {
         ignoreTeleportDelay = true;
+        return this;
+    }
+
+    public Teleport ignoreTeleportDelay(boolean ignoreTeleportDelay) {
+        this.ignoreTeleportDelay = ignoreTeleportDelay;
         return this;
     }
 
