@@ -7,13 +7,15 @@ import me.darkeyedragon.randomtp.eco.EcoHandler;
 import me.darkeyedragon.randomtp.world.location.LocationSearcher;
 import me.darkeyedragon.randomtp.world.location.LocationSearcherFactory;
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Teleport {
 
@@ -27,6 +29,7 @@ public class Teleport {
     private ConfigHandler configHandler;
     private EcoHandler ecoHandler;
     private long cooldown;
+    private boolean bypassCooldown;
 
     public Teleport(RandomTeleport plugin) {
         this.plugin = plugin;
@@ -47,8 +50,8 @@ public class Teleport {
         return this;
     }
 
-    public Teleport location(Location location) {
-        this.location = location;
+    public Teleport bypassCooldown(boolean bypassCooldown) {
+        this.bypassCooldown = bypassCooldown;
         return this;
     }
 
@@ -86,10 +89,11 @@ public class Teleport {
         teleport.useEco = this.useEco;
         teleport.commandSender = this.commandSender;
         teleport.cooldown = this.cooldown;
+        teleport.bypassCooldown = this.bypassCooldown;
         return teleport;
     }
 
-    public void teleport() {
+    public void random() {
         final long delay;
         if (useEco) {
             double price = configHandler.getConfigEconomy().getPrice();
@@ -105,7 +109,7 @@ public class Teleport {
             delay = configHandler.getConfigTeleport().getDelay();
         }
         // Check if the player still has a cooldown active.
-        if (cooldown > 0) {
+        if (cooldown > 0 && plugin.getCooldowns().containsKey(player.getUniqueId()) && !bypassCooldown) {
             long lastTp = plugin.getCooldowns().get(player.getUniqueId());
             long remaining = lastTp + cooldown - System.currentTimeMillis();
             boolean ableToTp = remaining < 0;
@@ -115,34 +119,62 @@ public class Teleport {
             }
         }
         if (delay == 0) {
-            PaperLib.getChunkAtAsync(location).thenAccept(chunk -> {
-                Block block = chunk.getWorld().getBlockAt(location);
-                LocationSearcher locationSearcher = LocationSearcherFactory.getLocationSearcher(world, plugin);
-                //TODO revalidate locations
-                Location location = block.getLocation().add(0.5, 2, 0.5);
-                plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
-                drawWarpParticles(player);
-                PaperLib.teleportAsync(player, location);
-                if (useEco) {
-                    ecoHandler.makePayment(player, configHandler.getConfigEconomy().getPrice());
-                    player.spigot().sendMessage(configHandler.getConfigMessage().getEconomy().getPayment());
-                }
-                drawWarpParticles(player);
-                player.spigot().sendMessage(configHandler.getConfigMessage().getTeleport());
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(world);
-                        plugin.getWorldQueue().get(world).generate(worldConfigSection, 1);
+            teleport();
+        } else {
+            player.spigot().sendMessage(configHandler.getConfigMessage().getInitTeleportDelay(delay));
+            AtomicBoolean complete = new AtomicBoolean(false);
+            int taskId = Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                complete.set(true);
+                teleport();
+            }, delay).getTaskId();
+            Location originalLoc = player.getLocation().clone();
+            if (configHandler.getConfigTeleport().isCancelOnMove()) {
+                Bukkit.getScheduler().runTaskTimer(plugin, bukkitTask -> {
+                    Location currentLoc = player.getLocation();
+                    if (complete.get()) {
+                        bukkitTask.cancel();
+                    } else if ((originalLoc.getX() != currentLoc.getX() || originalLoc.getY() != currentLoc.getY() || originalLoc.getZ() != currentLoc.getZ())) {
+                        Bukkit.getScheduler().cancelTask(taskId);
+                        bukkitTask.cancel();
+                        player.spigot().sendMessage(configHandler.getConfigMessage().getTeleportCanceled());
                     }
-                }.runTaskLater(plugin, configHandler.getConfigQueue().getInitDelay());
-            });
+                }, 0, 5L);
+            }
         }
     }
 
     private void drawWarpParticles(Player player) {
         Location spawnLoc = player.getEyeLocation().add(player.getLocation().getDirection());
         player.getWorld().spawnParticle(Particle.CLOUD, spawnLoc, 20);
+    }
+
+    private void teleport() {
+        Location location = plugin.getWorldQueue().popLocation(world);
+        if (location == null) {
+            commandSender.spigot().sendMessage(configHandler.getConfigMessage().getDepletedQueue());
+            return;
+        }
+        LocationSearcher locationSearcher = LocationSearcherFactory.getLocationSearcher(world, plugin);
+        if (!locationSearcher.isSafeLocation(location)) {
+            random();
+        }
+        PaperLib.getChunkAtAsync(location).thenAccept(chunk -> {
+            Block block = chunk.getWorld().getBlockAt(location);
+            Location loc = block.getLocation().add(0.5, 2, 0.5);
+            plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
+            drawWarpParticles(player);
+            PaperLib.teleportAsync(player, loc);
+            if (useEco) {
+                ecoHandler.makePayment(player, configHandler.getConfigEconomy().getPrice());
+                player.spigot().sendMessage(configHandler.getConfigMessage().getEconomy().getPayment());
+            }
+            drawWarpParticles(player);
+            player.spigot().sendMessage(configHandler.getConfigMessage().getTeleport());
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(world);
+                plugin.getWorldQueue().get(world).generate(worldConfigSection, 1);
+            }, configHandler.getConfigQueue().getInitDelay());
+        });
     }
 }
 
