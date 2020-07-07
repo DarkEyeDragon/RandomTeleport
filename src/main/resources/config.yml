@@ -38,14 +38,14 @@ teleport:
   delay: "0s"
   cancel_on_move: true
 #Plugins to take into consideration when teleporting. A player will not be teleported in those regions
-#Currently supports Factions (FactionsUUID), WorldGuard, GriefPrevention, GriefDefender, RedProtect
+#Currently supports Factions (FactionsUUID), WorldGuard, GriefPrevention, RedProtect, Towny
 #If you want more plugins to be supported: https://github.com/DarkEyeDragon/RandomTeleport/issues
 plugins:
-  - "Factions"
-  - "WorldGuard"
-  - "GriefPrevention"
-  - "GriefDefender"
-  - "RedProtect"
+  - Factions
+  - WorldGuard
+  - GriefPrevention
+  - RedProtect
+  - Towny
 debug:
   #Safe location added for world(3/5)
   #Location removed from world(2/5)

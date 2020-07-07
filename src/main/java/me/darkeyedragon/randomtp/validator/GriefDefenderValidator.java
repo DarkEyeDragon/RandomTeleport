@@ -1,6 +1,6 @@
 package me.darkeyedragon.randomtp.validator;
 
-import com.griefdefender.api.Core;
+/*import com.griefdefender.api.Core;
 import com.griefdefender.api.GriefDefender;
 import com.griefdefender.api.claim.Claim;
 import org.bukkit.Location;
@@ -36,3 +36,4 @@ public class GriefDefenderValidator implements ChunkValidator {
         return Validator.GRIEF_DEFENDER;
     }
 }
+*/

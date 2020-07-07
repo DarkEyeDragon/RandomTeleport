@@ -14,10 +14,12 @@ public class ValidatorFactory {
                 return new WorldGuardValidator();
             case GRIEF_PREVENTION:
                 return new GriefPreventionValidator();
-            case GRIEF_DEFENDER:
-                return new GriefDefenderValidator();
+            /*case GRIEF_DEFENDER:
+                return new GriefDefenderValidator();*/
             case RED_PROTECT:
                 return new RedProtectValidator();
+            case TOWNY:
+                return new TownyValidator();
         }
         return null;
     }

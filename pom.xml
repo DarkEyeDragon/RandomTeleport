@@ -6,7 +6,7 @@
 
     <groupId>me.darkeyedragon</groupId>
     <artifactId>randomtp</artifactId>
-    <version>1.5.0</version>
+    <version>1.5.1-${build}</version>
     <packaging>jar</packaging>
 
     <name>RandomTeleport</name>
@@ -67,9 +67,6 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <outputFile>
-                                C:\Users\Joshua\Documents\Minecraft-server-1.16.1\plugins\${project.artifactId}-${project.version}.jar
-                            </outputFile>
                         </configuration>
                     </execution>
                 </executions>
@@ -173,12 +170,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.griefdefender</groupId>
-            <artifactId>api</artifactId>
-            <version>1.0.0-snapshot</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>br.net.fabiozumbi12.RedProtect</groupId>
             <artifactId>RedProtect-Core</artifactId>
             <version>LATEST</version>
@@ -188,6 +179,12 @@
             <groupId>br.net.fabiozumbi12.RedProtect</groupId>
             <artifactId>RedProtect-Spigot-1.13</artifactId>
             <version>LATEST</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.TownyAdvanced</groupId>
+            <artifactId>Towny</artifactId>
+            <version>0.96.1.11</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
