@@ -20,7 +20,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 @CommandAlias("rtp|randomtp|randomteleport")
@@ -154,22 +153,21 @@ public class TeleportCommand extends BaseCommand {
             LocationQueue locationQueue = configWorld.add(new WorldConfigSection(offsetX, offsetZ, radius, world, useWorldBorder, needsWorldPermission));
             if (locationQueue != null) {
                 commandSender.sendMessage(ChatColor.GREEN + "Successfully added to config.");
-                if (!(commandSender instanceof ConsoleCommandSender)) {
-                    locationQueue.subscribe(new QueueListener<Location>() {
-                        @Override
-                        public void onAdd(Location element) {
-                            commandSender.sendMessage("Safe location added for " + world.getName() + " (" + locationQueue.size() + "/" + configQueue.getSize() + ")");
-                            if (locationQueue.size() == configQueue.getSize()) {
-                                locationQueue.unsubscribe(this);
-                            }
+                locationQueue.subscribe(new QueueListener<Location>() {
+                    @Override
+                    public void onAdd(Location element) {
+                        commandSender.sendMessage(ChatColor.GREEN + "Safe location added for " + ChatColor.GOLD + element.getWorld().getName() + ChatColor.GREEN + " (" + ChatColor.YELLOW + locationQueue.size() + ChatColor.GREEN + "/" + configQueue.getSize() + ")");
+                        if (locationQueue.size() == configQueue.getSize()) {
+                            commandSender.sendMessage(ChatColor.GREEN + "Queue populated for " + ChatColor.GOLD + element.getWorld().getName());
+                            locationQueue.unsubscribe(this);
                         }
+                    }
 
-                        @Override
-                        public void onRemove(Location element) {
-                            //ignored
-                        }
-                    });
-                }
+                    @Override
+                    public void onRemove(Location element) {
+                        //ignored
+                    }
+                });
             } else {
                 commandSender.sendMessage(ChatColor.RED + "Size section not present in the config! Add it or recreate your config.");
             }
