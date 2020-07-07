@@ -153,9 +153,10 @@ public class ConfigHandler {
             World world = Bukkit.getWorld(key);
             if (world == null) {
                 plugin.getLogger().warning("World " + key + " does not exist! Skipping...");
-                break;
+            } else {
+                plugin.getLogger().info(ChatColor.GREEN + key + " found! Loading...");
+                offsetMap.put(world, new WorldConfigSection(offsetX, offsetZ, radius, world, useWorldBorder, needsWorldPermission));
             }
-            offsetMap.put(world, new WorldConfigSection(offsetX, offsetZ, radius, world, useWorldBorder, needsWorldPermission));
         }
         return offsetMap;
     }
