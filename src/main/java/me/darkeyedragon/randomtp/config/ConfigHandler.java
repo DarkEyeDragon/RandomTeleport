@@ -145,18 +145,18 @@ public class ConfigHandler {
         Set<String> keys = Objects.requireNonNull(section).getKeys(false);
         Map<World, WorldConfigSection> offsetMap = new HashMap<>(keys.size());
         for (String key : keys) {
+            World world = Bukkit.getWorld(key);
+            if (world == null) {
+                plugin.getLogger().warning("World " + key + " does not exist! Skipping...");
+                continue;
+            }
             boolean useWorldBorder = section.getBoolean(key + ".use_worldborder");
             boolean needsWorldPermission = section.getBoolean(key + ".needs_world_permission");
             int radius = section.getInt(key + ".radius");
             int offsetX = section.getInt(key + ".offsetX");
             int offsetZ = section.getInt(key + ".offsetZ");
-            World world = Bukkit.getWorld(key);
-            if (world == null) {
-                plugin.getLogger().warning("World " + key + " does not exist! Skipping...");
-            } else {
-                plugin.getLogger().info(ChatColor.GREEN + key + " found! Loading...");
-                offsetMap.put(world, new WorldConfigSection(offsetX, offsetZ, radius, world, useWorldBorder, needsWorldPermission));
-            }
+            plugin.getLogger().info(ChatColor.GREEN + key + " found! Loading...");
+            offsetMap.put(world, new WorldConfigSection(offsetX, offsetZ, radius, world, useWorldBorder, needsWorldPermission));
         }
         return offsetMap;
     }
