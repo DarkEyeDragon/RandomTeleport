@@ -6,7 +6,7 @@
 
     <groupId>me.darkeyedragon</groupId>
     <artifactId>randomtp</artifactId>
-    <version>1.5.0</version>
+    <version>1.5.0-b${build}}</version>
     <packaging>jar</packaging>
 
     <name>RandomTeleport</name>
@@ -67,9 +67,6 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <outputFile>
-                                C:\Users\Joshua\Documents\Minecraft-server-1.16.1\plugins\${project.artifactId}-${project.version}.jar
-                            </outputFile>
                         </configuration>
                     </execution>
                 </executions>
