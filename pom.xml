@@ -6,7 +6,7 @@
 
     <groupId>me.darkeyedragon</groupId>
     <artifactId>randomtp</artifactId>
-    <version>1.5.1-${build}</version>
+    <version>1.5.2-${build}</version>
     <packaging>jar</packaging>
 
     <name>RandomTeleport</name>
