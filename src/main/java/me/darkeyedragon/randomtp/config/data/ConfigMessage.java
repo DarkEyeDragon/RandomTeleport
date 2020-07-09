@@ -78,17 +78,17 @@ public class ConfigMessage {
         return null;
     }
 
-    public TextComponent getTeleport(Location location) {
-        String message = teleport;
-        if (message != null) {
-            message = ChatColor.translateAlternateColorCodes('&', message);
-            message = message.replaceAll("%posX", location.getX() + "")
-                    .replaceAll("%posY", location.getY() + "")
-                    .replaceAll("%posZ", location.getZ() + "");
-            return MessageUtil.getChatComponents(message);
-        }
-        return null;
+public TextComponent getTeleport(Location location) {
+    String message = teleport;
+    if (message != null) {
+        message = ChatColor.translateAlternateColorCodes('&', message);
+        message = message.replaceAll("%posX", location.getBlockX() + "")
+                .replaceAll("%posY", location.getBlockY() + "")
+                .replaceAll("%posZ", location.getBlockZ() + "");
+        return MessageUtil.getChatComponents(message);
     }
+    return null;
+}
 
     public TextComponent getInitTeleportDelay(long millis) {
         String message = initTeleportDelay;
