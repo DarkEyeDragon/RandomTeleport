@@ -173,7 +173,7 @@ public class Teleport {
                 player.spigot().sendMessage(configHandler.getConfigMessage().getEconomy().getPayment());
             }
             drawWarpParticles(player);
-            player.spigot().sendMessage(configHandler.getConfigMessage().getTeleport());
+            player.spigot().sendMessage(configHandler.getConfigMessage().getTeleport(location));
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(world);
                 plugin.getWorldQueue().get(world).generate(worldConfigSection, 1);

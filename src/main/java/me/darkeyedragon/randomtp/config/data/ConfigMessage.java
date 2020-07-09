@@ -5,6 +5,7 @@ import me.darkeyedragon.randomtp.util.MessageUtil;
 import me.darkeyedragon.randomtp.util.TimeUtil;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.World;
 
 public class ConfigMessage {
@@ -77,10 +78,13 @@ public class ConfigMessage {
         return null;
     }
 
-    public TextComponent getTeleport() {
+    public TextComponent getTeleport(Location location) {
         String message = teleport;
         if (message != null) {
             message = ChatColor.translateAlternateColorCodes('&', message);
+            message = message.replaceAll("%posX", location.getX() + "")
+                    .replaceAll("%posY", location.getY() + "")
+                    .replaceAll("%posZ", location.getZ() + "");
             return MessageUtil.getChatComponents(message);
         }
         return null;
