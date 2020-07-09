@@ -165,11 +165,21 @@ public TextComponent getTeleport(Location location) {
         }
 
         public TextComponent getInsufficientFunds() {
-            return MessageUtil.getChatComponents(insufficientFunds);
+            String message = insufficientFunds;
+            if (message != null) {
+                message = ChatColor.translateAlternateColorCodes('&', message);
+                return MessageUtil.getChatComponents(message);
+            }
+            return null;
         }
 
         public TextComponent getPayment() {
-            return MessageUtil.getChatComponents(payment);
+            String message = payment;
+            if (message != null) {
+                message = ChatColor.translateAlternateColorCodes('&', message);
+                return MessageUtil.getChatComponents(message);
+            }
+            return null;
         }
     }
 

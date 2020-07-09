@@ -64,8 +64,8 @@ public class Teleport {
         return this;
     }
 
-    public Teleport useEco() {
-        useEco = true;
+    public Teleport useEco(boolean useEco) {
+        this.useEco = useEco;
         return this;
     }
 
@@ -94,6 +94,7 @@ public class Teleport {
         teleport.commandSender = this.commandSender;
         teleport.cooldown = this.cooldown;
         teleport.bypassCooldown = this.bypassCooldown;
+        teleport.ecoHandler = this.ecoHandler;
         return teleport;
     }
 
