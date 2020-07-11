@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 
 public class EcoHandler {
 
-    private Economy economy;
+    private final Economy economy;
 
     public EcoHandler(Economy economy) {
         this.economy = economy;

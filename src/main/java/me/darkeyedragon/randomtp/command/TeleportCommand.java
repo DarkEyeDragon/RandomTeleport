@@ -9,8 +9,8 @@ import me.darkeyedragon.randomtp.config.ConfigHandler;
 import me.darkeyedragon.randomtp.config.data.ConfigMessage;
 import me.darkeyedragon.randomtp.config.data.ConfigQueue;
 import me.darkeyedragon.randomtp.config.data.ConfigWorld;
-import me.darkeyedragon.randomtp.eco.EcoHandler;
 import me.darkeyedragon.randomtp.teleport.Teleport;
+import me.darkeyedragon.randomtp.teleport.TeleportProperty;
 import me.darkeyedragon.randomtp.world.LocationQueue;
 import me.darkeyedragon.randomtp.world.QueueListener;
 import me.darkeyedragon.randomtp.world.WorldQueue;
@@ -33,7 +33,6 @@ public class TeleportCommand extends BaseCommand {
     private boolean teleportSuccess;
 
     //Economy
-    private final EcoHandler ecoHandler;
 
     //Config sections
     private ConfigMessage configMessage;
@@ -42,7 +41,6 @@ public class TeleportCommand extends BaseCommand {
 
     public TeleportCommand(RandomTeleport plugin) {
         this.plugin = plugin;
-        this.ecoHandler = plugin.getEcoHandler();
         setConfigs();
     }
 
@@ -107,17 +105,9 @@ public class TeleportCommand extends BaseCommand {
             }
         }
         final World finalWorld = newWorld;
-        Teleport teleport = new Teleport(plugin)
-                .commandSender(sender)
-                .configHandler(configHandler)
-                .ecoHandler(ecoHandler)
-                .world(finalWorld)
-                .player(player)
-                .cooldown(configHandler.getConfigTeleport().getCooldown())
-                .ignoreTeleportDelay(sender.hasPermission("rtp.teleportdelay.bypass"))
-                .bypassCooldown(sender.hasPermission("rtp.teleport.bypass"))
-                .useEco(!player.hasPermission("rtp.eco.bypass"))
-                .build();
+        final boolean useEco = !player.hasPermission("rtp.eco.bypass") && configHandler.getConfigEconomy().useEco();
+        TeleportProperty teleportProperty = new TeleportProperty(sender, player, finalWorld, sender.hasPermission("rtp.teleport.bypass"), sender.hasPermission("rtp.teleportdelay.bypass"), useEco, configHandler, configHandler.getConfigTeleport().getCooldown());
+        Teleport teleport = new Teleport(plugin, teleportProperty);
         teleport.random();
     }
 

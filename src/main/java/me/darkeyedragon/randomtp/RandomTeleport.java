@@ -5,6 +5,7 @@ import co.aikar.commands.PaperCommandManager;
 import me.darkeyedragon.randomtp.command.TeleportCommand;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
+import me.darkeyedragon.randomtp.eco.EcoFactory;
 import me.darkeyedragon.randomtp.eco.EcoHandler;
 import me.darkeyedragon.randomtp.listener.PluginLoadListener;
 import me.darkeyedragon.randomtp.listener.WorldLoadListener;
@@ -41,7 +42,7 @@ public final class RandomTeleport extends JavaPlugin {
 
     //Economy
     private Economy econ;
-    private EcoHandler ecoHandler;
+    private static EcoHandler ecoHandler;
 
     @Override
     public void onEnable() {
@@ -71,7 +72,7 @@ public final class RandomTeleport extends JavaPlugin {
         cooldowns = new HashMap<>();
         if (setupEconomy()) {
             getLogger().info("Vault found. Hooking into it.");
-            ecoHandler = new EcoHandler(econ);
+            EcoFactory.createDefault(econ);
         } else {
             getLogger().warning("Vault not found. Currency based options are disabled.");
         }
@@ -176,10 +177,5 @@ public final class RandomTeleport extends JavaPlugin {
     public LocationFactory getLocationFactory() {
         return locationFactory;
     }
-
-    public EcoHandler getEcoHandler() {
-        return ecoHandler;
-    }
-
 
 }
