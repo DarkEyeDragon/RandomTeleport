@@ -105,8 +105,10 @@ public class TeleportCommand extends BaseCommand {
             }
         }
         final World finalWorld = newWorld;
-        final boolean useEco = !player.hasPermission("rtp.eco.bypass") && configHandler.getConfigEconomy().useEco();
-        TeleportProperty teleportProperty = new TeleportProperty(sender, player, finalWorld, sender.hasPermission("rtp.teleport.bypass"), sender.hasPermission("rtp.teleportdelay.bypass"), useEco, configHandler, configHandler.getConfigTeleport().getCooldown());
+        final boolean useEco = configHandler.getConfigEconomy().useEco();
+        final boolean bypassEco = player.hasPermission("rtp.eco.bypass");
+        final boolean logic = useEco && !bypassEco;
+        TeleportProperty teleportProperty = new TeleportProperty(sender, player, finalWorld, sender.hasPermission("rtp.teleport.bypass"), sender.hasPermission("rtp.teleportdelay.bypass"), logic, configHandler, configHandler.getConfigTeleport().getCooldown());
         Teleport teleport = new Teleport(plugin, teleportProperty);
         teleport.random();
     }

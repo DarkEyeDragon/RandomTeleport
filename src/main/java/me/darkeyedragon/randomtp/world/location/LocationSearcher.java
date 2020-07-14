@@ -81,7 +81,6 @@ public class LocationSearcher {
                 }
             }
         }
-
         return null;
     }
 
@@ -97,9 +96,9 @@ public class LocationSearcher {
 
     private CompletableFuture<Chunk> getRandomChunkAsync(WorldConfigSection worldConfigSection) {
         ThreadLocalRandom rnd = ThreadLocalRandom.current();
-        int chunkRadius = worldConfigSection.getRadius()/16;
-        int chunkOffsetX = worldConfigSection.getX()/16;
-        int chunkOffsetZ = worldConfigSection.getZ()/16;
+        int chunkRadius = worldConfigSection.getRadius() / 16;
+        int chunkOffsetX = worldConfigSection.getX() / 16;
+        int chunkOffsetZ = worldConfigSection.getZ() / 16;
         int x = rnd.nextInt(-chunkRadius, chunkRadius);
         int z = rnd.nextInt(-chunkRadius, chunkRadius);
         return PaperLib.getChunkAtAsync(worldConfigSection.getWorld(), x + chunkOffsetX, z + chunkOffsetZ);

@@ -35,8 +35,8 @@ public class Teleport {
 
     public void random() {
         final long delay;
+        double price = configHandler.getConfigEconomy().getPrice();
         if (property.isUseEco()) {
-            double price = configHandler.getConfigEconomy().getPrice();
             try {
                 ecoHandler = EcoFactory.getInstance();
                 if (!ecoHandler.hasEnough(player, price)) {
