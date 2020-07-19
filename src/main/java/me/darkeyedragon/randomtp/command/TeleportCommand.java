@@ -3,6 +3,7 @@ package me.darkeyedragon.randomtp.command;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.annotation.*;
+import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
@@ -185,12 +186,13 @@ public class TeleportCommand extends BaseCommand {
     @Subcommand("resetcooldown")
     @CommandCompletion("@players")
     @CommandPermission("rtp.admin.resetcooldown")
-    public void resetCooldown(CommandSender commandSender, Player target) {
+    public void resetCooldown(CommandSender commandSender, OnlinePlayer target) {
         if (target != null) {
-            if (plugin.getCooldowns().remove(target.getUniqueId()) != null) {
-                commandSender.sendMessage(ChatColor.GREEN + "Cooldown reset for " + target.getName());
+            Player player = target.getPlayer();
+            if (plugin.getCooldowns().remove(player.getUniqueId()) != null) {
+                commandSender.sendMessage(ChatColor.GREEN + "Cooldown reset for " + player.getName());
             } else {
-                commandSender.sendMessage(ChatColor.RED + "There was no cooldown for " + target.getName());
+                commandSender.sendMessage(ChatColor.RED + "There was no cooldown for " + player.getName());
             }
         }
     }
