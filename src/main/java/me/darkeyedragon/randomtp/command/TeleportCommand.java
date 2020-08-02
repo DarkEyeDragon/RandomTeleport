@@ -26,7 +26,7 @@ import org.bukkit.entity.Player;
 @CommandAlias("rtp|randomtp|randomteleport")
 public class TeleportCommand extends BaseCommand {
 
-    //private LocationSearcher locationHelper;
+    //private BaseLocationSearcher locationHelper;
     private ConfigHandler configHandler;
     private final RandomTeleport plugin;
     private WorldQueue worldQueue;

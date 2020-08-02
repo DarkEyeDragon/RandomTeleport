@@ -15,7 +15,7 @@ import me.darkeyedragon.randomtp.world.LocationQueue;
 import me.darkeyedragon.randomtp.world.QueueListener;
 import me.darkeyedragon.randomtp.world.WorldQueue;
 import me.darkeyedragon.randomtp.world.location.LocationFactory;
-import me.darkeyedragon.randomtp.world.location.LocationSearcherFactory;
+import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -37,7 +37,7 @@ public final class RandomTeleport extends JavaPlugin {
     private List<ChunkValidator> validatorList;
     private WorldQueue worldQueue;
     private ConfigHandler configHandler;
-    //private LocationSearcher locationSearcher;
+    //private BaseLocationSearcher locationSearcher;
     private LocationFactory locationFactory;
 
     //Economy

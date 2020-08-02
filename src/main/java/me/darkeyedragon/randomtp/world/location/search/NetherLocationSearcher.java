@@ -1,4 +1,4 @@
-package me.darkeyedragon.randomtp.world.location;
+package me.darkeyedragon.randomtp.world.location.search;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.validator.ChunkValidator;
@@ -10,7 +10,7 @@ import org.bukkit.block.Block;
 
 import java.util.EnumSet;
 
-public class NetherLocationSearcher extends LocationSearcher {
+public class NetherLocationSearcher extends BaseLocationSearcher {
 
     private final EnumSet<Material> blacklistMaterial;
     private final int MAX_HEIGHT = 120; //Everything above this is nether ceiling
@@ -46,7 +46,7 @@ public class NetherLocationSearcher extends LocationSearcher {
             for (int z = 8; z < 16; z++) {
                 for (int y = 0; y < MAX_HEIGHT; y++) {
                     Block block = chunk.getWorld().getBlockAt((chunk.getX() << 4) + x, y, (chunk.getZ() << 4) + z);
-                    if (isSafeLocation(block.getLocation())) {
+                    if (isSafe(block.getLocation())) {
                         return block.getLocation();
                     }
                 }
@@ -57,7 +57,7 @@ public class NetherLocationSearcher extends LocationSearcher {
     }
 
     @Override
-    public boolean isSafeLocation(Location loc) {
+    public boolean isSafe(Location loc) {
         final World world = loc.getWorld();
         if (world == null) return false;
         if (loc.getBlock().getType() == Material.AIR) return false;

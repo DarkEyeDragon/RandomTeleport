@@ -1,8 +1,9 @@
-package me.darkeyedragon.randomtp.world.location;
+package me.darkeyedragon.randomtp.world.location.search;
 
 import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.validator.ChunkValidator;
+import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,7 +17,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class LocationSearcher {
+public class BaseLocationSearcher implements LocationSearcher {
 
     private static final String OCEAN = "ocean";
     private final EnumSet<Material> blacklistMaterial;
@@ -27,10 +28,12 @@ public class LocationSearcher {
     /**
      * A simple utility class to help with {@link Location}
      */
-    public LocationSearcher(RandomTeleport plugin) {
+    public BaseLocationSearcher(RandomTeleport plugin) {
         this.plugin = plugin;
         //Illegal material types
         blacklistMaterial = EnumSet.of(
+                Material.AIR,
+                Material.VOID_AIR,
                 Material.LAVA,
                 Material.CACTUS,
                 Material.FIRE,
@@ -56,11 +59,11 @@ public class LocationSearcher {
     }
 
     /* This is the final method that will be called from the other end, to get a location */
-    public CompletableFuture<Location> getRandomLocation(WorldConfigSection worldConfigSection) {
+    public CompletableFuture<Location> getRandom(WorldConfigSection worldConfigSection) {
         CompletableFuture<Location> location = pickRandomLocation(worldConfigSection);
         return location.thenCompose((loc) -> {
             if (loc == null) {
-                return getRandomLocation(worldConfigSection);
+                return getRandom(worldConfigSection);
             } else return CompletableFuture.completedFuture(loc);
         });
     }
@@ -76,7 +79,7 @@ public class LocationSearcher {
         for (int x = 8; x < 16; x++) {
             for (int z = 8; z < 16; z++) {
                 Block block = chunk.getWorld().getHighestBlockAt((chunk.getX() << 4) + x, (chunk.getZ() << 4) + z);
-                if (isSafeLocation(block.getLocation())) {
+                if (isSafe(block.getLocation())) {
                     return block.getLocation();
                 }
             }
@@ -104,7 +107,7 @@ public class LocationSearcher {
         return PaperLib.getChunkAtAsync(worldConfigSection.getWorld(), x + chunkOffsetX, z + chunkOffsetZ);
     }
 
-    public boolean isSafeLocation(Location loc) {
+    public boolean isSafe(Location loc) {
         World world = loc.getWorld();
         if (world == null) return false;
         //Check 2 blocks to see if its safe for the player to stand. Since getHighestBlockAt doesnt include trees
