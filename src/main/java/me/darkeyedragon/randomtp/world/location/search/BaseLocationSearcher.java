@@ -100,6 +100,9 @@ public class BaseLocationSearcher implements LocationSearcher {
         int chunkOffsetZ = worldConfigSection.getZ() / 16;
         int x = rnd.nextInt(-chunkRadius, chunkRadius);
         int z = rnd.nextInt(-chunkRadius, chunkRadius);
+        if (PaperLib.isPaper()) {
+            return worldConfigSection.getWorld().getChunkAtAsyncUrgently(x + chunkOffsetX, z + chunkOffsetZ);
+        }
         return PaperLib.getChunkAtAsync(worldConfigSection.getWorld(), x + chunkOffsetX, z + chunkOffsetZ);
     }
 
