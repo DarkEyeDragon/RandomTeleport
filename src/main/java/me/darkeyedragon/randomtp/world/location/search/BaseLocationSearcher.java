@@ -12,8 +12,6 @@ import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 
 import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -21,7 +19,7 @@ public class BaseLocationSearcher implements LocationSearcher {
 
     private static final String OCEAN = "ocean";
     private final EnumSet<Material> blacklistMaterial;
-    private final Set<Biome> blacklistBiome;
+    private final EnumSet<Biome> blacklistBiome;
     private final RandomTeleport plugin;
     private boolean useWorldBorder;
 
@@ -46,7 +44,7 @@ public class BaseLocationSearcher implements LocationSearcher {
                 Material.HEAVY_WEIGHTED_PRESSURE_PLATE,
                 Material.LIGHT_WEIGHTED_PRESSURE_PLATE
         );
-        blacklistBiome = new HashSet<>();
+        blacklistBiome = EnumSet.noneOf(Biome.class);
 
         //Illegal biomes
         for (Biome biome : Biome.values()) {
