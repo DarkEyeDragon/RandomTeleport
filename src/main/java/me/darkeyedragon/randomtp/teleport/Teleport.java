@@ -108,7 +108,7 @@ public class Teleport {
         }
         PaperLib.getChunkAtAsync(location).thenAccept(chunk -> {
             Block block = chunk.getWorld().getBlockAt(location);
-            Location loc = block.getLocation().add(0.5, 0.5, 0.5);
+            Location loc = block.getLocation().add(0.5, 1.5, 0.5);
             plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
             drawWarpParticles(player);
             PaperLib.teleportAsync(player, loc);

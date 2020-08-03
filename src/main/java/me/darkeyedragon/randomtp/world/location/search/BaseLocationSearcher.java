@@ -32,8 +32,6 @@ public class BaseLocationSearcher implements LocationSearcher {
         this.plugin = plugin;
         //Illegal material types
         blacklistMaterial = EnumSet.of(
-                Material.AIR,
-                Material.VOID_AIR,
                 Material.LAVA,
                 Material.CACTUS,
                 Material.FIRE,
@@ -110,6 +108,7 @@ public class BaseLocationSearcher implements LocationSearcher {
     public boolean isSafe(Location loc) {
         World world = loc.getWorld();
         if (world == null) return false;
+        if (loc.getBlock().getType().isAir()) return false;
         //Check 2 blocks to see if its safe for the player to stand. Since getHighestBlockAt doesnt include trees
         if (loc.clone().add(0, 2, 0).getBlock().getType() != Material.AIR) return false;
         if (blacklistMaterial.contains(loc.getBlock().getType())) return false;
