@@ -6,6 +6,7 @@ import me.darkeyedragon.randomtp.config.ConfigHandler;
 import me.darkeyedragon.randomtp.eco.EcoFactory;
 import me.darkeyedragon.randomtp.eco.EcoHandler;
 import me.darkeyedragon.randomtp.exception.EcoNotSupportedException;
+import me.darkeyedragon.randomtp.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
 import me.darkeyedragon.randomtp.world.location.search.BaseLocationSearcher;
 import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
@@ -90,6 +91,15 @@ public class Teleport {
         }
     }
 
+    private void addToDeathTimer(Player player) {
+        DeathTracker tracker = plugin.getDeathTracker();
+        if (tracker.contains(player)) {
+            tracker.getBukkitTask(player).cancel();
+            tracker.remove(player);
+        }
+        plugin.getDeathTracker().add(player, configHandler.getConfigTeleport().getDeathTimer());
+    }
+
     private void drawWarpParticles(Player player) {
         Location spawnLoc = player.getEyeLocation().add(player.getLocation().getDirection());
         player.getWorld().spawnParticle(Particle.CLOUD, spawnLoc, 20);
@@ -112,6 +122,9 @@ public class Teleport {
             plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
             drawWarpParticles(player);
             PaperLib.teleportAsync(player, loc);
+            if (configHandler.getConfigTeleport().getDeathTimer() > 0) {
+                addToDeathTimer(player);
+            }
             if (property.isUseEco() && EcoFactory.isUseEco()) {
                 ecoHandler.makePayment(player, configHandler.getConfigEconomy().getPrice());
                 player.spigot().sendMessage(configHandler.getConfigMessage().getEconomy().getPayment());

@@ -38,6 +38,9 @@ teleport:
   #default: "0s"
   delay: "0s"
   cancel_on_move: true
+  #If players die within this time after RTP'ing they wont lose anything.
+  #Set to 0 to disable. Default "10s"
+  death_timer: "10s"
 #Plugins to take into consideration when teleporting. A player will not be teleported in those regions
 #Currently supports Factions (FactionsUUID), WorldGuard, GriefPrevention, RedProtect, Towny
 #If you want more plugins to be supported: https://github.com/DarkEyeDragon/RandomTeleport/issues

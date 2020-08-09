@@ -6,18 +6,24 @@ public class ConfigTeleport {
     private long cooldown;
     private long delay;
     private boolean cancelOnMove;
+    private long deathTimer;
 
-    public ConfigTeleport cooldown(long cooldown){
+    public ConfigTeleport cooldown(long cooldown) {
         this.cooldown = cooldown;
         return this;
     }
 
-    public ConfigTeleport delay(long delay){
+    public ConfigTeleport delay(long delay) {
         this.delay = delay;
         return this;
     }
 
-    public ConfigTeleport cancelOnMove(boolean cancelOnMove){
+    public ConfigTeleport deathTimer(long deathTimer) {
+        this.deathTimer = deathTimer;
+        return this;
+    }
+
+    public ConfigTeleport cancelOnMove(boolean cancelOnMove) {
         this.cancelOnMove = cancelOnMove;
         return this;
     }
@@ -32,5 +38,9 @@ public class ConfigTeleport {
 
     public boolean isCancelOnMove() {
         return cancelOnMove;
+    }
+
+    public long getDeathTimer() {
+        return deathTimer;
     }
 }
