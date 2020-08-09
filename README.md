@@ -1,5 +1,5 @@
 # Random Teleport
-Teleport a player to a random (safe) location in the Minecraft world.
+Teleport a player to a random (hopefully safe) location in the Minecraft world.
 
 ### Features
 - World based teleports.
