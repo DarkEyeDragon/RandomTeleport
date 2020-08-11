@@ -15,7 +15,7 @@ import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
-public abstract class BaseLocationSearcher implements LocationSearcher {
+abstract class BaseLocationSearcher implements LocationSearcher {
 
     protected static final String OCEAN = "ocean";
     protected final EnumSet<Material> blacklistMaterial;

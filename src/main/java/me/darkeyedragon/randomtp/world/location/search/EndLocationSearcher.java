@@ -18,7 +18,6 @@ public class EndLocationSearcher extends BaseLocationSearcher {
      */
     public EndLocationSearcher(RandomTeleport plugin) {
         super(plugin);
-        //setBlacklistBiome(EnumSet.of(Biome.THE_END, Biome.END_BARRENS));
     }
 
     @Override

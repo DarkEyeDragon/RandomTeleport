@@ -8,7 +8,7 @@ import me.darkeyedragon.randomtp.eco.EcoHandler;
 import me.darkeyedragon.randomtp.exception.EcoNotSupportedException;
 import me.darkeyedragon.randomtp.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
-import me.darkeyedragon.randomtp.world.location.search.BaseLocationSearcher;
+import me.darkeyedragon.randomtp.world.location.search.LocationSearcher;
 import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -112,7 +112,7 @@ public class Teleport {
             return;
         }
         PaperLib.getChunkAtAsync(location).thenAccept(chunk -> {
-            BaseLocationSearcher baseLocationSearcher = LocationSearcherFactory.getLocationSearcher(property.getWorld(), plugin);
+            LocationSearcher baseLocationSearcher = LocationSearcherFactory.getLocationSearcher(property.getWorld(), plugin);
             if (!baseLocationSearcher.isSafe(location)) {
                 random();
                 return;
