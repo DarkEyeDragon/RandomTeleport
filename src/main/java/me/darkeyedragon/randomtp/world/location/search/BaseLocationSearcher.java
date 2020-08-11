@@ -15,13 +15,16 @@ import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class BaseLocationSearcher implements LocationSearcher {
+public abstract class BaseLocationSearcher implements LocationSearcher {
 
-    private static final String OCEAN = "ocean";
-    final EnumSet<Material> blacklistMaterial;
-    final EnumSet<Biome> blacklistBiome;
-    private final RandomTeleport plugin;
+    protected static final String OCEAN = "ocean";
+    protected final EnumSet<Material> blacklistMaterial;
+    protected final EnumSet<Biome> blacklistBiome;
+    protected final RandomTeleport plugin;
     private boolean useWorldBorder;
+
+    protected final byte CHUNK_SIZE = 16; //The size (in blocks) of a chunk in all directions
+    protected final byte CHUNK_SHIFT = 4; //The amount of bits needed to translate between locations and chunks
 
     /**
      * A simple utility class to help with {@link Location}
@@ -72,9 +75,9 @@ public class BaseLocationSearcher implements LocationSearcher {
 
     /* Will search through the chunk to find a location that is safe, returning null if none is found. */
     public Location getRandomLocationFromChunk(Chunk chunk) {
-        for (int x = 8; x < 16; x++) {
-            for (int z = 8; z < 16; z++) {
-                Block block = chunk.getWorld().getHighestBlockAt((chunk.getX() << 4) + x, (chunk.getZ() << 4) + z);
+        for (int x = 8; x < CHUNK_SIZE; x++) {
+            for (int z = 8; z < CHUNK_SIZE; z++) {
+                Block block = chunk.getWorld().getHighestBlockAt((chunk.getX() << CHUNK_SHIFT) + x, (chunk.getZ() << CHUNK_SHIFT) + z);
                 if (isSafe(block.getLocation())) {
                     return block.getLocation();
                 }
@@ -95,9 +98,9 @@ public class BaseLocationSearcher implements LocationSearcher {
 
     CompletableFuture<Chunk> getRandomChunkAsync(WorldConfigSection worldConfigSection) {
         ThreadLocalRandom rnd = ThreadLocalRandom.current();
-        int chunkRadius = worldConfigSection.getRadius() / 16;
-        int chunkOffsetX = worldConfigSection.getX() / 16;
-        int chunkOffsetZ = worldConfigSection.getZ() / 16;
+        int chunkRadius = worldConfigSection.getRadius() >> CHUNK_SHIFT;
+        int chunkOffsetX = worldConfigSection.getX() >> CHUNK_SHIFT;
+        int chunkOffsetZ = worldConfigSection.getZ() >> CHUNK_SHIFT;
         int x = rnd.nextInt(-chunkRadius, chunkRadius);
         int z = rnd.nextInt(-chunkRadius, chunkRadius);
         if (PaperLib.isPaper()) {
@@ -123,10 +126,10 @@ public class BaseLocationSearcher implements LocationSearcher {
         return true;
     }
 
-    boolean isSafeChunk(Chunk chunk) {
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                Block block = chunk.getWorld().getHighestBlockAt((chunk.getX() << 4) + x, (chunk.getZ() << 4) + z);
+    public boolean isSafeChunk(Chunk chunk) {
+        for (int x = 0; x < CHUNK_SIZE; x++) {
+            for (int z = 0; z < CHUNK_SIZE; z++) {
+                Block block = chunk.getWorld().getHighestBlockAt((chunk.getX() << CHUNK_SHIFT) + x, (chunk.getZ() << CHUNK_SHIFT) + z);
                 if (blacklistBiome.contains(block.getBiome())) {
                     return false;
                 }

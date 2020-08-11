@@ -8,11 +8,8 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
-import java.util.EnumSet;
-
 public class NetherLocationSearcher extends BaseLocationSearcher {
 
-    private final EnumSet<Material> blacklistMaterial;
     private final int MAX_HEIGHT = 120; //Everything above this is nether ceiling
 
     /**
@@ -22,30 +19,15 @@ public class NetherLocationSearcher extends BaseLocationSearcher {
      */
     public NetherLocationSearcher(RandomTeleport plugin) {
         super(plugin);
-        blacklistMaterial = EnumSet.of(
-                Material.LAVA,
-                Material.BEDROCK,
-                Material.FIRE,
-                Material.TRIPWIRE,
-                Material.ACACIA_PRESSURE_PLATE,
-                Material.BIRCH_PRESSURE_PLATE,
-                Material.JUNGLE_PRESSURE_PLATE,
-                Material.OAK_PRESSURE_PLATE,
-                Material.SPRUCE_PRESSURE_PLATE,
-                Material.STONE_PRESSURE_PLATE,
-                Material.DARK_OAK_PRESSURE_PLATE,
-                Material.HEAVY_WEIGHTED_PRESSURE_PLATE,
-                Material.LIGHT_WEIGHTED_PRESSURE_PLATE
-        );
     }
 
     /* Will search through the chunk to find a location that is safe, returning null if none is found. */
     @Override
     public Location getRandomLocationFromChunk(Chunk chunk) {
-        for (int x = 8; x < 16; x++) {
-            for (int z = 8; z < 16; z++) {
+        for (int x = 8; x < CHUNK_SIZE; x++) {
+            for (int z = 8; z < CHUNK_SIZE; z++) {
                 for (int y = 0; y < MAX_HEIGHT; y++) {
-                    Block block = chunk.getWorld().getBlockAt((chunk.getX() << 4) + x, y, (chunk.getZ() << 4) + z);
+                    Block block = chunk.getWorld().getBlockAt((chunk.getX() << CHUNK_SHIFT) + x, y, (chunk.getZ() << CHUNK_SHIFT) + z);
                     if (isSafe(block.getLocation())) {
                         return block.getLocation();
                     }
