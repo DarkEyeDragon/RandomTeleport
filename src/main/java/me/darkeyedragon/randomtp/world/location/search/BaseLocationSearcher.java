@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 
 import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
@@ -114,16 +115,28 @@ abstract class BaseLocationSearcher implements LocationSearcher {
         if (world == null) return false;
         if (loc.getBlock().getType().isAir()) return false;
         //Check 2 blocks to see if its safe for the player to stand. Since getHighestBlockAt doesnt include trees
-        Block upperBlock = loc.clone().add(0, 1, 0).getBlock();
-        if (!upperBlock.getType().isAir() && !upperBlock.getLocation().add(0, 1, 0).getBlock().getType().isAir())
-            return false;
+        if (!isSafeAbove(loc)) return false;
         if (blacklistMaterial.contains(loc.getBlock().getType())) return false;
+        return isSafeForPlugins(loc);
+    }
+
+    protected boolean isSafeForPlugins(Location location) {
         for (ChunkValidator validator : plugin.getValidatorList()) {
-            if (!validator.isValid(loc)) {
+            if (!validator.isValid(location)) {
                 return false;
             }
         }
         return true;
+    }
+
+    /**
+     * @param location the {@link Location} to validate
+     * @return true if the 2 blocks above are air
+     */
+    protected boolean isSafeAbove(Location location) {
+        Block blockAbove = location.getBlock().getRelative(BlockFace.UP);
+        Block blockAboveAbove = blockAbove.getRelative(BlockFace.UP);
+        return (blockAbove.isPassable() && blockAboveAbove.isPassable());
     }
 
     public boolean isSafeChunk(Chunk chunk) {

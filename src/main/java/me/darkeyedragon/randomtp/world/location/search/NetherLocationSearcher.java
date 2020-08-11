@@ -1,7 +1,6 @@
 package me.darkeyedragon.randomtp.world.location.search;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
-import me.darkeyedragon.randomtp.validator.ChunkValidator;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -44,14 +43,7 @@ public class NetherLocationSearcher extends BaseLocationSearcher {
         if (world == null) return false;
         if (loc.getBlock().getType() == Material.AIR) return false;
         if (blacklistMaterial.contains(loc.getBlock().getType())) return false;
-        final Location clone = loc.clone();
-        if (clone.add(0, 1, 0).getBlock().getType() != Material.AIR) return false;
-        if (clone.add(0, 1, 0).getBlock().getType() != Material.AIR) return false;
-        for (ChunkValidator validator : super.getPlugin().getValidatorList()) {
-            if (!validator.isValid(loc)) {
-                return false;
-            }
-        }
-        return true;
+        if (!isSafeAbove(loc)) return false;
+        return isSafeForPlugins(loc);
     }
 }
