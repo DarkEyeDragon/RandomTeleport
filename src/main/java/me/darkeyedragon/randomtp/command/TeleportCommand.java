@@ -3,14 +3,15 @@ package me.darkeyedragon.randomtp.command;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.annotation.*;
+import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
 import me.darkeyedragon.randomtp.config.data.ConfigMessage;
 import me.darkeyedragon.randomtp.config.data.ConfigQueue;
 import me.darkeyedragon.randomtp.config.data.ConfigWorld;
-import me.darkeyedragon.randomtp.eco.EcoHandler;
 import me.darkeyedragon.randomtp.teleport.Teleport;
+import me.darkeyedragon.randomtp.teleport.TeleportProperty;
 import me.darkeyedragon.randomtp.world.LocationQueue;
 import me.darkeyedragon.randomtp.world.QueueListener;
 import me.darkeyedragon.randomtp.world.WorldQueue;
@@ -25,7 +26,7 @@ import org.bukkit.entity.Player;
 @CommandAlias("rtp|randomtp|randomteleport")
 public class TeleportCommand extends BaseCommand {
 
-    //private LocationSearcher locationHelper;
+    //private BaseLocationSearcher locationHelper;
     private ConfigHandler configHandler;
     private final RandomTeleport plugin;
     private WorldQueue worldQueue;
@@ -33,7 +34,6 @@ public class TeleportCommand extends BaseCommand {
     private boolean teleportSuccess;
 
     //Economy
-    private final EcoHandler ecoHandler;
 
     //Config sections
     private ConfigMessage configMessage;
@@ -42,7 +42,6 @@ public class TeleportCommand extends BaseCommand {
 
     public TeleportCommand(RandomTeleport plugin) {
         this.plugin = plugin;
-        this.ecoHandler = plugin.getEcoHandler();
         setConfigs();
     }
 
@@ -107,16 +106,11 @@ public class TeleportCommand extends BaseCommand {
             }
         }
         final World finalWorld = newWorld;
-        Teleport teleport = new Teleport(plugin)
-                .commandSender(sender)
-                .configHandler(configHandler)
-                .ecoHandler(ecoHandler)
-                .world(finalWorld)
-                .player(player)
-                .cooldown(configHandler.getConfigTeleport().getCooldown())
-                .ignoreTeleportDelay(sender.hasPermission("rtp.teleportdelay.bypass"))
-                .bypassCooldown(sender.hasPermission("rtp.teleport.bypass"))
-                .build();
+        final boolean useEco = configHandler.getConfigEconomy().useEco();
+        final boolean bypassEco = player.hasPermission("rtp.eco.bypass");
+        final boolean logic = useEco && !bypassEco;
+        TeleportProperty teleportProperty = new TeleportProperty(sender, player, finalWorld, sender.hasPermission("rtp.teleport.bypass"), sender.hasPermission("rtp.teleportdelay.bypass"), logic, configHandler, configHandler.getConfigTeleport().getCooldown());
+        Teleport teleport = new Teleport(plugin, teleportProperty);
         teleport.random();
     }
 
@@ -192,12 +186,13 @@ public class TeleportCommand extends BaseCommand {
     @Subcommand("resetcooldown")
     @CommandCompletion("@players")
     @CommandPermission("rtp.admin.resetcooldown")
-    public void resetCooldown(CommandSender commandSender, Player target) {
+    public void resetCooldown(CommandSender commandSender, OnlinePlayer target) {
         if (target != null) {
-            if (plugin.getCooldowns().remove(target.getUniqueId()) != null) {
-                commandSender.sendMessage(ChatColor.GREEN + "Cooldown reset for " + target.getName());
+            Player player = target.getPlayer();
+            if (plugin.getCooldowns().remove(player.getUniqueId()) != null) {
+                commandSender.sendMessage(ChatColor.GREEN + "Cooldown reset for " + player.getName());
             } else {
-                commandSender.sendMessage(ChatColor.RED + "There was no cooldown for " + target.getName());
+                commandSender.sendMessage(ChatColor.RED + "There was no cooldown for " + player.getName());
             }
         }
     }

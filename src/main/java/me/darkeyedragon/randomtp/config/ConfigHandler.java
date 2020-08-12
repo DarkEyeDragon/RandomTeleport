@@ -69,7 +69,8 @@ public class ConfigHandler {
         configTeleport = new ConfigTeleport()
                 .cooldown(getCooldown())
                 .delay(getTeleportDelay())
-                .cancelOnMove(isCanceledOnMove());
+                .cancelOnMove(isCanceledOnMove())
+                .deathTimer(getTeleportDeathTimer());
     }
 
     public void populateConfigDebug() {
@@ -225,5 +226,13 @@ public class ConfigHandler {
     public void setTeleportPrice(double price) {
         plugin.getConfig().set("economy.price", price);
         plugin.saveConfig();
+    }
+
+    private long getTeleportDeathTimer() {
+        String message = plugin.getConfig().getString("teleport.death_timer", "10s");
+        if (message != null) {
+            return TimeUtil.stringToTicks(message);
+        }
+        throw new NumberFormatException("Not a valid number");
     }
 }

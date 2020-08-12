@@ -5,6 +5,7 @@ import me.darkeyedragon.randomtp.util.MessageUtil;
 import me.darkeyedragon.randomtp.util.TimeUtil;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.World;
 
 public class ConfigMessage {
@@ -77,14 +78,17 @@ public class ConfigMessage {
         return null;
     }
 
-    public TextComponent getTeleport() {
-        String message = teleport;
-        if (message != null) {
-            message = ChatColor.translateAlternateColorCodes('&', message);
-            return MessageUtil.getChatComponents(message);
-        }
-        return null;
+public TextComponent getTeleport(Location location) {
+    String message = teleport;
+    if (message != null) {
+        message = ChatColor.translateAlternateColorCodes('&', message);
+        message = message.replaceAll("%posX", location.getBlockX() + "")
+                .replaceAll("%posY", location.getBlockY() + "")
+                .replaceAll("%posZ", location.getBlockZ() + "");
+        return MessageUtil.getChatComponents(message);
     }
+    return null;
+}
 
     public TextComponent getInitTeleportDelay(long millis) {
         String message = initTeleportDelay;
@@ -161,11 +165,21 @@ public class ConfigMessage {
         }
 
         public TextComponent getInsufficientFunds() {
-            return MessageUtil.getChatComponents(insufficientFunds);
+            String message = insufficientFunds;
+            if (message != null) {
+                message = ChatColor.translateAlternateColorCodes('&', message);
+                return MessageUtil.getChatComponents(message);
+            }
+            return null;
         }
 
         public TextComponent getPayment() {
-            return MessageUtil.getChatComponents(payment);
+            String message = payment;
+            if (message != null) {
+                message = ChatColor.translateAlternateColorCodes('&', message);
+                return MessageUtil.getChatComponents(message);
+            }
+            return null;
         }
     }
 

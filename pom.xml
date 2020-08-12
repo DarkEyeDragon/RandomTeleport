@@ -6,7 +6,7 @@
 
     <groupId>me.darkeyedragon</groupId>
     <artifactId>randomtp</artifactId>
-    <version>1.5.1-${build}</version>
+    <version>1.5.2-${build}</version>
     <packaging>jar</packaging>
 
     <name>RandomTeleport</name>
@@ -108,12 +108,16 @@
             <id>redprotect-repo</id>
             <url>https://raw.githubusercontent.com/FabioZumbi12/RedProtect/mvn-repo/</url>
         </repository>
+        <repository>
+            <id>papermc</id>
+            <url>https://papermc.io/repo/repository/maven-public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
+            <groupId>com.destroystokyo.paper</groupId>
+            <artifactId>paper-api</artifactId>
             <version>1.16.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>

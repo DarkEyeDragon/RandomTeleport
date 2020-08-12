@@ -1,15 +1,15 @@
 package me.darkeyedragon.randomtp.world;
 
-import me.darkeyedragon.randomtp.world.location.LocationSearcher;
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
+import me.darkeyedragon.randomtp.world.location.search.LocationSearcher;
 import org.bukkit.Location;
 
 public class LocationQueue extends ObservableQueue<Location> {
-    private final LocationSearcher locationSearcher;
+    private final LocationSearcher baseLocationSearcher;
 
-    public LocationQueue(int capacity, LocationSearcher locationSearcher) {
+    public LocationQueue(int capacity, LocationSearcher baseLocationSearcher) {
         super(capacity);
-        this.locationSearcher = locationSearcher;
+        this.baseLocationSearcher = baseLocationSearcher;
     }
 
     public boolean offer(Location location) {
@@ -25,7 +25,7 @@ public class LocationQueue extends ObservableQueue<Location> {
     }
     public void generate(WorldConfigSection worldConfigSection, int amount){
         for(int i = 0; i < amount; i++){
-            locationSearcher.getRandomLocation(worldConfigSection).thenAccept(this::offer);
+            baseLocationSearcher.getRandom(worldConfigSection).thenAccept(this::offer);
         }
     }
 }

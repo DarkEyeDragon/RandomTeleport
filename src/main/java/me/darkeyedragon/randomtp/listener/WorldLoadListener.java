@@ -4,7 +4,7 @@ import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
 import me.darkeyedragon.randomtp.world.LocationQueue;
 import me.darkeyedragon.randomtp.world.QueueListener;
-import me.darkeyedragon.randomtp.world.location.LocationSearcherFactory;
+import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;

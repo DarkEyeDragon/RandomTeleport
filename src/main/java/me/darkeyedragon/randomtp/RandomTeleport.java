@@ -5,7 +5,10 @@ import co.aikar.commands.PaperCommandManager;
 import me.darkeyedragon.randomtp.command.TeleportCommand;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
+import me.darkeyedragon.randomtp.eco.EcoFactory;
 import me.darkeyedragon.randomtp.eco.EcoHandler;
+import me.darkeyedragon.randomtp.failsafe.DeathTracker;
+import me.darkeyedragon.randomtp.failsafe.listener.PlayerDeathListener;
 import me.darkeyedragon.randomtp.listener.PluginLoadListener;
 import me.darkeyedragon.randomtp.listener.WorldLoadListener;
 import me.darkeyedragon.randomtp.validator.ChunkValidator;
@@ -14,7 +17,7 @@ import me.darkeyedragon.randomtp.world.LocationQueue;
 import me.darkeyedragon.randomtp.world.QueueListener;
 import me.darkeyedragon.randomtp.world.WorldQueue;
 import me.darkeyedragon.randomtp.world.location.LocationFactory;
-import me.darkeyedragon.randomtp.world.location.LocationSearcherFactory;
+import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -36,12 +39,12 @@ public final class RandomTeleport extends JavaPlugin {
     private List<ChunkValidator> validatorList;
     private WorldQueue worldQueue;
     private ConfigHandler configHandler;
-    //private LocationSearcher locationSearcher;
+    //private BaseLocationSearcher locationSearcher;
     private LocationFactory locationFactory;
-
+    private DeathTracker deathTracker;
     //Economy
     private Economy econ;
-    private EcoHandler ecoHandler;
+    private static EcoHandler ecoHandler;
 
     @Override
     public void onEnable() {
@@ -51,6 +54,7 @@ public final class RandomTeleport extends JavaPlugin {
         configHandler = new ConfigHandler(this);
         configHandler.reload();
         locationFactory = new LocationFactory(configHandler);
+        deathTracker = new DeathTracker(this);
         //check if the first argument is a world or player
         worldQueue = new WorldQueue();
         manager.getCommandContexts().registerContext(PlayerWorldContext.class, c -> {
@@ -71,12 +75,13 @@ public final class RandomTeleport extends JavaPlugin {
         cooldowns = new HashMap<>();
         if (setupEconomy()) {
             getLogger().info("Vault found. Hooking into it.");
-            ecoHandler = new EcoHandler(econ);
+            EcoFactory.createDefault(econ);
         } else {
             getLogger().warning("Vault not found. Currency based options are disabled.");
         }
         manager.registerCommand(new TeleportCommand(this));
         getServer().getPluginManager().registerEvents(new WorldLoadListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), this);
         validatorList = new ArrayList<>();
         getLogger().info(ChatColor.AQUA + "======== [Loading validators] ========");
         configHandler.getConfigPlugin().getPlugins().forEach(s -> {
@@ -177,9 +182,7 @@ public final class RandomTeleport extends JavaPlugin {
         return locationFactory;
     }
 
-    public EcoHandler getEcoHandler() {
-        return ecoHandler;
+    public DeathTracker getDeathTracker() {
+        return deathTracker;
     }
-
-
 }
