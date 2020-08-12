@@ -77,8 +77,9 @@ public class ConfigWorld {
             return false;
         }
         section.set(world.getName(), null);
-        plugin.saveConfig();
+        worldConfigSectionMap.remove(world);
         plugin.getWorldQueue().remove(world);
+        plugin.saveConfig();
         return true;
     }
 }

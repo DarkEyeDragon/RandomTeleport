@@ -3,10 +3,12 @@ package me.darkeyedragon.randomtp.teleport;
 import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
+import me.darkeyedragon.randomtp.config.data.ConfigMessage;
 import me.darkeyedragon.randomtp.eco.EcoFactory;
 import me.darkeyedragon.randomtp.eco.EcoHandler;
 import me.darkeyedragon.randomtp.exception.EcoNotSupportedException;
 import me.darkeyedragon.randomtp.failsafe.DeathTracker;
+import me.darkeyedragon.randomtp.util.MessageUtil;
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
 import me.darkeyedragon.randomtp.world.location.search.LocationSearcher;
 import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
@@ -37,11 +39,13 @@ public class Teleport {
     public void random() {
         final long delay;
         double price = configHandler.getConfigEconomy().getPrice();
+        ConfigMessage configMessage = configHandler.getConfigMessage();
+
         if (property.isUseEco()) {
             try {
                 ecoHandler = EcoFactory.getInstance();
                 if (!ecoHandler.hasEnough(player, price)) {
-                    player.spigot().sendMessage(configHandler.getConfigMessage().getEconomy().getInsufficientFunds());
+                    MessageUtil.sendMessage(player, configMessage.getEconomy().getInsufficientFunds());
                     return;
                 }
             } catch (EcoNotSupportedException e) {
@@ -62,14 +66,14 @@ public class Teleport {
             long remaining = lastTp + property.getCooldown() - System.currentTimeMillis();
             boolean ableToTp = remaining < 0;
             if (!ableToTp) {
-                player.spigot().sendMessage(configHandler.getConfigMessage().getCountdown(remaining));
+                MessageUtil.sendMessage(player, configMessage.getCountdown(remaining));
                 return;
             }
         }
         if (delay == 0) {
             teleport();
         } else {
-            player.spigot().sendMessage(configHandler.getConfigMessage().getInitTeleportDelay(delay));
+            MessageUtil.sendMessage(player, configMessage.getInitTeleportDelay(delay));
             AtomicBoolean complete = new AtomicBoolean(false);
             int taskId = Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 complete.set(true);
@@ -84,7 +88,7 @@ public class Teleport {
                     } else if ((originalLoc.getX() != currentLoc.getX() || originalLoc.getY() != currentLoc.getY() || originalLoc.getZ() != currentLoc.getZ())) {
                         Bukkit.getScheduler().cancelTask(taskId);
                         bukkitTask.cancel();
-                        player.spigot().sendMessage(configHandler.getConfigMessage().getTeleportCanceled());
+                        MessageUtil.sendMessage(player, configMessage.getTeleportCanceled());
                     }
                 }, 0, 5L);
             }
@@ -107,8 +111,9 @@ public class Teleport {
 
     private void teleport() {
         Location location = plugin.getWorldQueue().popLocation(property.getWorld());
+        ConfigMessage configMessage = configHandler.getConfigMessage();
         if (location == null) {
-            property.getCommandSender().spigot().sendMessage(configHandler.getConfigMessage().getDepletedQueue());
+            MessageUtil.sendMessage(property.getCommandSender(), configMessage.getDepletedQueue());
             return;
         }
         PaperLib.getChunkAtAsync(location).thenAccept(chunk -> {
@@ -127,10 +132,10 @@ public class Teleport {
             }
             if (property.isUseEco() && EcoFactory.isUseEco()) {
                 ecoHandler.makePayment(player, configHandler.getConfigEconomy().getPrice());
-                player.spigot().sendMessage(configHandler.getConfigMessage().getEconomy().getPayment());
+                MessageUtil.sendMessage(player, configMessage.getEconomy().getPayment());
             }
             drawWarpParticles(player);
-            player.spigot().sendMessage(configHandler.getConfigMessage().getTeleport(location));
+            MessageUtil.sendMessage(player, configMessage.getTeleport(location));
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(property.getWorld());
                 plugin.getWorldQueue().get(property.getWorld()).generate(worldConfigSection, 1);
