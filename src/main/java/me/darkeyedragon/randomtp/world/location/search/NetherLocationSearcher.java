@@ -3,8 +3,6 @@ package me.darkeyedragon.randomtp.world.location.search;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 
 public class NetherLocationSearcher extends BaseLocationSearcher {
@@ -33,17 +31,6 @@ public class NetherLocationSearcher extends BaseLocationSearcher {
                 }
             }
         }
-
         return null;
-    }
-
-    @Override
-    public boolean isSafe(Location loc) {
-        final World world = loc.getWorld();
-        if (world == null) return false;
-        if (loc.getBlock().getType() == Material.AIR) return false;
-        if (blacklistMaterial.contains(loc.getBlock().getType())) return false;
-        if (!isSafeAbove(loc)) return false;
-        return isSafeForPlugins(loc);
     }
 }

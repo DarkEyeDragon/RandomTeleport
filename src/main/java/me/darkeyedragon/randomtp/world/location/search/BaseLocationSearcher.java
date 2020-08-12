@@ -37,6 +37,7 @@ abstract class BaseLocationSearcher implements LocationSearcher {
                 Material.LAVA,
                 Material.CACTUS,
                 Material.FIRE,
+                Material.MAGMA_BLOCK,
                 Material.TRIPWIRE,
                 Material.ACACIA_PRESSURE_PLATE,
                 Material.BIRCH_PRESSURE_PLATE,
@@ -113,11 +114,11 @@ abstract class BaseLocationSearcher implements LocationSearcher {
     public boolean isSafe(Location loc) {
         World world = loc.getWorld();
         if (world == null) return false;
-        if (loc.getBlock().getType().isAir()) return false;
-        //Check 2 blocks to see if its safe for the player to stand. Since getHighestBlockAt doesnt include trees
-        if (!isSafeAbove(loc)) return false;
         if (blacklistMaterial.contains(loc.getBlock().getType())) return false;
-        return isSafeForPlugins(loc);
+        if (!loc.getBlock().getType().isSolid()) return false;
+        if (!isSafeAbove(loc)) return false;
+        if (!isSafeForPlugins(loc)) return false;
+        return isSafeSurrounding(loc);
     }
 
     protected boolean isSafeForPlugins(Location location) {
@@ -136,7 +137,7 @@ abstract class BaseLocationSearcher implements LocationSearcher {
     protected boolean isSafeAbove(Location location) {
         Block blockAbove = location.getBlock().getRelative(BlockFace.UP);
         Block blockAboveAbove = blockAbove.getRelative(BlockFace.UP);
-        return (blockAbove.isPassable() && blockAboveAbove.isPassable());
+        return (blockAbove.isPassable() && blockAboveAbove.isPassable() && !blockAbove.isLiquid());
     }
 
     public boolean isSafeChunk(Chunk chunk) {
@@ -147,6 +148,24 @@ abstract class BaseLocationSearcher implements LocationSearcher {
                     return false;
                 }
             }
+        }
+        return true;
+    }
+
+    /**
+     * @param location the {@link Location} to check around
+     * @return true if the suroundings are safe
+     */
+    protected boolean isSafeSurrounding(Location location) {
+        Block block = location.getBlock();
+        EnumSet<BlockFace> blockfaces = EnumSet.allOf(BlockFace.class);
+        blockfaces.remove(BlockFace.UP);
+        blockfaces.remove(BlockFace.DOWN);
+        for (BlockFace blockFace : blockfaces) {
+            Block relativeBlock = block.getRelative(blockFace);
+            if (relativeBlock.isEmpty()) return false;
+            if (!relativeBlock.getType().isSolid()) return false;
+            if (blacklistMaterial.contains(relativeBlock.getType())) return false;
         }
         return true;
     }

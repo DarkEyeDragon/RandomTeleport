@@ -37,6 +37,4 @@ public class EndLocationSearcher extends BaseLocationSearcher {
         }
         return true;
     }
-
-
 }
