@@ -1,13 +1,13 @@
 package me.darkeyedragon.randomtp.world;
 
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
-import me.darkeyedragon.randomtp.world.location.search.BaseLocationSearcher;
+import me.darkeyedragon.randomtp.world.location.search.LocationSearcher;
 import org.bukkit.Location;
 
 public class LocationQueue extends ObservableQueue<Location> {
-    private final BaseLocationSearcher baseLocationSearcher;
+    private final LocationSearcher baseLocationSearcher;
 
-    public LocationQueue(int capacity, BaseLocationSearcher baseLocationSearcher) {
+    public LocationQueue(int capacity, LocationSearcher baseLocationSearcher) {
         super(capacity);
         this.baseLocationSearcher = baseLocationSearcher;
     }

@@ -8,7 +8,7 @@ public class LocationSearcherFactory {
     public static BaseLocationSearcher getLocationSearcher(World world, RandomTeleport randomTeleport) {
         switch (world.getEnvironment()) {
             case NORMAL:
-                return new BaseLocationSearcher(randomTeleport);
+                return new OverworldLocationSearcher(randomTeleport);
             case THE_END:
                 return new EndLocationSearcher(randomTeleport);
             case NETHER:
