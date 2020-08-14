@@ -2,7 +2,7 @@ package me.darkeyedragon.randomtp.api.config;
 
 import me.darkeyedragon.randomtp.api.config.section.*;
 
-interface RandomConfigHandler {
+public interface RandomConfigHandler {
     SectionDebug getSectionDebug();
     SectionEconomy getSectionEconomy();
     SectionMessage getSectionMessage();
