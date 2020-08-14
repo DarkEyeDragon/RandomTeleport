@@ -1,0 +1,4 @@
+name: Spigot
+version: ${project.version}
+main: me.darkeyedragon.randomteleport.spigot.Spigot
+api-version: 1.16
