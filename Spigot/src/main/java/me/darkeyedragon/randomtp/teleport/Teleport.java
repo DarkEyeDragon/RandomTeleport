@@ -8,7 +8,6 @@ import me.darkeyedragon.randomtp.eco.EcoHandler;
 import me.darkeyedragon.randomtp.exception.EcoNotSupportedException;
 import me.darkeyedragon.randomtp.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
-import me.darkeyedragon.randomtp.world.location.search.LocationSearcher;
 import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -36,12 +35,12 @@ public class Teleport {
 
     public void random() {
         final long delay;
-        double price = configHandler.getConfigEconomy().getPrice();
+        double price = configHandler.getSectionEconomy().getPrice();
         if (property.isUseEco()) {
             try {
                 ecoHandler = EcoFactory.getInstance();
                 if (!ecoHandler.hasEnough(player, price)) {
-                    player.spigot().sendMessage(configHandler.getConfigMessage().getEconomy().getInsufficientFunds());
+                    player.spigot().sendMessage(configHandler.getSectionMessage().getEconomy().getInsufficientFunds());
                     return;
                 }
             } catch (EcoNotSupportedException e) {
@@ -54,7 +53,7 @@ public class Teleport {
         if (property.isIgnoreTeleportDelay()) {
             delay = 0;
         } else {
-            delay = configHandler.getConfigTeleport().getDelay();
+            delay = configHandler.getSectionTeleport().getDelay();
         }
         // Check if the player still has a cooldown active.
         if (property.getCooldown() > 0 && plugin.getCooldowns().containsKey(player.getUniqueId()) && !property.isBypassCooldown()) {
@@ -62,21 +61,21 @@ public class Teleport {
             long remaining = lastTp + property.getCooldown() - System.currentTimeMillis();
             boolean ableToTp = remaining < 0;
             if (!ableToTp) {
-                player.spigot().sendMessage(configHandler.getConfigMessage().getCountdown(remaining));
+                player.spigot().sendMessage(configHandler.getSectionMessage().getCountdown(remaining));
                 return;
             }
         }
         if (delay == 0) {
             teleport();
         } else {
-            player.spigot().sendMessage(configHandler.getConfigMessage().getInitTeleportDelay(delay));
+            player.spigot().sendMessage(configHandler.getSectionMessage().getInitTeleportDelay(delay));
             AtomicBoolean complete = new AtomicBoolean(false);
             int taskId = Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 complete.set(true);
                 teleport();
             }, delay).getTaskId();
             Location originalLoc = player.getLocation().clone();
-            if (configHandler.getConfigTeleport().isCancelOnMove()) {
+            if (configHandler.getSectionTeleport().isCancelOnMove()) {
                 Bukkit.getScheduler().runTaskTimer(plugin, bukkitTask -> {
                     Location currentLoc = player.getLocation();
                     if (complete.get()) {
@@ -84,7 +83,7 @@ public class Teleport {
                     } else if ((originalLoc.getX() != currentLoc.getX() || originalLoc.getY() != currentLoc.getY() || originalLoc.getZ() != currentLoc.getZ())) {
                         Bukkit.getScheduler().cancelTask(taskId);
                         bukkitTask.cancel();
-                        player.spigot().sendMessage(configHandler.getConfigMessage().getTeleportCanceled());
+                        player.spigot().sendMessage(configHandler.getSectionMessage().getTeleportCanceled());
                     }
                 }, 0, 5L);
             }
@@ -97,7 +96,7 @@ public class Teleport {
             tracker.getBukkitTask(player).cancel();
             tracker.remove(player);
         }
-        plugin.getDeathTracker().add(player, configHandler.getConfigTeleport().getDeathTimer());
+        plugin.getDeathTracker().add(player, configHandler.getSectionTeleport().getDeathTimer());
     }
 
     private void drawWarpParticles(Player player) {
@@ -108,7 +107,7 @@ public class Teleport {
     private void teleport() {
         Location location = plugin.getWorldQueue().popLocation(property.getWorld());
         if (location == null) {
-            property.getCommandSender().spigot().sendMessage(configHandler.getConfigMessage().getDepletedQueue());
+            property.getCommandSender().spigot().sendMessage(configHandler.getSectionMessage().getDepletedQueue());
             return;
         }
         PaperLib.getChunkAtAsync(location).thenAccept(chunk -> {
@@ -122,19 +121,19 @@ public class Teleport {
             plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
             drawWarpParticles(player);
             PaperLib.teleportAsync(player, loc);
-            if (configHandler.getConfigTeleport().getDeathTimer() > 0) {
+            if (configHandler.getSectionTeleport().getDeathTimer() > 0) {
                 addToDeathTimer(player);
             }
             if (property.isUseEco() && EcoFactory.isUseEco()) {
-                ecoHandler.makePayment(player, configHandler.getConfigEconomy().getPrice());
-                player.spigot().sendMessage(configHandler.getConfigMessage().getEconomy().getPayment());
+                ecoHandler.makePayment(player, configHandler.getSectionEconomy().getPrice());
+                player.spigot().sendMessage(configHandler.getSectionMessage().getEconomy().getPayment());
             }
             drawWarpParticles(player);
-            player.spigot().sendMessage(configHandler.getConfigMessage().getTeleport(location));
+            player.spigot().sendMessage(configHandler.getSectionMessage().getTeleport(location));
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(property.getWorld());
                 plugin.getWorldQueue().get(property.getWorld()).generate(worldConfigSection, 1);
-            }, configHandler.getConfigQueue().getInitDelay());
+            }, configHandler.getSectionQueue().getInitDelay());
         });
     }
 }

@@ -21,7 +21,7 @@ public class ConfigQueue implements SectionQueue {
         return size;
     }
 
-    public int getInitDelay() {
+    public long getInitDelay() {
         return initDelay;
     }
 }

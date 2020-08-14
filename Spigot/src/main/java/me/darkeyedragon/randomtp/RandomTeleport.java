@@ -2,6 +2,9 @@ package me.darkeyedragon.randomtp;
 
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
+import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
+import me.darkeyedragon.randomtp.api.queue.LocationQueue;
+import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 import me.darkeyedragon.randomtp.command.TeleportCommand;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
@@ -13,9 +16,6 @@ import me.darkeyedragon.randomtp.listener.PluginLoadListener;
 import me.darkeyedragon.randomtp.listener.WorldLoadListener;
 import me.darkeyedragon.randomtp.validator.ChunkValidator;
 import me.darkeyedragon.randomtp.validator.ValidatorFactory;
-import me.darkeyedragon.randomtp.world.LocationQueue;
-import me.darkeyedragon.randomtp.world.QueueListener;
-import me.darkeyedragon.randomtp.world.WorldQueue;
 import me.darkeyedragon.randomtp.world.location.LocationFactory;
 import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
 import net.milkbowl.vault.economy.Economy;
@@ -84,7 +84,7 @@ public final class RandomTeleport extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), this);
         validatorList = new ArrayList<>();
         getLogger().info(ChatColor.AQUA + "======== [Loading validators] ========");
-        configHandler.getConfigPlugin().getPlugins().forEach(s -> {
+        configHandler.getSectionPlugin().getPlugins().forEach(s -> {
             if (getServer().getPluginManager().getPlugin(s) != null) {
                 ChunkValidator validator = ValidatorFactory.createFrom(s);
                 if (validator != null) {
@@ -113,20 +113,21 @@ public final class RandomTeleport extends JavaPlugin {
     }
 
     public void populateWorldQueue() {
-        for (World world : configHandler.getConfigWorld().getWorlds()) {
+        for (SectionWorldDetail worldDetail : configHandler.getSectionWorld().getWorldSet()) {
+            World world = Bukkit.getWorld(worldDetail.getUUID());
             //Add a new world to the world queue and generate random locations
-            LocationQueue locationQueue = new LocationQueue(configHandler.getConfigQueue().getSize(), LocationSearcherFactory.getLocationSearcher(world, this));
+            LocationQueue locationQueue = new LocationQueue(configHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(worldDetail, this));
             //Subscribe to the locationqueue to be notified of changes
-            subscribe(locationQueue, world);
+            subscribe(locationQueue,  world);
             locationQueue.generate(getLocationFactory().getWorldConfigSection(world));
-            getWorldQueue().put(world, locationQueue);
+            getWorldQueue().put(worldDetail, locationQueue);
 
         }
     }
 
     public void subscribe(LocationQueue locationQueue, World world) {
-        if (configHandler.getConfigDebug().isShowQueuePopulation()) {
-            int size = configHandler.getConfigQueue().getSize();
+        if (configHandler.getSectionDebug().isShowQueuePopulation()) {
+            int size = configHandler.getSectionQueue().getSize();
             locationQueue.subscribe(new QueueListener<Location>() {
                 @Override
                 public void onAdd(Location element) {

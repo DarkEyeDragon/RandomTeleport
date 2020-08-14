@@ -95,31 +95,38 @@ public class ConfigHandler implements RandomConfigHandler {
         return plugin;
     }
 
-    public SectionMessage getConfigMessage() {
+    @Override
+    public SectionMessage getSectionMessage() {
         return configMessage;
     }
 
-    public SectionQueue getConfigQueue() {
+    @Override
+    public SectionQueue getSectionQueue() {
         return configQueue;
     }
 
-    public SectionWorld getConfigWorld() {
+    @Override
+    public SectionWorld getSectionWorld() {
         return configWorld;
     }
 
-    public SectionTeleport getConfigTeleport() {
+    @Override
+    public SectionTeleport getSectionTeleport() {
         return configTeleport;
     }
 
-    public SectionPlugin getConfigPlugin() {
+    @Override
+    public SectionPlugin getSectionPlugin() {
         return configPlugin;
     }
 
-    public SectionDebug getConfigDebug() {
+    @Override
+    public SectionDebug getSectionDebug() {
         return configDebug;
     }
 
-    public SectionEconomy getConfigEconomy() {
+    @Override
+    public SectionEconomy getSectionEconomy() {
         return configEconomy;
     }
 

@@ -8,16 +8,11 @@ import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.api.config.section.SectionMessage;
 import me.darkeyedragon.randomtp.api.config.section.SectionQueue;
 import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
+import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
-import me.darkeyedragon.randomtp.config.section.ConfigMessage;
-import me.darkeyedragon.randomtp.config.section.ConfigQueue;
-import me.darkeyedragon.randomtp.config.section.ConfigWorld;
 import me.darkeyedragon.randomtp.teleport.Teleport;
 import me.darkeyedragon.randomtp.teleport.TeleportProperty;
-import me.darkeyedragon.randomtp.world.LocationQueue;
-import me.darkeyedragon.randomtp.world.QueueListener;
-import me.darkeyedragon.randomtp.world.WorldQueue;
 import me.darkeyedragon.randomtp.world.location.LocationFactory;
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
 import org.bukkit.ChatColor;
@@ -50,9 +45,9 @@ public class TeleportCommand extends BaseCommand {
 
     private void setConfigs() {
         this.configHandler = plugin.getConfigHandler();
-        this.configMessage = configHandler.getConfigMessage();
-        this.configQueue = configHandler.getConfigQueue();
-        this.configWorld = configHandler.getConfigWorld();
+        this.configMessage = configHandler.getSectionMessage();
+        this.configQueue = configHandler.getSectionQueue();
+        this.configWorld = configHandler.getSectionWorld();
         this.locationFactory = plugin.getLocationFactory();
         this.worldQueue = plugin.getWorldQueue();
     }
@@ -109,10 +104,10 @@ public class TeleportCommand extends BaseCommand {
             }
         }
         final World finalWorld = newWorld;
-        final boolean useEco = configHandler.getConfigEconomy().useEco();
+        final boolean useEco = configHandler.getSectionEconomy().useEco();
         final boolean bypassEco = player.hasPermission("rtp.eco.bypass");
         final boolean logic = useEco && !bypassEco;
-        TeleportProperty teleportProperty = new TeleportProperty(sender, player, finalWorld, sender.hasPermission("rtp.teleport.bypass"), sender.hasPermission("rtp.teleportdelay.bypass"), logic, configHandler, configHandler.getConfigTeleport().getCooldown());
+        TeleportProperty teleportProperty = new TeleportProperty(sender, player, finalWorld, sender.hasPermission("rtp.teleport.bypass"), sender.hasPermission("rtp.teleportdelay.bypass"), logic, configHandler, configHandler.getSectionTeleport().getCooldown());
         Teleport teleport = new Teleport(plugin, teleportProperty);
         teleport.random();
     }

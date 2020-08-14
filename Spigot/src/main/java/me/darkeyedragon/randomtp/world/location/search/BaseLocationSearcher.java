@@ -2,6 +2,10 @@ package me.darkeyedragon.randomtp.world.location.search;
 
 import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.RandomTeleport;
+import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
+import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
+import me.darkeyedragon.randomtp.util.location.LocationUtil;
 import me.darkeyedragon.randomtp.validator.ChunkValidator;
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
 import org.bukkit.Chunk;
@@ -60,55 +64,55 @@ abstract class BaseLocationSearcher implements LocationSearcher {
     }
 
     /* This is the final method that will be called from the other end, to get a location */
-    public CompletableFuture<Location> getRandom(WorldConfigSection worldConfigSection) {
-        CompletableFuture<Location> location = pickRandomLocation(worldConfigSection);
+    public CompletableFuture<RandomLocation> getRandom(SectionWorld sectionWorld) {
+        CompletableFuture<RandomLocation> location = pickRandomLocation(sectionWorld);
         return location.thenCompose((loc) -> {
             if (loc == null) {
-                return getRandom(worldConfigSection);
+                return getRandom(sectionWorld);
             } else return CompletableFuture.completedFuture(loc);
         });
     }
 
     /*Pick a random location based on chunks*/
-    private CompletableFuture<Location> pickRandomLocation(WorldConfigSection worldConfigSection) {
-        CompletableFuture<Chunk> chunk = getRandomChunk(worldConfigSection);
+    private CompletableFuture<RandomLocation> pickRandomLocation(SectionWorld sectionWorld) {
+        CompletableFuture<Chunk> chunk = getRandomChunk(sectionWorld);
         return chunk.thenApply(this::getRandomLocationFromChunk);
     }
 
     /* Will search through the chunk to find a location that is safe, returning null if none is found. */
-    public Location getRandomLocationFromChunk(Chunk chunk) {
+    public RandomLocation getRandomLocationFromChunk(Chunk chunk) {
         for (int x = 8; x < CHUNK_SIZE; x++) {
             for (int z = 8; z < CHUNK_SIZE; z++) {
                 Block block = chunk.getWorld().getHighestBlockAt((chunk.getX() << CHUNK_SHIFT) + x, (chunk.getZ() << CHUNK_SHIFT) + z);
                 if (isSafe(block.getLocation())) {
-                    return block.getLocation();
+                    return LocationUtil.toRandomLocation(block.getLocation());
                 }
             }
         }
         return null;
     }
 
-    CompletableFuture<Chunk> getRandomChunk(WorldConfigSection worldConfigSection) {
-        CompletableFuture<Chunk> chunkFuture = getRandomChunkAsync(worldConfigSection);
+    CompletableFuture<Chunk> getRandomChunk(SectionWorld sectionWorld) {
+        CompletableFuture<Chunk> chunkFuture = getRandomChunkAsync(sectionWorld);
         return chunkFuture.thenCompose((chunk) -> {
             boolean isSafe = isSafeChunk(chunk);
             if (!isSafe) {
-                return getRandomChunk(worldConfigSection);
+                return getRandomChunk(sectionWorld);
             } else return CompletableFuture.completedFuture(chunk);
         });
     }
 
-    CompletableFuture<Chunk> getRandomChunkAsync(WorldConfigSection worldConfigSection) {
+    CompletableFuture<Chunk> getRandomChunkAsync(SectionWorld sectionWorld) {
         ThreadLocalRandom rnd = ThreadLocalRandom.current();
-        int chunkRadius = worldConfigSection.getRadius() >> CHUNK_SHIFT;
-        int chunkOffsetX = worldConfigSection.getX() >> CHUNK_SHIFT;
-        int chunkOffsetZ = worldConfigSection.getZ() >> CHUNK_SHIFT;
+        int chunkRadius = sectionWorld.getRadius() >> CHUNK_SHIFT;
+        int chunkOffsetX = sectionWorld.getX() >> CHUNK_SHIFT;
+        int chunkOffsetZ = sectionWorld.getZ() >> CHUNK_SHIFT;
         int x = rnd.nextInt(-chunkRadius, chunkRadius);
         int z = rnd.nextInt(-chunkRadius, chunkRadius);
         if (PaperLib.isPaper()) {
-            return worldConfigSection.getWorld().getChunkAtAsyncUrgently(x + chunkOffsetX, z + chunkOffsetZ);
+            return sectionWorld.getWorld().getChunkAtAsyncUrgently(x + chunkOffsetX, z + chunkOffsetZ);
         }
-        return PaperLib.getChunkAtAsync(worldConfigSection.getWorld(), x + chunkOffsetX, z + chunkOffsetZ);
+        return PaperLib.getChunkAtAsync(sectionWorld.getWorld(), x + chunkOffsetX, z + chunkOffsetZ);
     }
 
     public boolean isSafe(Location loc) {

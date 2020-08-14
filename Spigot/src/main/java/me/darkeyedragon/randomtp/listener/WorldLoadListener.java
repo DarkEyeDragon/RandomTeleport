@@ -2,8 +2,6 @@ package me.darkeyedragon.randomtp.listener;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
-import me.darkeyedragon.randomtp.world.LocationQueue;
-import me.darkeyedragon.randomtp.world.QueueListener;
 import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -24,12 +22,12 @@ public class WorldLoadListener implements Listener {
     @EventHandler
     public void onWorldLoad(WorldLoadEvent event) {
         World world = event.getWorld();
-        if (configHandler.getConfigWorld().getWorlds().contains(world)) {
+        if (configHandler.getSectionWorld().getWorlds().contains(world)) {
             //Add a new world to the world queue and generate random locations
-            LocationQueue locationQueue = new LocationQueue(configHandler.getConfigQueue().getSize(), LocationSearcherFactory.getLocationSearcher(world, plugin));
+            LocationQueue locationQueue = new LocationQueue(configHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(world, plugin));
             //Subscribe to the locationqueue to be notified of changes
-            if (configHandler.getConfigDebug().isShowQueuePopulation()) {
-                int size = configHandler.getConfigQueue().getSize();
+            if (configHandler.getSectionDebug().isShowQueuePopulation()) {
+                int size = configHandler.getSectionQueue().getSize();
                 locationQueue.subscribe(new QueueListener<Location>() {
                     @Override
                     public void onAdd(Location element) {

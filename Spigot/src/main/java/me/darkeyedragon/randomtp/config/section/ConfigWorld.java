@@ -1,8 +1,10 @@
 package me.darkeyedragon.randomtp.config.section;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
+import me.darkeyedragon.randomtp.api.config.section.SectionQueue;
 import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
-import me.darkeyedragon.randomtp.world.LocationQueue;
+import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
+import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
 import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
 import org.bukkit.World;
@@ -65,10 +67,10 @@ public class ConfigWorld implements SectionWorld {
 
     private LocationQueue generateLocations(World world) {
         WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(world);
-        ConfigQueue configQueue = plugin.getConfigHandler().getConfigQueue();
-        LocationQueue locationQueue = new LocationQueue(configQueue.getSize(), LocationSearcherFactory.getLocationSearcher(world, plugin));
+        SectionQueue sectionQueue = plugin.getConfigHandler().getSectionQueue();
+        LocationQueue locationQueue = new LocationQueue(sectionQueue.getSize(), LocationSearcherFactory.getLocationSearcher(world, plugin));
         plugin.subscribe(locationQueue, world);
-        locationQueue.generate(worldConfigSection, configQueue.getSize());
+        locationQueue.generate(locationQueue., sectionQueue.getSize());
         plugin.getWorldQueue().put(world, locationQueue);
         return locationQueue;
     }
@@ -81,5 +83,10 @@ public class ConfigWorld implements SectionWorld {
         plugin.saveConfig();
         plugin.getWorldQueue().remove(world);
         return true;
+    }
+
+    @Override
+    public Set<SectionWorldDetail> getWorldSet() {
+        return worldConfigSectionMap.;
     }
 }

@@ -1,23 +1,23 @@
 package me.darkeyedragon.randomtp.api.world.location;
 
-import me.darkeyedragon.randomtp.api.world.RandomWorld;
+import java.util.UUID;
 
 public class RandomLocation {
 
-    private final RandomWorld world;
+    private final UUID worldUuid;
     private final int x;
     private final int y;
     private final int z;
 
-    public RandomLocation(RandomWorld world, int x, int y, int z) {
-        this.world = world;
+    public RandomLocation(UUID world, int x, int y, int z) {
+        this.worldUuid = world;
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
-    public RandomWorld getWorld() {
-        return world;
+    public UUID getWorldUuid() {
+        return worldUuid;
     }
 
     public int getX() {
