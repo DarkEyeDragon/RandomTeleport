@@ -1,11 +1,14 @@
 package me.darkeyedragon.randomtp.validator;
 
+import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
+import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.util.location.LocationUtil;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
 
-public class GriefPreventionValidator implements ChunkValidator {
+public class GriefPreventionValidator implements PluginLocationValidator {
 
     private final Plugin instance;
     private boolean isLoaded;
@@ -16,8 +19,9 @@ public class GriefPreventionValidator implements ChunkValidator {
     }
 
     @Override
-    public boolean isValid(Location location) {
-        Claim claim = GriefPrevention.instance.dataStore.getClaimAt(location, true, null);
+    public boolean isValid(RandomLocation location) {
+        Location loc = LocationUtil.toLocation(location);
+        Claim claim = GriefPrevention.instance.dataStore.getClaimAt(loc, true, null);
         return claim == null;
     }
 

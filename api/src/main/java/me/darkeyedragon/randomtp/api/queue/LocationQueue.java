@@ -1,11 +1,11 @@
 package me.darkeyedragon.randomtp.api.queue;
 
-import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
 
 public class LocationQueue extends ObservableQueue<RandomLocation> {
+
     private final LocationSearcher baseLocationSearcher;
 
     public LocationQueue(int capacity, LocationSearcher baseLocationSearcher) {

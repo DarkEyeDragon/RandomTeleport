@@ -11,7 +11,7 @@ public class LocationUtil {
     }
 
     public static Location toLocation(RandomLocation location){
-        World world = Bukkit.getWorld(location.getWorldUuid());
+        World world = Bukkit.getWorld(location.getRandomWorld());
         return new Location(world, location.getX(), location.getY(), location.getZ());
     }
 }

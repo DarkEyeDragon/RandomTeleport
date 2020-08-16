@@ -2,11 +2,14 @@ package me.darkeyedragon.randomtp.teleport;
 
 import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.RandomTeleport;
+import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
 import me.darkeyedragon.randomtp.eco.EcoFactory;
 import me.darkeyedragon.randomtp.eco.EcoHandler;
 import me.darkeyedragon.randomtp.exception.EcoNotSupportedException;
 import me.darkeyedragon.randomtp.failsafe.DeathTracker;
+import me.darkeyedragon.randomtp.util.location.LocationUtil;
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
 import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
 import org.bukkit.Bukkit;
@@ -83,7 +86,7 @@ public class Teleport {
                     } else if ((originalLoc.getX() != currentLoc.getX() || originalLoc.getY() != currentLoc.getY() || originalLoc.getZ() != currentLoc.getZ())) {
                         Bukkit.getScheduler().cancelTask(taskId);
                         bukkitTask.cancel();
-                        player.spigot().sendMessage(configHandler.getSectionMessage().getTeleportCanceled());
+                        player.sendMessage(configHandler.getSectionMessage().getTeleportCanceled());
                     }
                 }, 0, 5L);
             }
@@ -105,18 +108,19 @@ public class Teleport {
     }
 
     private void teleport() {
-        Location location = plugin.getWorldQueue().popLocation(property.getWorld());
-        if (location == null) {
-            property.getCommandSender().spigot().sendMessage(configHandler.getSectionMessage().getDepletedQueue());
+        RandomLocation randomLocation = plugin.getWorldQueue().popLocation(property.getWorld());
+        if (randomLocation == null) {
+            property.getCommandSender().sendMessage(configHandler.getSectionMessage().getDepletedQueue());
             return;
         }
+        Location location = LocationUtil.toLocation(randomLocation);
         PaperLib.getChunkAtAsync(location).thenAccept(chunk -> {
             LocationSearcher baseLocationSearcher = LocationSearcherFactory.getLocationSearcher(property.getWorld(), plugin);
-            if (!baseLocationSearcher.isSafe(location)) {
+            if (!baseLocationSearcher.isSafe(randomLocation)) {
                 random();
                 return;
             }
-            Block block = chunk.getWorld().getBlockAt(location);
+            Block block = chunk.getWorld().getBlockAt(randomLocation);
             Location loc = block.getLocation().add(0.5, 1.5, 0.5);
             plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
             drawWarpParticles(player);
@@ -129,7 +133,7 @@ public class Teleport {
                 player.spigot().sendMessage(configHandler.getSectionMessage().getEconomy().getPayment());
             }
             drawWarpParticles(player);
-            player.spigot().sendMessage(configHandler.getSectionMessage().getTeleport(location));
+            player.spigot().sendMessage(configHandler.getSectionMessage().getTeleport(randomLocation));
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(property.getWorld());
                 plugin.getWorldQueue().get(property.getWorld()).generate(worldConfigSection, 1);

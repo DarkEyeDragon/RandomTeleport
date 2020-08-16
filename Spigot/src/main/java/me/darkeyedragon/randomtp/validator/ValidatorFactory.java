@@ -1,12 +1,14 @@
 package me.darkeyedragon.randomtp.validator;
 
+import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
+
 public class ValidatorFactory {
 
-    public static ChunkValidator createFrom(String string) {
+    public static PluginLocationValidator createFrom(String string) {
         return createFrom(Validator.getValidator(string));
     }
 
-    public static ChunkValidator createFrom(Validator validator) {
+    public static PluginLocationValidator createFrom(Validator validator) {
         switch (validator) {
             case FACTIONS:
                 return new FactionsUuidValidator();

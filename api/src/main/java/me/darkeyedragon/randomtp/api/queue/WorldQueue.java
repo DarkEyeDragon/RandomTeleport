@@ -1,26 +1,29 @@
 package me.darkeyedragon.randomtp.api.queue;
 
 
+import me.darkeyedragon.randomtp.api.world.RandomWorld;
+import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class WorldQueue<K, V extends ObservableQueue<V>> {
+public class WorldQueue {
 
-    private final Map<K, V> worldQueueMap;
+    private final Map<RandomLocation, LocationQueue> worldQueueMap;
 
     public WorldQueue() {
         this.worldQueueMap = new HashMap<>();
     }
 
-    public V put(K world, V locationQueue) {
+    public LocationQueue put(RandomLocation world, LocationQueue locationQueue) {
         return worldQueueMap.put(world, locationQueue);
     }
 
-    public V remove(K world) {
+    public LocationQueue remove(RandomLocation world) {
         return worldQueueMap.remove(world);
     }
 
-    public V get(K world) {
+    public LocationQueue get(RandomLocation world) {
         return worldQueueMap.get(world);
     }
 
@@ -28,8 +31,8 @@ public class WorldQueue<K, V extends ObservableQueue<V>> {
         worldQueueMap.clear();
     }
 
-    public V popLocation(K world) {
-        V locationQueue = get(world);
+    public RandomLocation popLocation(RandomLocation world) {
+        LocationQueue locationQueue = get(world);
         if (locationQueue == null) {
             return null;
         }

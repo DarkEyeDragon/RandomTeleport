@@ -2,9 +2,14 @@ package me.darkeyedragon.randomtp;
 
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
+import me.darkeyedragon.randomtp.api.RandomPlugin;
+import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
+import me.darkeyedragon.randomtp.api.queue.QueueListener;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
+import me.darkeyedragon.randomtp.api.world.RandomWorld;
+import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.command.TeleportCommand;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
@@ -14,30 +19,26 @@ import me.darkeyedragon.randomtp.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.failsafe.listener.PlayerDeathListener;
 import me.darkeyedragon.randomtp.listener.PluginLoadListener;
 import me.darkeyedragon.randomtp.listener.WorldLoadListener;
-import me.darkeyedragon.randomtp.validator.ChunkValidator;
+import me.darkeyedragon.randomtp.util.WorldUtil;
 import me.darkeyedragon.randomtp.validator.ValidatorFactory;
 import me.darkeyedragon.randomtp.world.location.LocationFactory;
 import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
-public final class RandomTeleport extends JavaPlugin {
+public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
 
     private HashMap<UUID, Long> cooldowns;
     private PaperCommandManager manager;
-    private List<ChunkValidator> validatorList;
-    private WorldQueue worldQueue;
+    private Set<PluginLocationValidator> validatorList;
+    private WorldQueue<RandomWorld, LocationQueue> worldQueue;
     private ConfigHandler configHandler;
     //private BaseLocationSearcher locationSearcher;
     private LocationFactory locationFactory;
@@ -56,7 +57,7 @@ public final class RandomTeleport extends JavaPlugin {
         locationFactory = new LocationFactory(configHandler);
         deathTracker = new DeathTracker(this);
         //check if the first argument is a world or player
-        worldQueue = new WorldQueue();
+        worldQueue = new WorldQueue<>();
         manager.getCommandContexts().registerContext(PlayerWorldContext.class, c -> {
             String arg1 = c.popFirstArg();
             World world = Bukkit.getWorld(arg1);
@@ -82,11 +83,11 @@ public final class RandomTeleport extends JavaPlugin {
         manager.registerCommand(new TeleportCommand(this));
         getServer().getPluginManager().registerEvents(new WorldLoadListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), this);
-        validatorList = new ArrayList<>();
+        validatorList = new HashSet<>();
         getLogger().info(ChatColor.AQUA + "======== [Loading validators] ========");
         configHandler.getSectionPlugin().getPlugins().forEach(s -> {
             if (getServer().getPluginManager().getPlugin(s) != null) {
-                ChunkValidator validator = ValidatorFactory.createFrom(s);
+                PluginLocationValidator validator = ValidatorFactory.createFrom(s);
                 if (validator != null) {
                     if (validator.isLoaded()) {
                         getLogger().info(ChatColor.GREEN + s + " -- Successfully loaded");
@@ -114,28 +115,28 @@ public final class RandomTeleport extends JavaPlugin {
 
     public void populateWorldQueue() {
         for (SectionWorldDetail worldDetail : configHandler.getSectionWorld().getWorldSet()) {
-            World world = Bukkit.getWorld(worldDetail.getUUID());
+            RandomWorld world = worldDetail.getWorld();
             //Add a new world to the world queue and generate random locations
-            LocationQueue locationQueue = new LocationQueue(configHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(worldDetail, this));
+            LocationQueue locationQueue = new LocationQueue(configHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(WorldUtil.toWorld(world), this));
             //Subscribe to the locationqueue to be notified of changes
-            subscribe(locationQueue,  world);
-            locationQueue.generate(getLocationFactory().getWorldConfigSection(world));
+            subscribe(locationQueue, world);
+            locationQueue.generate(getLocationFactory().getWorldConfigSection(worldDetail));
             getWorldQueue().put(worldDetail, locationQueue);
 
         }
     }
 
-    public void subscribe(LocationQueue locationQueue, World world) {
+    public void subscribe(LocationQueue locationQueue, RandomWorld world) {
         if (configHandler.getSectionDebug().isShowQueuePopulation()) {
             int size = configHandler.getSectionQueue().getSize();
-            locationQueue.subscribe(new QueueListener<Location>() {
+            locationQueue.subscribe(new QueueListener<RandomLocation>() {
                 @Override
-                public void onAdd(Location element) {
+                public void onAdd(RandomLocation element) {
                     getLogger().info("Safe location added for " + world.getName() + " (" + locationQueue.size() + "/" + size + ")");
                 }
 
                 @Override
-                public void onRemove(Location element) {
+                public void onRemove(RandomLocation element) {
                     getLogger().info("Safe location consumed for " + world.getName() + " (" + locationQueue.size() + "/" + size + ")");
                 }
             });
@@ -159,7 +160,7 @@ public final class RandomTeleport extends JavaPlugin {
         return cooldowns;
     }
 
-    public List<ChunkValidator> getValidatorList() {
+    public Set<PluginLocationValidator> getValidatorList() {
         return validatorList;
     }
 
@@ -171,7 +172,7 @@ public final class RandomTeleport extends JavaPlugin {
         return worldQueue;
     }
 
-    public LocationQueue getQueue(World world) {
+    public LocationQueue getQueue(RandomWorld world) {
         return worldQueue.get(world);
     }
 

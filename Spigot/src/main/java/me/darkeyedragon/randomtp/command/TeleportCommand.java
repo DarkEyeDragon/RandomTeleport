@@ -8,6 +8,8 @@ import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.api.config.section.SectionMessage;
 import me.darkeyedragon.randomtp.api.config.section.SectionQueue;
 import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
+import me.darkeyedragon.randomtp.api.queue.LocationQueue;
+import me.darkeyedragon.randomtp.api.queue.QueueListener;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
@@ -142,7 +144,7 @@ public class TeleportCommand extends BaseCommand {
                 if (offsetX == null) offsetX = 0;
                 if (offsetZ == null) offsetZ = 0;
             }
-            LocationQueue locationQueue = configWorld.add(new WorldConfigSection(offsetX, offsetZ, radius, world, useWorldBorder, needsWorldPermission));
+            LocationQueue<Location, World> locationQueue = configWorld.add(new WorldConfigSection(offsetX, offsetZ, radius, world, useWorldBorder, needsWorldPermission));
             if (locationQueue != null) {
                 commandSender.sendMessage(ChatColor.GREEN + "Successfully added to config.");
                 locationQueue.subscribe(new QueueListener<Location>() {

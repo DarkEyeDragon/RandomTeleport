@@ -2,7 +2,7 @@ package me.darkeyedragon.randomtp.validator;
 
 import javax.management.ValueExp;
 
-public enum Validator {
+public enum Validator implements me.darkeyedragon.randomtp.api.addon.Validator {
     FACTIONS("Factions"),
     WORLD_GUARD("WorldGuard"),
     GRIEF_PREVENTION("GriefPrevention"),

@@ -1,9 +1,12 @@
 package me.darkeyedragon.randomtp.validator;
 
 import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect;
+import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
+import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.util.location.LocationUtil;
 import org.bukkit.Location;
 
-public class RedProtectValidator implements ChunkValidator {
+public class RedProtectValidator implements PluginLocationValidator {
 
     private final RedProtect instance;
     private boolean isLoaded;
@@ -14,8 +17,9 @@ public class RedProtectValidator implements ChunkValidator {
     }
 
     @Override
-    public boolean isValid(Location location) {
-        return instance.getAPI().getRegion(location) == null;
+    public boolean isValid(RandomLocation location) {
+        Location loc = LocationUtil.toLocation(location);
+        return instance.getAPI().getRegion(loc) == null;
     }
 
     @Override

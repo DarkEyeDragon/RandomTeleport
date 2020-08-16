@@ -1,11 +1,14 @@
 package me.darkeyedragon.randomtp.world.location.search;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
+import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
+import org.bukkit.Location;
 import org.bukkit.World;
 
 public class LocationSearcherFactory {
 
-    public static BaseLocationSearcher getLocationSearcher(World world, RandomTeleport randomTeleport) {
+    public static LocationSearcher getLocationSearcher(World world, RandomTeleport randomTeleport) {
         switch (world.getEnvironment()) {
             case NORMAL:
                 return new OverworldLocationSearcher(randomTeleport);
