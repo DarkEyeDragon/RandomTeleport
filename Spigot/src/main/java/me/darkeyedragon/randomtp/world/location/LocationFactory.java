@@ -1,10 +1,11 @@
 package me.darkeyedragon.randomtp.world.location;
 
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
+import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.RandomWorldBorder;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
 
-import java.util.Set;
+import java.util.Map;
 
 public class LocationFactory {
 
@@ -14,24 +15,24 @@ public class LocationFactory {
         this.configHandler = configHandler;
     }
 
-    public WorldConfigSection getWorldConfigSection(SectionWorldDetail sectionWorldDetail){
-        Set<SectionWorldDetail> worldSet = configHandler.getSectionWorld().getWorldSet();
-        WorldConfigSection worldConfigSection = worldSet.get(sectionWorldDetail);
-        int offsetX;
-        int offsetZ;
-        int radius;
-        if(worldConfigSection == null) return null;
-        if (worldConfigSection.useWorldBorder()) {
-            RandomWorldBorder worldBorder = sectionWorldDetail.getWorldBorder();
-            offsetX = worldBorder.getCenter().getBlockX();
-            offsetZ = worldBorder.getCenter().getBlockZ();
-            radius = (int) Math.floor(sectionWorldDetail.getWorldBorder().getSize() / 2 - sectionWorldDetail.getWorldBorder().getWarningDistance());
+    public WorldConfigSection getWorldConfigSection(RandomWorld randomWorld){
+        Map<RandomWorld, SectionWorldDetail> worldMap = configHandler.getSectionWorld().getWorldSet();
+        SectionWorldDetail sectionWorldDetail = worldMap.get(randomWorld);
+        int offsetX = 0;
+        int offsetZ = 0;
+        int radius = 0;
+        if(sectionWorldDetail == null) return null;
+        if (sectionWorldDetail.useWorldBorder()) {
+            RandomWorldBorder worldBorder = sectionWorldDetail.getWorld().getWorldBorder();
+            offsetX = worldBorder.getCenter().getX();
+            offsetZ = worldBorder.getCenter().getZ();
+            radius = (int) Math.floor(worldBorder.getSize() / 2 - worldBorder.getWarningDistance());
         } else {
-            offsetX = worldConfigSection.getX();
-            offsetZ = worldConfigSection.getZ();
-            radius = worldConfigSection.getRadius();
+            offsetX = sectionWorldDetail.getX();
+            offsetZ = sectionWorldDetail.getZ();
+            radius = sectionWorldDetail.getRadius();
         }
-        return new WorldConfigSection(offsetX, offsetZ, radius, sectionWorldDetail, worldConfigSection.useWorldBorder(), worldConfigSection.needsWorldPermission());
+        return new WorldConfigSection(offsetX, offsetZ, radius, sectionWorldDetail.getWorld(), sectionWorldDetail.useWorldBorder(), sectionWorldDetail.needsWorldPermission());
     }
 
     public ConfigHandler getConfigHandler() {

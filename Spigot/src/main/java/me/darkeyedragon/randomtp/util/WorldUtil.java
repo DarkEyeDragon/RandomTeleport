@@ -1,13 +1,16 @@
 package me.darkeyedragon.randomtp.util;
 
 import me.darkeyedragon.randomtp.api.world.RandomChunk;
+import me.darkeyedragon.randomtp.api.world.RandomEnvironment;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
+import me.darkeyedragon.randomtp.api.world.RandomWorldBorder;
 import me.darkeyedragon.randomtp.api.world.block.BlockFace;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.util.location.LocationUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.WorldBorder;
 import org.bukkit.block.Block;
 
 import java.util.UUID;
@@ -50,6 +53,16 @@ public class WorldUtil {
             public RandomBlock getBlockAt(int x, int y, int z) {
                 return null;
             }
+
+            @Override
+            public RandomWorldBorder getWorldBorder() {
+                return toRandomWorldBorder(world.getWorldBorder());
+            }
+
+            @Override
+            public RandomEnvironment getEnvironment() {
+                return toRandomEnvironment(world.getEnvironment());
+            }
         };
     }
     public static RandomBlock toRandomBlock(Block block){
@@ -82,5 +95,28 @@ public class WorldUtil {
     }
     private static org.bukkit.block.BlockFace toBlockFace(BlockFace blockFace){
         return org.bukkit.block.BlockFace.valueOf(blockFace.name());
+    }
+
+    public static RandomWorldBorder toRandomWorldBorder(WorldBorder worldBorder){
+        return new RandomWorldBorder() {
+            @Override
+            public RandomLocation getCenter() {
+                return LocationUtil.toRandomLocation(worldBorder.getCenter());
+            }
+
+            @Override
+            public double getSize() {
+                return 0;
+            }
+
+            @Override
+            public int getWarningDistance() {
+                return 0;
+            }
+        };
+    }
+
+    public static RandomEnvironment toRandomEnvironment(World.Environment environment){
+        return RandomEnvironment.valueOf(environment.name());
     }
 }

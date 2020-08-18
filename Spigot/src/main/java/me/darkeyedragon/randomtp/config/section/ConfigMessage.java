@@ -2,6 +2,7 @@ package me.darkeyedragon.randomtp.config.section;
 
 import me.darkeyedragon.randomtp.api.config.section.SectionMessage;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SubSectionEconomy;
+import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.util.CustomTime;
 import me.darkeyedragon.randomtp.util.TimeUtil;
@@ -133,7 +134,8 @@ public class ConfigMessage implements SectionMessage {
         return null;
     }
 
-    public String getNoWorldPermission(World world) {
+    @Override
+    public String getNoWorldPermission(RandomWorld world) {
         String message = noWorldPermission;
         if (message != null) {
             message = message.replace("%world", world.getName());
@@ -153,21 +155,12 @@ public class ConfigMessage implements SectionMessage {
     }
 
     @Override
-    public SubSectionEconomy getEconomySection() {
-        return null;
+    public SubSectionEconomy getSubSectionEconomy() {
+        return this.economy;
     }
 
-    @Override
-    public String getInitTeleportDelay() {
-        return null;
-    }
 
-    @Override
-    public String getNoWorldPermission() {
-        return null;
-    }
-
-    public class Economy {
+    public static class Economy implements SubSectionEconomy{
 
         private String insufficientFunds;
         private String payment;

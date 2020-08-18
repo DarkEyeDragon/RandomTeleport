@@ -1,7 +1,9 @@
 package me.darkeyedragon.randomtp.util;
 
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.command.CommandSender;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,5 +35,13 @@ public class MessageUtil {
         return textComponent;
     }
 
+    public static void sendMessage(CommandSender sender, String message) {
+        if (message.isEmpty()) return;
+        sender.sendMessage(message);
+    }
 
+    public static void sendMessage(CommandSender sender, BaseComponent baseComponent) {
+        if (baseComponent.toPlainText().isEmpty()) return;
+        sender.spigot().sendMessage(baseComponent);
+    }
 }

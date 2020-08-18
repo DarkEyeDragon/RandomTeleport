@@ -1,5 +1,6 @@
 package me.darkeyedragon.randomtp.teleport;
 
+import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -9,14 +10,14 @@ public class TeleportProperty {
 
     private final CommandSender commandSender;
     private final Player player;
-    private final World world;
+    private final RandomWorld world;
     private final boolean bypassCooldown;
     private final boolean ignoreTeleportDelay;
     private final boolean useEco;
     private final ConfigHandler configHandler;
     private final long cooldown;
 
-    public TeleportProperty(CommandSender commandSender, Player player, World world, boolean bypassCooldown, boolean ignoreTeleportDelay, boolean useEco, ConfigHandler configHandler, long cooldown) {
+    public TeleportProperty(CommandSender commandSender, Player player, RandomWorld world, boolean bypassCooldown, boolean ignoreTeleportDelay, boolean useEco, ConfigHandler configHandler, long cooldown) {
         this.commandSender = commandSender;
         this.player = player;
         this.world = world;
@@ -35,7 +36,7 @@ public class TeleportProperty {
         return player;
     }
 
-    public World getWorld() {
+    public RandomWorld getWorld() {
         return world;
     }
 

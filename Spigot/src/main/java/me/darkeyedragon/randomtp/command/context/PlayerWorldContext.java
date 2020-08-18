@@ -1,5 +1,7 @@
 package me.darkeyedragon.randomtp.command.context;
 
+import me.darkeyedragon.randomtp.api.world.RandomWorld;
+import me.darkeyedragon.randomtp.util.WorldUtil;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -23,8 +25,8 @@ public class PlayerWorldContext {
         this.player = player;
     }
 
-    public World getWorld() {
-        return world;
+    public RandomWorld getWorld() {
+        return WorldUtil.toRandomWorld(world);
     }
 
     public void setWorld(World world) {

@@ -11,10 +11,14 @@ import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.QueueListener;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
+import me.darkeyedragon.randomtp.api.world.RandomWorld;
+import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
 import me.darkeyedragon.randomtp.teleport.Teleport;
 import me.darkeyedragon.randomtp.teleport.TeleportProperty;
+import me.darkeyedragon.randomtp.util.MessageUtil;
+import me.darkeyedragon.randomtp.util.WorldUtil;
 import me.darkeyedragon.randomtp.world.location.LocationFactory;
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
 import org.bukkit.ChatColor;
@@ -59,13 +63,13 @@ public class TeleportCommand extends BaseCommand {
     @CommandCompletion("@players|@worlds")
     public void onTeleport(CommandSender sender, @Optional PlayerWorldContext target, @Optional @CommandPermission("rtp.teleport.world") World world) {
         Player player;
-        World newWorld;
+        RandomWorld newWorld;
         if (target == null) {
             if (sender instanceof Player) {
                 player = (Player) sender;
-                newWorld = player.getWorld();
-                if (!configWorld.contains(newWorld)) {
-                    sender.spigot().sendMessage(configMessage.getNoWorldPermission(newWorld));
+                newWorld = WorldUtil.toRandomWorld(player.getWorld());
+                if (!configWorld.getWorldSet().containsKey(newWorld)) {
+                    MessageUtil.sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
                     return;
                 }
             } else {
@@ -75,9 +79,9 @@ public class TeleportCommand extends BaseCommand {
             if (target.isPlayer()) {
                 if (sender.hasPermission("rtp.teleport.other")) {
                     player = target.getPlayer();
-                    newWorld = world;
-                    if (!configWorld.contains(newWorld)) {
-                        sender.spigot().sendMessage(configMessage.getNoWorldPermission(newWorld));
+                    newWorld = WorldUtil.toRandomWorld(world);
+                    if (!configWorld.getWorldSet().containsKey(newWorld)) {
+                        MessageUtil.sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
                         return;
                     }
                 } else {
@@ -88,13 +92,13 @@ public class TeleportCommand extends BaseCommand {
                 if (sender instanceof Player) {
                     player = (Player) sender;
                     newWorld = target.getWorld();
-                    if (!configWorld.contains(newWorld)) {
-                        sender.spigot().sendMessage(configMessage.getNoWorldPermission(newWorld));
+                    if (!configWorld.getWorldSet().containsKey(newWorld)) {
+                        MessageUtil.sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
                         return;
                     }
                     WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(newWorld);
                     if (worldConfigSection == null || ((!sender.hasPermission("rtp.world." + newWorld.getName())) && worldConfigSection.needsWorldPermission())) {
-                        sender.spigot().sendMessage(configMessage.getNoWorldPermission(newWorld));
+                        MessageUtil.sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
                         return;
                     }
 
@@ -105,7 +109,7 @@ public class TeleportCommand extends BaseCommand {
                 throw new InvalidCommandArgument(true);
             }
         }
-        final World finalWorld = newWorld;
+        final RandomWorld finalWorld = newWorld;
         final boolean useEco = configHandler.getSectionEconomy().useEco();
         final boolean bypassEco = player.hasPermission("rtp.eco.bypass");
         final boolean logic = useEco && !bypassEco;
@@ -134,22 +138,24 @@ public class TeleportCommand extends BaseCommand {
     @CommandPermission("rtp.admin.addworld")
     @CommandCompletion("@worlds true|false true|false <Integer> <Integer> <Integer>")
     public void onAddWorld(CommandSender commandSender, World world, boolean useWorldBorder, boolean needsWorldPermission, @Optional Integer radius, @Optional Integer offsetX, @Optional Integer offsetZ) {
+        RandomWorld randomWorld = WorldUtil.toRandomWorld(world);
         if (!useWorldBorder && (radius == null || offsetX == null || offsetZ == null)) {
             commandSender.sendMessage(ChatColor.GOLD + "If " + ChatColor.AQUA + "useWorldBorder" + ChatColor.GOLD + " is false you need to provide the other parameters.");
             throw new InvalidCommandArgument(true);
         }
-        if (!configWorld.contains(world)) {
+        if (!configWorld.getWorldSet().containsKey(randomWorld)) {
             if (useWorldBorder) {
                 if (radius == null) radius = 0;
                 if (offsetX == null) offsetX = 0;
                 if (offsetZ == null) offsetZ = 0;
             }
-            LocationQueue<Location, World> locationQueue = configWorld.add(new WorldConfigSection(offsetX, offsetZ, radius, world, useWorldBorder, needsWorldPermission));
+            configWorld.getWorldSet().put(randomWorld, new WorldConfigSection(offsetX, offsetZ, radius, randomWorld, useWorldBorder, needsWorldPermission));
+            LocationQueue locationQueue = plugin.getQueue(WorldUtil.toRandomWorld(world));
             if (locationQueue != null) {
                 commandSender.sendMessage(ChatColor.GREEN + "Successfully added to config.");
-                locationQueue.subscribe(new QueueListener<Location>() {
+                locationQueue.subscribe(new QueueListener<RandomLocation>() {
                     @Override
-                    public void onAdd(Location element) {
+                    public void onAdd(RandomLocation element) {
                         commandSender.sendMessage(ChatColor.GREEN + "Safe location added for " + ChatColor.GOLD + element.getWorld().getName() + ChatColor.GREEN + " (" + ChatColor.YELLOW + locationQueue.size() + ChatColor.GREEN + "/" + configQueue.getSize() + ")");
                         if (locationQueue.size() == configQueue.getSize()) {
                             commandSender.sendMessage(ChatColor.GREEN + "Queue populated for " + ChatColor.GOLD + element.getWorld().getName());
@@ -158,7 +164,7 @@ public class TeleportCommand extends BaseCommand {
                     }
 
                     @Override
-                    public void onRemove(Location element) {
+                    public void onRemove(RandomLocation element) {
                         //ignored
                     }
                 });
@@ -174,8 +180,9 @@ public class TeleportCommand extends BaseCommand {
     @CommandCompletion("@worlds")
     @CommandPermission("rtp.admin.removeworld")
     public void removeWorld(CommandSender commandSender, World world) {
-        if (configWorld.contains(world)) {
-            if (configWorld.remove(world)) {
+        RandomWorld randomWorld = WorldUtil.toRandomWorld(world);
+        if (configWorld.getWorldSet().containsKey(randomWorld)) {
+            if (configWorld.getWorldSet().remove(randomWorld) != null) {
                 commandSender.sendMessage(ChatColor.GREEN + "Removed world from the config and queue!");
             }
         } else {

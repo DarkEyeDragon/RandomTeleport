@@ -16,5 +16,7 @@ public interface SectionWorldDetail {
 
     RandomWorld getWorld();
 
-    RandomWorldBorder getWorldBorder();
+    boolean useWorldBorder();
+
+    boolean needsWorldPermission();
 }

@@ -1,8 +1,8 @@
 package me.darkeyedragon.randomtp.world.location;
 
+import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
-import org.bukkit.World;
 
 public class WorldConfigSection implements SectionWorldDetail {
 
@@ -13,7 +13,7 @@ public class WorldConfigSection implements SectionWorldDetail {
     private final boolean useWorldBorder;
     private final boolean needsWorldPermission;
 
-    public WorldConfigSection(int x, int z, int radius, RandomWorld world, boolean useWorldBorder,boolean needsWorldPermission) {
+    public WorldConfigSection(int x, int z, int radius, RandomWorld world, boolean useWorldBorder, boolean needsWorldPermission) {
         this.x = x;
         this.z = z;
         this.radius = radius;

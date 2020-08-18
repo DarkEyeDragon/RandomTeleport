@@ -8,7 +8,6 @@ import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
 import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
-import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.Map;
@@ -17,7 +16,7 @@ import java.util.Set;
 
 public class ConfigWorld implements SectionWorld {
 
-    private Map<World, WorldConfigSection> worldConfigSectionMap;
+    private SectionWorld sectionWorld;
     private final RandomTeleport plugin;
     private final ConfigurationSection section;
 
@@ -27,29 +26,29 @@ public class ConfigWorld implements SectionWorld {
     }
 
 
-    public ConfigWorld set(Map<World, WorldConfigSection> worldConfigSectionMap) {
-        this.worldConfigSectionMap = worldConfigSectionMap;
+    public ConfigWorld set(SectionWorld sectionWorld) {
+        this.sectionWorld = sectionWorld;
         return this;
     }
 
-    public WorldConfigSection get(World world) {
-        return worldConfigSectionMap.get(world);
+    public SectionWorldDetail get(RandomWorld world) {
+        return sectionWorld.getWorldSet().get(world);
     }
 
-    public Map<World, WorldConfigSection> getWorldConfigSectionMap() {
-        return worldConfigSectionMap;
+    public SectionWorld getSectionWorld() {
+        return sectionWorld;
     }
 
-    public Set<World> getWorlds() {
-        return worldConfigSectionMap.keySet();
+    public Set<RandomWorld> getWorlds() {
+        return sectionWorld.getWorldSet().keySet();
     }
 
-    public boolean contains(World world) {
-        return worldConfigSectionMap.containsKey(world);
+    public boolean contains(RandomWorld world) {
+        return sectionWorld.getWorldSet().containsKey(world);
     }
 
     public boolean contains(WorldConfigSection worldConfigSection) {
-        return worldConfigSectionMap.containsKey(worldConfigSection.getWorld());
+        return sectionWorld.getWorldSet().containsKey(worldConfigSection.getWorld());
     }
 
     public LocationQueue add(WorldConfigSection worldConfigSection) {
@@ -62,7 +61,7 @@ public class ConfigWorld implements SectionWorld {
         section.set(worldConfigSection.getWorld().getName() + ".offsetX", worldConfigSection.getX());
         section.set(worldConfigSection.getWorld().getName() + ".offsetZ", worldConfigSection.getZ());
         plugin.saveConfig();
-        worldConfigSectionMap.put(worldConfigSection.getWorld(), worldConfigSection);
+        sectionWorld.getWorldSet().put(worldConfigSection.getWorld(), worldConfigSection);
         return generateLocations(worldConfigSection.getWorld());
     }
 
@@ -71,12 +70,12 @@ public class ConfigWorld implements SectionWorld {
         SectionQueue sectionQueue = plugin.getConfigHandler().getSectionQueue();
         LocationQueue locationQueue = new LocationQueue(sectionQueue.getSize(), LocationSearcherFactory.getLocationSearcher(world, plugin));
         plugin.subscribe(locationQueue, world);
-        locationQueue.generate(locationQueue., sectionQueue.getSize());
+        locationQueue.generate(worldConfigSection, sectionQueue.getSize());
         plugin.getWorldQueue().put(world, locationQueue);
         return locationQueue;
     }
 
-    public boolean remove(World world) {
+    public boolean remove(RandomWorld world) {
         if (section == null || !section.contains(world.getName())) {
             return false;
         }
@@ -87,7 +86,7 @@ public class ConfigWorld implements SectionWorld {
     }
 
     @Override
-    public Set<SectionWorldDetail> getWorldSet() {
-        return worldConfigSectionMap.;
+    public Map<RandomWorld, SectionWorldDetail> getWorldSet() {
+        return sectionWorld.getWorldSet();
     }
 }

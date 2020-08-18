@@ -19,7 +19,6 @@ import me.darkeyedragon.randomtp.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.failsafe.listener.PlayerDeathListener;
 import me.darkeyedragon.randomtp.listener.PluginLoadListener;
 import me.darkeyedragon.randomtp.listener.WorldLoadListener;
-import me.darkeyedragon.randomtp.util.WorldUtil;
 import me.darkeyedragon.randomtp.validator.ValidatorFactory;
 import me.darkeyedragon.randomtp.world.location.LocationFactory;
 import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
@@ -38,7 +37,7 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
     private HashMap<UUID, Long> cooldowns;
     private PaperCommandManager manager;
     private Set<PluginLocationValidator> validatorList;
-    private WorldQueue<RandomWorld, LocationQueue> worldQueue;
+    private WorldQueue worldQueue;
     private ConfigHandler configHandler;
     //private BaseLocationSearcher locationSearcher;
     private LocationFactory locationFactory;
@@ -57,7 +56,7 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
         locationFactory = new LocationFactory(configHandler);
         deathTracker = new DeathTracker(this);
         //check if the first argument is a world or player
-        worldQueue = new WorldQueue<>();
+        worldQueue = new WorldQueue();
         manager.getCommandContexts().registerContext(PlayerWorldContext.class, c -> {
             String arg1 = c.popFirstArg();
             World world = Bukkit.getWorld(arg1);
@@ -114,14 +113,14 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
     }
 
     public void populateWorldQueue() {
-        for (SectionWorldDetail worldDetail : configHandler.getSectionWorld().getWorldSet()) {
+        for (SectionWorldDetail worldDetail : configHandler.getSectionWorld().getWorldSet().values()) {
             RandomWorld world = worldDetail.getWorld();
             //Add a new world to the world queue and generate random locations
-            LocationQueue locationQueue = new LocationQueue(configHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(WorldUtil.toWorld(world), this));
+            LocationQueue locationQueue = new LocationQueue(configHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(world, this));
             //Subscribe to the locationqueue to be notified of changes
             subscribe(locationQueue, world);
-            locationQueue.generate(getLocationFactory().getWorldConfigSection(worldDetail));
-            getWorldQueue().put(worldDetail, locationQueue);
+            locationQueue.generate(getLocationFactory().getWorldConfigSection(world));
+            getWorldQueue().put(world, locationQueue);
 
         }
     }

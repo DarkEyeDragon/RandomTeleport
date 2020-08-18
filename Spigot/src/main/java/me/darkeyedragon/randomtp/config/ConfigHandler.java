@@ -3,8 +3,11 @@ package me.darkeyedragon.randomtp.config;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.config.section.*;
+import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
+import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.config.section.*;
 import me.darkeyedragon.randomtp.util.TimeUtil;
+import me.darkeyedragon.randomtp.util.WorldUtil;
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -150,10 +153,10 @@ public class ConfigHandler implements RandomConfigHandler {
         return plugin.getConfig().getString("message.countdown");
     }
 
-    private Map<World, WorldConfigSection> getOffsets() {
+    private WorldConfig getOffsets() {
         final ConfigurationSection section = plugin.getConfig().getConfigurationSection("worlds");
         Set<String> keys = Objects.requireNonNull(section).getKeys(false);
-        Map<World, WorldConfigSection> offsetMap = new HashMap<>(keys.size());
+        Map<RandomWorld, SectionWorldDetail> offsetMap = new HashMap<>(keys.size());
         for (String key : keys) {
             World world = Bukkit.getWorld(key);
             if (world == null) {
@@ -166,9 +169,10 @@ public class ConfigHandler implements RandomConfigHandler {
             int offsetX = section.getInt(key + ".offsetX");
             int offsetZ = section.getInt(key + ".offsetZ");
             plugin.getLogger().info(ChatColor.GREEN + key + " found! Loading...");
-            offsetMap.put(world, new WorldConfigSection(offsetX, offsetZ, radius, world, useWorldBorder, needsWorldPermission));
+            RandomWorld randomWorld = WorldUtil.toRandomWorld(world);
+            offsetMap.put(randomWorld, new WorldConfigSection(offsetX, offsetZ, radius, randomWorld, useWorldBorder, needsWorldPermission));
         }
-        return offsetMap;
+        return new WorldConfig(offsetMap);
     }
 
     private String getInsufficientFundsMessage() {

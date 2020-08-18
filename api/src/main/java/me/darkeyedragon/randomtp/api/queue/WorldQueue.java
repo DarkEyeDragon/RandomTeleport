@@ -9,21 +9,21 @@ import java.util.Map;
 
 public class WorldQueue {
 
-    private final Map<RandomLocation, LocationQueue> worldQueueMap;
+    private final Map<RandomWorld, LocationQueue> worldQueueMap;
 
     public WorldQueue() {
         this.worldQueueMap = new HashMap<>();
     }
 
-    public LocationQueue put(RandomLocation world, LocationQueue locationQueue) {
+    public LocationQueue put(RandomWorld world, LocationQueue locationQueue) {
         return worldQueueMap.put(world, locationQueue);
     }
 
-    public LocationQueue remove(RandomLocation world) {
+    public LocationQueue remove(RandomWorld world) {
         return worldQueueMap.remove(world);
     }
 
-    public LocationQueue get(RandomLocation world) {
+    public LocationQueue get(RandomWorld world) {
         return worldQueueMap.get(world);
     }
 
@@ -31,7 +31,7 @@ public class WorldQueue {
         worldQueueMap.clear();
     }
 
-    public RandomLocation popLocation(RandomLocation world) {
+    public RandomLocation popLocation(RandomWorld world) {
         LocationQueue locationQueue = get(world);
         if (locationQueue == null) {
             return null;

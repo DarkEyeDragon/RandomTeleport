@@ -19,4 +19,8 @@ public interface RandomWorld {
     String getName();
 
     RandomBlock getBlockAt(int x, int y, int z);
+    
+    RandomWorldBorder getWorldBorder();
+
+    RandomEnvironment getEnvironment();
 }

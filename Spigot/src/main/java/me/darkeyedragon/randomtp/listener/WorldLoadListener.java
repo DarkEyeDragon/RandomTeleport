@@ -19,7 +19,7 @@ public class WorldLoadListener implements Listener {
         this.configHandler = plugin.getConfigHandler();
     }
 
-    @EventHandler
+    /*@EventHandler
     public void onWorldLoad(WorldLoadEvent event) {
         World world = event.getWorld();
         if (configHandler.getSectionWorld().getWorlds().contains(world)) {
@@ -43,5 +43,5 @@ public class WorldLoadListener implements Listener {
             locationQueue.generate(plugin.getLocationFactory().getWorldConfigSection(world));
             plugin.getWorldQueue().put(world, locationQueue);
         }
-    }
+    }*/
 }
