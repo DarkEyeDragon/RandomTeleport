@@ -30,7 +30,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
 
@@ -119,7 +122,8 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
             LocationQueue locationQueue = new LocationQueue(configHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(world, this));
             //Subscribe to the locationqueue to be notified of changes
             subscribe(locationQueue, world);
-            locationQueue.generate(getLocationFactory().getWorldConfigSection(world));
+            SectionWorldDetail sectionWorldDetail = getLocationFactory().getWorldConfigSection(world);
+            locationQueue.generate(sectionWorldDetail);
             getWorldQueue().put(world, locationQueue);
 
         }

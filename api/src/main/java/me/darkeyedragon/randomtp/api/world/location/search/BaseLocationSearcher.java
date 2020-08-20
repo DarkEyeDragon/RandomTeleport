@@ -3,12 +3,14 @@ package me.darkeyedragon.randomtp.api.world.location.search;
 import me.darkeyedragon.randomtp.api.RandomPlugin;
 import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
-import me.darkeyedragon.randomtp.api.world.*;
+import me.darkeyedragon.randomtp.api.world.RandomChunk;
+import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.block.BlockFace;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
@@ -27,6 +29,8 @@ public abstract class BaseLocationSearcher<Biome> implements LocationSearcher {
 
     public BaseLocationSearcher(RandomPlugin plugin) {
         //Illegal material types
+        blacklistMaterial = new HashSet<>();
+        blacklistBiome = new HashSet<>();
         this.plugin = plugin;
     }
 
@@ -78,17 +82,20 @@ public abstract class BaseLocationSearcher<Biome> implements LocationSearcher {
         int x = rnd.nextInt(-chunkRadius, chunkRadius);
         int z = rnd.nextInt(-chunkRadius, chunkRadius);
         RandomWorld world = sectionWorldDetail.getWorld();
-        if(world == null) return CompletableFuture.completedFuture(null);
-        return world.getChunkAtAsync(x + chunkOffsetX, z + chunkOffsetZ);
+        if (world == null) return CompletableFuture.completedFuture(null);
+        return world.getChunkAtAsync(world, x + chunkOffsetX, z + chunkOffsetZ);
     }
 
     @Override
     public boolean isSafe(RandomLocation loc) {
         RandomWorld world = loc.getWorld();
         if (world == null) return false;
-        if (blacklistMaterial.contains(loc.getBlock())) return false;
+        if (blacklistMaterial.contains(loc.getBlock())) {
+            return false;
+        }
         //TODO FIX
-        //if (!loc.getBlock().getType().isSolid()) return false;
+        if (!loc.getBlock().isPassable()) return false;
+        if (!loc.getBlock().isLiquid()) return false;
         if (!isSafeAbove(loc)) return false;
         if (!isSafeForPlugins(loc)) return false;
         return isSafeSurrounding(loc);
@@ -115,7 +122,7 @@ public abstract class BaseLocationSearcher<Biome> implements LocationSearcher {
     }
 
     public boolean isSafeChunk(RandomChunk chunk) {
-        if(chunk == null) return false;
+        if (chunk == null) return false;
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {
                 RandomBlock block = chunk.getWorld().getHighestBlockAt((chunk.getX() << CHUNK_SHIFT) + x, (chunk.getZ() << CHUNK_SHIFT) + z);

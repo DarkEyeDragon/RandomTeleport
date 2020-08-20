@@ -7,8 +7,6 @@ import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.util.CustomTime;
 import me.darkeyedragon.randomtp.util.TimeUtil;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
 
 public class ConfigMessage implements SectionMessage {
 
