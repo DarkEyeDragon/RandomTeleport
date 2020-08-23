@@ -1,5 +1,10 @@
 package me.darkeyedragon.randomtp.api.world;
 
-public enum RandomMaterial {
+public interface RandomMaterial {
 
+    boolean isSolid();
+
+    String getName();
+
+    boolean isAir();
 }

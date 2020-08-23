@@ -3,7 +3,9 @@ package me.darkeyedragon.randomtp.api.world.location.search;
 import me.darkeyedragon.randomtp.api.RandomPlugin;
 import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
+import me.darkeyedragon.randomtp.api.world.RandomBiome;
 import me.darkeyedragon.randomtp.api.world.RandomChunk;
+import me.darkeyedragon.randomtp.api.world.RandomMaterial;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.block.BlockFace;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
@@ -15,14 +17,11 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
-
-public abstract class BaseLocationSearcher<Biome> implements LocationSearcher {
-
+public abstract class BaseLocationSearcher implements LocationSearcher {
     protected static final String OCEAN = "ocean";
-    protected Set<RandomBlock> blacklistMaterial;
-    protected Set<Biome> blacklistBiome;
+    protected Set<RandomMaterial> blacklistMaterial;
+    protected Set<RandomBiome> blacklistBiome;
     protected final RandomPlugin plugin;
-    private boolean useWorldBorder;
 
     protected final byte CHUNK_SIZE = 16; //The size (in blocks) of a chunk in all directions
     protected final byte CHUNK_SHIFT = 4; //The amount of bits needed to translate between locations and chunks
@@ -41,7 +40,9 @@ public abstract class BaseLocationSearcher<Biome> implements LocationSearcher {
         return location.thenCompose((loc) -> {
             if (loc == null) {
                 return getRandom(sectionWorldDetail);
-            } else return CompletableFuture.completedFuture(loc);
+            } else {
+                return CompletableFuture.completedFuture(loc);
+            }
         });
     }
 
@@ -90,15 +91,18 @@ public abstract class BaseLocationSearcher<Biome> implements LocationSearcher {
     public boolean isSafe(RandomLocation loc) {
         RandomWorld world = loc.getWorld();
         if (world == null) return false;
-        if (blacklistMaterial.contains(loc.getBlock())) {
+        RandomBlock block = loc.getBlock();
+        if (block.getType().isAir()) return false;
+        if (blacklistMaterial.contains(loc.getBlock().getType())) {
             return false;
         }
         //TODO FIX
-        if (!loc.getBlock().isPassable()) return false;
-        if (!loc.getBlock().isLiquid()) return false;
+        if (block.isPassable()) return false;
+        if (block.isLiquid()) return false;
         if (!isSafeAbove(loc)) return false;
         if (!isSafeForPlugins(loc)) return false;
-        return isSafeSurrounding(loc);
+        if (!isSafeSurrounding(loc)) return false;
+        return true;
     }
 
     @Override
@@ -122,14 +126,12 @@ public abstract class BaseLocationSearcher<Biome> implements LocationSearcher {
     }
 
     public boolean isSafeChunk(RandomChunk chunk) {
-        if (chunk == null) return false;
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {
                 RandomBlock block = chunk.getWorld().getHighestBlockAt((chunk.getX() << CHUNK_SHIFT) + x, (chunk.getZ() << CHUNK_SHIFT) + z);
-                //TODO FIX
-                /*if (blacklistBiome.contains(block.getBiome())) {
+                if (blacklistBiome.contains(block.getBiome())) {
                     return false;
-                }*/
+                }
             }
         }
         return true;
@@ -137,7 +139,7 @@ public abstract class BaseLocationSearcher<Biome> implements LocationSearcher {
 
     /**
      * @param location the {@link RandomLocation} to check around
-     * @return true if the suroundings are safe
+     * @return true if the surroundings are safe
      */
     protected boolean isSafeSurrounding(RandomLocation location) {
         RandomBlock block = location.getBlock();
@@ -147,26 +149,9 @@ public abstract class BaseLocationSearcher<Biome> implements LocationSearcher {
         for (BlockFace blockFace : blockfaces) {
             RandomBlock relativeBlock = block.getRelative(blockFace);
             if (relativeBlock.isEmpty()) return false;
-            //TODO FIX
-            //if (!relativeBlock.getType().isSolid()) return false;
-            //if (blacklistMaterial.contains(relativeBlock.getType())) return false;
+            if (!relativeBlock.getType().isSolid()) return false;
+            if (blacklistMaterial.contains(relativeBlock.getType())) return false;
         }
         return true;
-    }
-
-    public boolean isUseWorldBorder() {
-        return useWorldBorder;
-    }
-
-    public void setUseWorldBorder(boolean useWorldBorder) {
-        this.useWorldBorder = useWorldBorder;
-    }
-
-    public void setBlacklistMaterial(Set<RandomBlock> blacklistMaterial) {
-        this.blacklistMaterial = blacklistMaterial;
-    }
-
-    public void setBlacklistBiome(Set<Biome> blacklistBiome) {
-        this.blacklistBiome = blacklistBiome;
     }
 }

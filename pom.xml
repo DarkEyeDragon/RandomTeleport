@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
 
-    <name>RandomTeleport-parent</name>
-    <groupId>me.darkeyedragon.randomtp</groupId>
-    <artifactId>parent</artifactId>
+    <name>RandomTeleport</name>
+    <groupId>me.darkeyedragon</groupId>
+    <artifactId>randomtp</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 
     <properties>

@@ -7,7 +7,6 @@ import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
 public class LocationQueue extends ObservableQueue<RandomLocation> {
 
     private final LocationSearcher baseLocationSearcher;
-
     public LocationQueue(int capacity, LocationSearcher baseLocationSearcher) {
         super(capacity);
         this.baseLocationSearcher = baseLocationSearcher;

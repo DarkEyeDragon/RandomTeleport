@@ -1,7 +1,7 @@
 package me.darkeyedragon.randomtp.api.world.location;
 
-import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
+import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 
 public class RandomLocation {
 

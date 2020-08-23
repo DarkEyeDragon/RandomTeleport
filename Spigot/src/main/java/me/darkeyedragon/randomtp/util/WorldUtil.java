@@ -6,23 +6,31 @@ import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.RandomWorldBorder;
 import me.darkeyedragon.randomtp.api.world.block.BlockFace;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
-import me.darkeyedragon.randomtp.world.SpigotBlock;
 import me.darkeyedragon.randomtp.world.SpigotChunk;
 import me.darkeyedragon.randomtp.world.SpigotWorld;
 import me.darkeyedragon.randomtp.world.SpigotWorldBorder;
+import me.darkeyedragon.randomtp.world.block.SpigotBlock;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.block.Block;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class WorldUtil {
+
+    public static final Map<World, RandomWorld> WORLd_MAP = new HashMap<>();
 
     public static World toWorld(RandomWorld world) {
         return Bukkit.getWorld(world.getUUID());
     }
 
     public static RandomWorld toRandomWorld(World world) {
+        if (WORLd_MAP.containsKey(world)) {
+            return WORLd_MAP.get(world);
+        }
         return new SpigotWorld(world);
     }
 

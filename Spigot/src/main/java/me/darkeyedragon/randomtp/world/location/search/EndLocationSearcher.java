@@ -1,20 +1,12 @@
 package me.darkeyedragon.randomtp.world.location.search;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
-import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
-import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
-import me.darkeyedragon.randomtp.api.world.RandomChunk;
-import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
-import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.search.BaseLocationSearcher;
-import org.bukkit.Chunk;
+import me.darkeyedragon.randomtp.world.block.SpigotMaterial;
 import org.bukkit.Location;
-import org.bukkit.block.Biome;
-import org.bukkit.block.Block;
+import org.bukkit.Material;
 
-import java.util.concurrent.CompletableFuture;
-
-public class EndLocationSearcher extends BaseLocationSearcher<Biome> {
+public class EndLocationSearcher extends BaseLocationSearcher {
 
     protected final int MIN_DISTANCE = 150;
     protected final int MAX_DISTANCE = 150;
@@ -26,6 +18,20 @@ public class EndLocationSearcher extends BaseLocationSearcher<Biome> {
      */
     public EndLocationSearcher(RandomTeleport plugin) {
         super(plugin);
+        blacklistMaterial.add(new SpigotMaterial(Material.LAVA));
+        blacklistMaterial.add(new SpigotMaterial(Material.CACTUS));
+        blacklistMaterial.add(new SpigotMaterial(Material.FIRE));
+        blacklistMaterial.add(new SpigotMaterial(Material.MAGMA_BLOCK));
+        blacklistMaterial.add(new SpigotMaterial(Material.TRIPWIRE));
+        blacklistMaterial.add(new SpigotMaterial(Material.ACACIA_PRESSURE_PLATE));
+        blacklistMaterial.add(new SpigotMaterial(Material.BIRCH_PRESSURE_PLATE));
+        blacklistMaterial.add(new SpigotMaterial(Material.JUNGLE_PRESSURE_PLATE));
+        blacklistMaterial.add(new SpigotMaterial(Material.OAK_PRESSURE_PLATE));
+        blacklistMaterial.add(new SpigotMaterial(Material.SPRUCE_PRESSURE_PLATE));
+        blacklistMaterial.add(new SpigotMaterial(Material.STONE_PRESSURE_PLATE));
+        blacklistMaterial.add(new SpigotMaterial(Material.DARK_OAK_PRESSURE_PLATE));
+        blacklistMaterial.add(new SpigotMaterial(Material.HEAVY_WEIGHTED_PRESSURE_PLATE));
+        blacklistMaterial.add(new SpigotMaterial(Material.LIGHT_WEIGHTED_PRESSURE_PLATE));
     }
 
     /*@Override

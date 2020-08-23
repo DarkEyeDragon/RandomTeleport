@@ -21,8 +21,8 @@ import me.darkeyedragon.randomtp.util.MessageUtil;
 import me.darkeyedragon.randomtp.util.WorldUtil;
 import me.darkeyedragon.randomtp.world.location.LocationFactory;
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -149,6 +149,7 @@ public class TeleportCommand extends BaseCommand {
                 if (offsetX == null) offsetX = 0;
                 if (offsetZ == null) offsetZ = 0;
             }
+            WorldUtil.WORLd_MAP.put(Bukkit.getWorld(randomWorld.getUUID()), randomWorld);
             configWorld.getWorldSet().put(randomWorld, new WorldConfigSection(offsetX, offsetZ, radius, randomWorld, useWorldBorder, needsWorldPermission));
             LocationQueue locationQueue = plugin.getQueue(WorldUtil.toRandomWorld(world));
             if (locationQueue != null) {

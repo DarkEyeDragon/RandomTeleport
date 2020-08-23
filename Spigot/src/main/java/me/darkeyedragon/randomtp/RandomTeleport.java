@@ -19,6 +19,7 @@ import me.darkeyedragon.randomtp.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.failsafe.listener.PlayerDeathListener;
 import me.darkeyedragon.randomtp.listener.PluginLoadListener;
 import me.darkeyedragon.randomtp.listener.WorldLoadListener;
+import me.darkeyedragon.randomtp.util.WorldUtil;
 import me.darkeyedragon.randomtp.validator.ValidatorFactory;
 import me.darkeyedragon.randomtp.world.location.LocationFactory;
 import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
@@ -42,7 +43,6 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
     private Set<PluginLocationValidator> validatorList;
     private WorldQueue worldQueue;
     private ConfigHandler configHandler;
-    //private BaseLocationSearcher locationSearcher;
     private LocationFactory locationFactory;
     private DeathTracker deathTracker;
     //Economy
@@ -110,14 +110,16 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
-        getLogger().info("Unregistering commands...");
-        manager.unregisterCommands();
         worldQueue.clear();
     }
 
     public void populateWorldQueue() {
+        Bukkit.getLogger().info("Populating WorldQueue");
+        long startTime = System.currentTimeMillis();
         for (SectionWorldDetail worldDetail : configHandler.getSectionWorld().getWorldSet().values()) {
             RandomWorld world = worldDetail.getWorld();
+            //TODO Figure out how to deal with this
+            WorldUtil.WORLd_MAP.put(Bukkit.getWorld(world.getUUID()), world);
             //Add a new world to the world queue and generate random locations
             LocationQueue locationQueue = new LocationQueue(configHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(world, this));
             //Subscribe to the locationqueue to be notified of changes
@@ -125,8 +127,8 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
             SectionWorldDetail sectionWorldDetail = getLocationFactory().getWorldConfigSection(world);
             locationQueue.generate(sectionWorldDetail);
             getWorldQueue().put(world, locationQueue);
-
         }
+        Bukkit.getLogger().info("WorldQueue population finished in " + (System.currentTimeMillis() - startTime) + "ms");
     }
 
     public void subscribe(LocationQueue locationQueue, RandomWorld world) {

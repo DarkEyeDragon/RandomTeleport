@@ -8,6 +8,7 @@ import me.darkeyedragon.randomtp.api.world.RandomWorldBorder;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.util.WorldUtil;
+import me.darkeyedragon.randomtp.world.block.SpigotBlock;
 import org.bukkit.World;
 
 import java.util.UUID;
@@ -33,7 +34,11 @@ public class SpigotWorld implements RandomWorld {
 
     @Override
     public CompletableFuture<RandomChunk> getChunkAtAsync(RandomWorld world, int x, int z) {
-        return PaperLib.getChunkAtAsync(WorldUtil.toWorld(world), x, z).thenApply(SpigotChunk::new);
+        World regWorld = WorldUtil.toWorld(world);
+        if (PaperLib.isPaper()) {
+            return regWorld.getChunkAtAsyncUrgently(x, z).thenApply(SpigotChunk::new);
+        }
+        return PaperLib.getChunkAtAsync(regWorld, x, z).thenApply(SpigotChunk::new);
     }
 
     @Override
