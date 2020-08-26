@@ -21,7 +21,6 @@ import me.darkeyedragon.randomtp.util.MessageUtil;
 import me.darkeyedragon.randomtp.util.WorldUtil;
 import me.darkeyedragon.randomtp.world.location.LocationFactory;
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -68,7 +67,7 @@ public class TeleportCommand extends BaseCommand {
             if (sender instanceof Player) {
                 player = (Player) sender;
                 newWorld = WorldUtil.toRandomWorld(player.getWorld());
-                if (!configWorld.getWorldSet().containsKey(newWorld)) {
+                if (!configWorld.contains(newWorld)) {
                     MessageUtil.sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
                     return;
                 }
@@ -80,7 +79,7 @@ public class TeleportCommand extends BaseCommand {
                 if (sender.hasPermission("rtp.teleport.other")) {
                     player = target.getPlayer();
                     newWorld = WorldUtil.toRandomWorld(world);
-                    if (!configWorld.getWorldSet().containsKey(newWorld)) {
+                    if (!configWorld.contains(newWorld)) {
                         MessageUtil.sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
                         return;
                     }
@@ -92,7 +91,7 @@ public class TeleportCommand extends BaseCommand {
                 if (sender instanceof Player) {
                     player = (Player) sender;
                     newWorld = target.getWorld();
-                    if (!configWorld.getWorldSet().containsKey(newWorld)) {
+                    if (!configWorld.contains(newWorld)) {
                         MessageUtil.sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
                         return;
                     }
@@ -143,15 +142,15 @@ public class TeleportCommand extends BaseCommand {
             commandSender.sendMessage(ChatColor.GOLD + "If " + ChatColor.AQUA + "useWorldBorder" + ChatColor.GOLD + " is false you need to provide the other parameters.");
             throw new InvalidCommandArgument(true);
         }
-        if (!configWorld.getWorldSet().containsKey(randomWorld)) {
+        if (!configWorld.contains(randomWorld)) {
             if (useWorldBorder) {
                 if (radius == null) radius = 0;
                 if (offsetX == null) offsetX = 0;
                 if (offsetZ == null) offsetZ = 0;
             }
-            WorldUtil.WORLd_MAP.put(Bukkit.getWorld(randomWorld.getUUID()), randomWorld);
-            configWorld.getWorldSet().put(randomWorld, new WorldConfigSection(offsetX, offsetZ, radius, randomWorld, useWorldBorder, needsWorldPermission));
-            LocationQueue locationQueue = plugin.getQueue(WorldUtil.toRandomWorld(world));
+            //WorldUtil.WORLD_MAP.put(Bukkit.getWorld(randomWorld.getUUID()), randomWorld);
+            configWorld.add(new WorldConfigSection(offsetX, offsetZ, radius, randomWorld, useWorldBorder, needsWorldPermission));
+            LocationQueue locationQueue = plugin.getQueue(randomWorld);
             if (locationQueue != null) {
                 commandSender.sendMessage(ChatColor.GREEN + "Successfully added to config.");
                 locationQueue.subscribe(new QueueListener<RandomLocation>() {
@@ -182,9 +181,11 @@ public class TeleportCommand extends BaseCommand {
     @CommandPermission("rtp.admin.removeworld")
     public void removeWorld(CommandSender commandSender, World world) {
         RandomWorld randomWorld = WorldUtil.toRandomWorld(world);
-        if (configWorld.getWorldSet().containsKey(randomWorld)) {
-            if (configWorld.getWorldSet().remove(randomWorld) != null) {
-                commandSender.sendMessage(ChatColor.GREEN + "Removed world from the config and queue!");
+        if (configWorld.contains(randomWorld)) {
+            if (configWorld.remove(randomWorld)) {
+                MessageUtil.sendMessage(commandSender, ChatColor.GREEN + "Removed world from the config and queue!");
+            } else {
+                MessageUtil.sendMessage(commandSender, ChatColor.RED + "Something went wrong with removing the world! Is it already removed?");
             }
         } else {
             commandSender.sendMessage(ChatColor.RED + "That world is not not in the config!");

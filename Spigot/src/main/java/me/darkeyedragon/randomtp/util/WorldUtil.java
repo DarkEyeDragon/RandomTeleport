@@ -21,15 +21,15 @@ import java.util.Map;
 
 public class WorldUtil {
 
-    public static final Map<World, RandomWorld> WORLd_MAP = new HashMap<>();
+    public static final Map<World, RandomWorld> WORLD_MAP = new HashMap<>();
 
     public static World toWorld(RandomWorld world) {
         return Bukkit.getWorld(world.getUUID());
     }
 
     public static RandomWorld toRandomWorld(World world) {
-        if (WORLd_MAP.containsKey(world)) {
-            return WORLd_MAP.get(world);
+        if (WORLD_MAP.containsKey(world)) {
+            return WORLD_MAP.get(world);
         }
         return new SpigotWorld(world);
     }

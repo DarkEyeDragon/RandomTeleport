@@ -116,10 +116,9 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
     public void populateWorldQueue() {
         Bukkit.getLogger().info("Populating WorldQueue");
         long startTime = System.currentTimeMillis();
-        for (SectionWorldDetail worldDetail : configHandler.getSectionWorld().getWorldSet().values()) {
-            RandomWorld world = worldDetail.getWorld();
+        for (RandomWorld world : configHandler.getSectionWorld().getWorlds()) {
             //TODO Figure out how to deal with this
-            WorldUtil.WORLd_MAP.put(Bukkit.getWorld(world.getUUID()), world);
+            WorldUtil.WORLD_MAP.put(Bukkit.getWorld(world.getUUID()), world);
             //Add a new world to the world queue and generate random locations
             LocationQueue locationQueue = new LocationQueue(configHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(world, this));
             //Subscribe to the locationqueue to be notified of changes

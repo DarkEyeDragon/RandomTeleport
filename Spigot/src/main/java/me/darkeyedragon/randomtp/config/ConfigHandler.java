@@ -14,9 +14,20 @@ import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 public class ConfigHandler implements RandomConfigHandler {
+
+    //Paths
+    public static String MESSAGE_PATH = "message";
+    public static String QUEUE_PATH = "queue";
+    public static String WORLDS_PATH = "worlds";
+    public static String TELEPORT_PATH = "teleport";
+    public static String PLUGINS_PATH = "plugins";
+    public static String DEBUG_PATH = "debug";
 
     private final RandomTeleport plugin;
     private ConfigMessage configMessage;
@@ -67,7 +78,7 @@ public class ConfigHandler implements RandomConfigHandler {
     }
 
     public void populateWorldConfigSection() {
-        configWorld = new ConfigWorld(plugin).set(getOffsets());
+        configWorld = new ConfigWorld(plugin, getOffsets());
     }
 
     public void populateConfigTeleport() {
@@ -153,10 +164,10 @@ public class ConfigHandler implements RandomConfigHandler {
         return plugin.getConfig().getString("message.countdown");
     }
 
-    private WorldConfig getOffsets() {
+    private Set<SectionWorldDetail> getOffsets() {
         final ConfigurationSection section = plugin.getConfig().getConfigurationSection("worlds");
         Set<String> keys = Objects.requireNonNull(section).getKeys(false);
-        Map<RandomWorld, SectionWorldDetail> offsetMap = new HashMap<>(keys.size());
+        Set<SectionWorldDetail> sectionWorldDetailSet = new HashSet<>(keys.size());
         for (String key : keys) {
             World world = Bukkit.getWorld(key);
             if (world == null) {
@@ -170,9 +181,9 @@ public class ConfigHandler implements RandomConfigHandler {
             int offsetZ = section.getInt(key + ".offsetZ");
             plugin.getLogger().info(ChatColor.GREEN + key + " found! Loading...");
             RandomWorld randomWorld = WorldUtil.toRandomWorld(world);
-            offsetMap.put(randomWorld, new WorldConfigSection(offsetX, offsetZ, radius, randomWorld, useWorldBorder, needsWorldPermission));
+            sectionWorldDetailSet.add(new WorldConfigSection(offsetX, offsetZ, radius, randomWorld, useWorldBorder, needsWorldPermission));
         }
-        return new WorldConfig(offsetMap);
+        return sectionWorldDetailSet;
     }
 
     private String getInsufficientFundsMessage() {

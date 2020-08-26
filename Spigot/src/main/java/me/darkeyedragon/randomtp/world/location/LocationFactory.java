@@ -5,8 +5,6 @@ import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.RandomWorldBorder;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
 
-import java.util.Map;
-
 public class LocationFactory {
 
     private final ConfigHandler configHandler;
@@ -16,8 +14,7 @@ public class LocationFactory {
     }
 
     public WorldConfigSection getWorldConfigSection(RandomWorld randomWorld){
-        Map<RandomWorld, SectionWorldDetail> worldMap = configHandler.getSectionWorld().getWorldSet();
-        SectionWorldDetail sectionWorldDetail = worldMap.get(randomWorld);
+        SectionWorldDetail sectionWorldDetail = configHandler.getSectionWorld().getSectionWorldDetail(randomWorld);
         int offsetX = 0;
         int offsetZ = 0;
         int radius = 0;

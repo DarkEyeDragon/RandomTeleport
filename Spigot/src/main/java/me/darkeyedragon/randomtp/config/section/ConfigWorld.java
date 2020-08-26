@@ -10,59 +10,66 @@ import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
 import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
 import org.bukkit.configuration.ConfigurationSection;
 
-import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 public class ConfigWorld implements SectionWorld {
 
-    private SectionWorld sectionWorld;
     private final RandomTeleport plugin;
     private final ConfigurationSection section;
+    private final Set<SectionWorldDetail> sectionWorldDetailSet;
 
-    public ConfigWorld(RandomTeleport plugin) {
+    public ConfigWorld(RandomTeleport plugin, Set<SectionWorldDetail> sectionWorldDetailsSet) {
         this.plugin = plugin;
         section = plugin.getConfig().getConfigurationSection("worlds");
+        this.sectionWorldDetailSet = sectionWorldDetailsSet;
     }
 
+    @Override
+    public SectionWorldDetail getSectionWorldDetail(RandomWorld randomWorld) {
+        for (SectionWorldDetail sectionWorldDetail : sectionWorldDetailSet) {
+            if (sectionWorldDetail.getWorld() == randomWorld) {
+                return sectionWorldDetail;
+            }
+        }
+        return null;
+    }
 
-    public ConfigWorld set(SectionWorld sectionWorld) {
-        this.sectionWorld = sectionWorld;
+    @Override
+    public ConfigWorld setSectionDetail(SectionWorldDetail sectionWorld) {
+        sectionWorldDetailSet.add(sectionWorld);
         return this;
     }
 
-    public SectionWorldDetail get(RandomWorld world) {
-        return sectionWorld.getWorldSet().get(world);
-    }
-
-    public SectionWorld getSectionWorld() {
-        return sectionWorld;
-    }
-
+    @Override
     public Set<RandomWorld> getWorlds() {
-        return sectionWorld.getWorldSet().keySet();
+        return sectionWorldDetailSet.stream().map(SectionWorldDetail::getWorld).collect(Collectors.toSet());
     }
 
+    @Override
     public boolean contains(RandomWorld world) {
-        return sectionWorld.getWorldSet().containsKey(world);
+        for (SectionWorldDetail sectionWorldDetail : sectionWorldDetailSet) {
+            if (sectionWorldDetail.getWorld() == world) return true;
+        }
+        return false;
     }
 
-    public boolean contains(WorldConfigSection worldConfigSection) {
-        return sectionWorld.getWorldSet().containsKey(worldConfigSection.getWorld());
-    }
-
-    public LocationQueue add(WorldConfigSection worldConfigSection) {
+    @Override
+    public LocationQueue add(SectionWorldDetail sectionWorldDetail) {
         if (section == null) {
             return null;
         }
-        section.set(worldConfigSection.getWorld().getName() + ".use_worldborder", worldConfigSection.useWorldBorder());
-        section.set(worldConfigSection.getWorld().getName() + ".needs_world_permission", worldConfigSection.needsWorldPermission());
-        section.set(worldConfigSection.getWorld().getName() + ".radius", worldConfigSection.getRadius());
-        section.set(worldConfigSection.getWorld().getName() + ".offsetX", worldConfigSection.getX());
-        section.set(worldConfigSection.getWorld().getName() + ".offsetZ", worldConfigSection.getZ());
+        RandomWorld randomWorld = sectionWorldDetail.getWorld();
+        String worldName = randomWorld.getName();
+        section.set(worldName + ".use_worldborder", sectionWorldDetail.useWorldBorder());
+        section.set(worldName + ".needs_world_permission", sectionWorldDetail.needsWorldPermission());
+        section.set(worldName + ".radius", sectionWorldDetail.getRadius());
+        section.set(worldName + ".offsetX", sectionWorldDetail.getX());
+        section.set(worldName + ".offsetZ", sectionWorldDetail.getZ());
         plugin.saveConfig();
-        sectionWorld.getWorldSet().put(worldConfigSection.getWorld(), worldConfigSection);
-        return generateLocations(worldConfigSection.getWorld());
+        sectionWorldDetailSet.add(sectionWorldDetail);
+        return generateLocations(randomWorld);
     }
 
     private LocationQueue generateLocations(RandomWorld world) {
@@ -75,18 +82,20 @@ public class ConfigWorld implements SectionWorld {
         return locationQueue;
     }
 
+    @Override
     public boolean remove(RandomWorld world) {
         if (section == null || !section.contains(world.getName())) {
             return false;
         }
         section.set(world.getName(), null);
+        sectionWorldDetailSet.remove(getSectionWorldDetail(world));
         plugin.saveConfig();
         plugin.getWorldQueue().remove(world);
         return true;
     }
 
     @Override
-    public Map<RandomWorld, SectionWorldDetail> getWorldSet() {
-        return sectionWorld.getWorldSet();
+    public Set<SectionWorldDetail> getSectionWorldDetailSet() {
+        return sectionWorldDetailSet;
     }
 }
