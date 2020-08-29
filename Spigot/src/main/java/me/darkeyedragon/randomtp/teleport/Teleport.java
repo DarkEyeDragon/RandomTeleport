@@ -44,11 +44,11 @@ public class Teleport {
             try {
                 ecoHandler = EcoFactory.getInstance();
                 if (!ecoHandler.hasEnough(player, price)) {
-                    MessageUtil.sendMessage(player, configHandler.getSectionMessage().getSubSectionEconomy().getInsufficientFunds());
+                    MessageUtil.sendMessage(plugin, player, configHandler.getSectionMessage().getSubSectionEconomy().getInsufficientFunds());
                     return;
                 }
             } catch (EcoNotSupportedException e) {
-                property.getCommandSender().sendMessage(ChatColor.RED + "Economy based features are disabled. Vault not found. Set the rtp cost to 0 or install vault.");
+                MessageUtil.sendMessage(plugin, property.getCommandSender(), ChatColor.RED + "Economy based features are disabled. Vault not found. Set the rtp cost to 0 or install vault.");
                 Bukkit.getLogger().severe("Economy based features are disabled. Vault not found. Set the rtp cost to 0 or install vault.");
             }
 
@@ -65,14 +65,14 @@ public class Teleport {
             long remaining = lastTp + property.getCooldown() - System.currentTimeMillis();
             boolean ableToTp = remaining < 0;
             if (!ableToTp) {
-                MessageUtil.sendMessage(player, configHandler.getSectionMessage().getCountdown(remaining));
+                MessageUtil.sendMessage(plugin, player, configHandler.getSectionMessage().getCountdown(remaining));
                 return;
             }
         }
         if (delay == 0) {
             teleport();
         } else {
-            MessageUtil.sendMessage(player, configHandler.getSectionMessage().getInitTeleportDelay(delay));
+            MessageUtil.sendMessage(plugin, player, configHandler.getSectionMessage().getInitTeleportDelay(delay));
             AtomicBoolean complete = new AtomicBoolean(false);
             int taskId = Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 complete.set(true);
@@ -87,7 +87,7 @@ public class Teleport {
                     } else if ((originalLoc.getX() != currentLoc.getX() || originalLoc.getY() != currentLoc.getY() || originalLoc.getZ() != currentLoc.getZ())) {
                         Bukkit.getScheduler().cancelTask(taskId);
                         bukkitTask.cancel();
-                        player.sendMessage(configHandler.getSectionMessage().getTeleportCanceled());
+                        MessageUtil.sendMessage(plugin, player, configHandler.getSectionMessage().getTeleportCanceled());
                     }
                 }, 0, 5L);
             }
@@ -111,7 +111,7 @@ public class Teleport {
     private void teleport() {
         RandomLocation randomLocation = plugin.getWorldQueue().popLocation(property.getWorld());
         if (randomLocation == null) {
-            property.getCommandSender().sendMessage(configHandler.getSectionMessage().getDepletedQueue());
+            MessageUtil.sendMessage(plugin, property.getCommandSender(), configHandler.getSectionMessage().getDepletedQueue());
             return;
         }
         Location location = LocationUtil.toLocation(randomLocation);
@@ -131,10 +131,10 @@ public class Teleport {
             }
             if (property.isUseEco() && EcoFactory.isUseEco()) {
                 ecoHandler.makePayment(player, configHandler.getSectionEconomy().getPrice());
-                MessageUtil.sendMessage(player, configHandler.getSectionMessage().getSubSectionEconomy().getPayment());
+                MessageUtil.sendMessage(plugin, player, configHandler.getSectionMessage().getSubSectionEconomy().getPayment());
             }
             drawWarpParticles(player);
-            MessageUtil.sendMessage(player, configHandler.getSectionMessage().getTeleport(randomLocation));
+            MessageUtil.sendMessage(plugin, player, configHandler.getSectionMessage().getTeleport(randomLocation));
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(property.getWorld());
                 plugin.getWorldQueue().get(property.getWorld()).generate(worldConfigSection, 1);

@@ -68,7 +68,7 @@ public class TeleportCommand extends BaseCommand {
                 player = (Player) sender;
                 newWorld = WorldUtil.toRandomWorld(player.getWorld());
                 if (!configWorld.contains(newWorld)) {
-                    MessageUtil.sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
+                    MessageUtil.sendMessage(plugin, sender, configMessage.getNoWorldPermission(newWorld));
                     return;
                 }
             } else {
@@ -80,11 +80,11 @@ public class TeleportCommand extends BaseCommand {
                     player = target.getPlayer();
                     newWorld = WorldUtil.toRandomWorld(world);
                     if (!configWorld.contains(newWorld)) {
-                        MessageUtil.sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
+                        MessageUtil.sendMessage(plugin, sender, configMessage.getNoWorldPermission(newWorld));
                         return;
                     }
                 } else {
-                    sender.sendMessage(ChatColor.RED + "I'm sorry, you do not have permission to perform this command!");
+                    MessageUtil.sendMessage(plugin, sender, ChatColor.RED + "I'm sorry, you do not have permission to perform this command!");
                     return;
                 }
             } else if (target.isWorld()) {
@@ -92,12 +92,12 @@ public class TeleportCommand extends BaseCommand {
                     player = (Player) sender;
                     newWorld = target.getWorld();
                     if (!configWorld.contains(newWorld)) {
-                        MessageUtil.sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
+                        MessageUtil.sendMessage(plugin, sender, configMessage.getNoWorldPermission(newWorld));
                         return;
                     }
                     WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(newWorld);
                     if (worldConfigSection == null || ((!sender.hasPermission("rtp.world." + newWorld.getName())) && worldConfigSection.needsWorldPermission())) {
-                        MessageUtil.sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
+                        MessageUtil.sendMessage(plugin, sender, configMessage.getNoWorldPermission(newWorld));
                         return;
                     }
 
@@ -119,27 +119,27 @@ public class TeleportCommand extends BaseCommand {
 
     @Subcommand("reload")
     @CommandPermission("rtp.admin.reload")
-    public void onReload(CommandSender commandSender) {
-        commandSender.sendMessage(ChatColor.GREEN + "Reloading config...");
+    public void onReload(CommandSender sender) {
+        sender.sendMessage(ChatColor.GREEN + "Reloading config...");
         plugin.saveDefaultConfig();
         plugin.reloadConfig();
         plugin.getConfigHandler().reload();
         //Set the new config object references
         setConfigs();
-        commandSender.sendMessage(ChatColor.GREEN + "Clearing queue...");
+        MessageUtil.sendMessage(plugin, sender, ChatColor.GREEN + "Clearing queue...");
         worldQueue.clear();
-        commandSender.sendMessage(ChatColor.GREEN + "Repopulating queue, this can take a while.");
+        MessageUtil.sendMessage(plugin, sender, ChatColor.GREEN + "Repopulating queue, this can take a while.");
         plugin.populateWorldQueue();
-        commandSender.sendMessage(ChatColor.GREEN + "Reloaded config");
+        MessageUtil.sendMessage(plugin, sender, ChatColor.GREEN + "Reloaded config");
     }
 
     @Subcommand("addworld")
     @CommandPermission("rtp.admin.addworld")
     @CommandCompletion("@worlds true|false true|false <Integer> <Integer> <Integer>")
-    public void onAddWorld(CommandSender commandSender, World world, boolean useWorldBorder, boolean needsWorldPermission, @Optional Integer radius, @Optional Integer offsetX, @Optional Integer offsetZ) {
+    public void onAddWorld(CommandSender sender, World world, boolean useWorldBorder, boolean needsWorldPermission, @Optional Integer radius, @Optional Integer offsetX, @Optional Integer offsetZ) {
         RandomWorld randomWorld = WorldUtil.toRandomWorld(world);
         if (!useWorldBorder && (radius == null || offsetX == null || offsetZ == null)) {
-            commandSender.sendMessage(ChatColor.GOLD + "If " + ChatColor.AQUA + "useWorldBorder" + ChatColor.GOLD + " is false you need to provide the other parameters.");
+            MessageUtil.sendMessage(plugin, sender, ChatColor.GOLD + "If " + ChatColor.AQUA + "useWorldBorder" + ChatColor.GOLD + " is false you need to provide the other parameters.");
             throw new InvalidCommandArgument(true);
         }
         if (!configWorld.contains(randomWorld)) {
@@ -152,13 +152,13 @@ public class TeleportCommand extends BaseCommand {
             configWorld.add(new WorldConfigSection(offsetX, offsetZ, radius, randomWorld, useWorldBorder, needsWorldPermission));
             LocationQueue locationQueue = plugin.getQueue(randomWorld);
             if (locationQueue != null) {
-                commandSender.sendMessage(ChatColor.GREEN + "Successfully added to config.");
+                MessageUtil.sendMessage(plugin, sender, ChatColor.GREEN + "Successfully added to config.");
                 locationQueue.subscribe(new QueueListener<RandomLocation>() {
                     @Override
                     public void onAdd(RandomLocation element) {
-                        commandSender.sendMessage(ChatColor.GREEN + "Safe location added for " + ChatColor.GOLD + element.getWorld().getName() + ChatColor.GREEN + " (" + ChatColor.YELLOW + locationQueue.size() + ChatColor.GREEN + "/" + configQueue.getSize() + ")");
+                        MessageUtil.sendMessage(plugin, sender, ChatColor.GREEN + "Safe location added for " + ChatColor.GOLD + element.getWorld().getName() + ChatColor.GREEN + " (" + ChatColor.YELLOW + locationQueue.size() + ChatColor.GREEN + "/" + configQueue.getSize() + ")");
                         if (locationQueue.size() == configQueue.getSize()) {
-                            commandSender.sendMessage(ChatColor.GREEN + "Queue populated for " + ChatColor.GOLD + element.getWorld().getName());
+                            MessageUtil.sendMessage(plugin, sender, ChatColor.GREEN + "Queue populated for " + ChatColor.GOLD + element.getWorld().getName());
                             locationQueue.unsubscribe(this);
                         }
                     }
@@ -169,39 +169,39 @@ public class TeleportCommand extends BaseCommand {
                     }
                 });
             } else {
-                commandSender.sendMessage(ChatColor.RED + "Size section not present in the config! Add it or recreate your config.");
+                MessageUtil.sendMessage(plugin, sender, ChatColor.RED + "Size section not present in the config! Add it or recreate your config.");
             }
         } else {
-            commandSender.sendMessage(ChatColor.RED + "That world is already added to the list!");
+            MessageUtil.sendMessage(plugin, sender, ChatColor.RED + "That world is already added to the list!");
         }
     }
 
     @Subcommand("removeworld")
     @CommandCompletion("@worlds")
     @CommandPermission("rtp.admin.removeworld")
-    public void removeWorld(CommandSender commandSender, World world) {
+    public void removeWorld(CommandSender sender, World world) {
         RandomWorld randomWorld = WorldUtil.toRandomWorld(world);
         if (configWorld.contains(randomWorld)) {
             if (configWorld.remove(randomWorld)) {
-                MessageUtil.sendMessage(commandSender, ChatColor.GREEN + "Removed world from the config and queue!");
+                MessageUtil.sendMessage(plugin, sender, ChatColor.GREEN + "Removed world from the config and queue!");
             } else {
-                MessageUtil.sendMessage(commandSender, ChatColor.RED + "Something went wrong with removing the world! Is it already removed?");
+                MessageUtil.sendMessage(plugin, sender, ChatColor.RED + "Something went wrong with removing the world! Is it already removed?");
             }
         } else {
-            commandSender.sendMessage(ChatColor.RED + "That world is not not in the config!");
+            MessageUtil.sendMessage(plugin, sender, ChatColor.RED + "That world is not not in the config!");
         }
     }
 
     @Subcommand("resetcooldown")
     @CommandCompletion("@players")
     @CommandPermission("rtp.admin.resetcooldown")
-    public void resetCooldown(CommandSender commandSender, OnlinePlayer target) {
+    public void resetCooldown(CommandSender sender, OnlinePlayer target) {
         if (target != null) {
             Player player = target.getPlayer();
             if (plugin.getCooldowns().remove(player.getUniqueId()) != null) {
-                commandSender.sendMessage(ChatColor.GREEN + "Cooldown reset for " + player.getName());
+                MessageUtil.sendMessage(plugin, sender, ChatColor.GREEN + "Cooldown reset for " + player.getName());
             } else {
-                commandSender.sendMessage(ChatColor.RED + "There was no cooldown for " + player.getName());
+                MessageUtil.sendMessage(plugin, sender, ChatColor.RED + "There was no cooldown for " + player.getName());
             }
         }
     }
@@ -209,11 +209,11 @@ public class TeleportCommand extends BaseCommand {
     @Subcommand("setprice")
     @CommandCompletion("<price>")
     @CommandPermission("rtp.admin.setprice")
-    public void setPrice(CommandSender commandSender, double price) {
+    public void setPrice(CommandSender sender, double price) {
         if (price >= 0) {
             plugin.getConfigHandler().setTeleportPrice(price);
         } else {
-            commandSender.sendMessage(ChatColor.RED + "Only positive numbers are allowed.");
+            MessageUtil.sendMessage(plugin, sender, ChatColor.RED + "Only positive numbers are allowed.");
         }
     }
 }

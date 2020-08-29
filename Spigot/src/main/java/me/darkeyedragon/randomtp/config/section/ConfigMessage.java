@@ -6,6 +6,8 @@ import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.util.CustomTime;
 import me.darkeyedragon.randomtp.util.TimeUtil;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.ChatColor;
 
 public class ConfigMessage implements SectionMessage {
@@ -70,84 +72,84 @@ public class ConfigMessage implements SectionMessage {
     }
 
     @Override
-    public String getInitTeleport() {
+    public Component getInitTeleport() {
         String message = init;
         if (message != null) {
-            return ChatColor.translateAlternateColorCodes('&', message);
+            return MiniMessage.get().parse(message);
         }
         return null;
     }
 
     @Override
-    public String getTeleport(RandomLocation location) {
+    public Component getTeleport(RandomLocation location) {
         String message = teleport;
         if (message != null) {
             message = ChatColor.translateAlternateColorCodes('&', message);
             message = message.replaceAll("%posX", location.getX() + "")
                     .replaceAll("%posY", location.getY() + "")
                     .replaceAll("%posZ", location.getZ() + "");
-            return message;
+            return MiniMessage.get().parse(message);
         }
         return null;
     }
 
     @Override
-    public String getInitTeleportDelay(long millis) {
+    public Component getInitTeleportDelay(long millis) {
         String message = initTeleportDelay;
         if (message != null) {
             message = ChatColor.translateAlternateColorCodes('&', message);
             CustomTime time = TimeUtil.formatTime(millis * 50);
             message = TimeUtil.toFormattedString(message, time);
-            return message;
+            return MiniMessage.get().parse(message);
         }
         return null;
     }
 
-    public String getTeleportCanceled() {
+    public Component getTeleportCanceled() {
         String message = teleportCanceled;
         if (message != null) {
             message = ChatColor.translateAlternateColorCodes('&', message);
-            return message;
+            return MiniMessage.get().parse(message);
         }
         return null;
     }
 
-    public String getDepletedQueue() {
+    public Component getDepletedQueue() {
         String message = depletedQueue;
         if (message != null) {
             message = ChatColor.translateAlternateColorCodes('&', message);
-            return message;
+            return MiniMessage.get().parse(message);
         }
         return null;
     }
 
-    public String getCountdown(long remainingTime) {
+    public Component getCountdown(long remainingTime) {
         String message = countdown;
         if (message != null) {
             message = ChatColor.translateAlternateColorCodes('&', message);
             CustomTime duration = TimeUtil.formatTime(remainingTime);
             message = TimeUtil.toFormattedString(message, duration);
-            return message;
+            return MiniMessage.get().parse(message);
         }
         return null;
     }
 
     @Override
-    public String getNoWorldPermission(RandomWorld world) {
+    public Component getNoWorldPermission(RandomWorld world) {
         String message = noWorldPermission;
         if (message != null) {
             message = message.replace("%world", world.getName());
             message = ChatColor.translateAlternateColorCodes('&', message);
-            return message;
+            return MiniMessage.get().parse(message);
         }
         return null;
     }
 
-    public String getEmptyQueue() {
+    public Component getEmptyQueue() {
         String message = emptyQueue;
         if (message != null) {
             message = ChatColor.translateAlternateColorCodes('&', message);
-            return message;
+            return MiniMessage.get().parse(message);
         }
         return null;
     }
@@ -158,7 +160,7 @@ public class ConfigMessage implements SectionMessage {
     }
 
 
-    public static class Economy implements SubSectionEconomy{
+    public static class Economy implements SubSectionEconomy {
 
         private String insufficientFunds;
         private String payment;
@@ -173,20 +175,20 @@ public class ConfigMessage implements SectionMessage {
             return this;
         }
 
-        public String getInsufficientFunds() {
+        public Component getInsufficientFunds() {
             String message = insufficientFunds;
             if (message != null) {
                 message = ChatColor.translateAlternateColorCodes('&', message);
-                return message;
+                return MiniMessage.get().parse(message);
             }
             return null;
         }
 
-        public String getPayment() {
+        public Component getPayment() {
             String message = payment;
             if (message != null) {
                 message = ChatColor.translateAlternateColorCodes('&', message);
-                return message;
+                return MiniMessage.get().parse(message);
             }
             return null;
         }

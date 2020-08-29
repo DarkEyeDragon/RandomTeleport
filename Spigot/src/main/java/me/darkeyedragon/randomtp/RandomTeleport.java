@@ -23,6 +23,7 @@ import me.darkeyedragon.randomtp.util.WorldUtil;
 import me.darkeyedragon.randomtp.validator.ValidatorFactory;
 import me.darkeyedragon.randomtp.world.location.LocationFactory;
 import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -45,66 +46,13 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
     private ConfigHandler configHandler;
     private LocationFactory locationFactory;
     private DeathTracker deathTracker;
+    private BukkitAudiences bukkitAudience;
     //Economy
     private Economy econ;
     private static EcoHandler ecoHandler;
 
-    @Override
-    public void onEnable() {
-        // Plugin startup logic
-        saveDefaultConfig();
-        manager = new PaperCommandManager(this);
-        configHandler = new ConfigHandler(this);
-        configHandler.reload();
-        locationFactory = new LocationFactory(configHandler);
-        deathTracker = new DeathTracker(this);
-        //check if the first argument is a world or player
-        worldQueue = new WorldQueue();
-        manager.getCommandContexts().registerContext(PlayerWorldContext.class, c -> {
-            String arg1 = c.popFirstArg();
-            World world = Bukkit.getWorld(arg1);
-            Player player = Bukkit.getPlayer(arg1);
-            PlayerWorldContext context = new PlayerWorldContext();
-            if (world != null) {
-                context.setWorld(world);
-                return context;
-            } else if (player != null) {
-                context.setPlayer(player);
-                return context;
-            } else {
-                throw new InvalidCommandArgument(true);
-            }
-        });
-        cooldowns = new HashMap<>();
-        if (setupEconomy()) {
-            getLogger().info("Vault found. Hooking into it.");
-            EcoFactory.createDefault(econ);
-        } else {
-            getLogger().warning("Vault not found. Currency based options are disabled.");
-        }
-        manager.registerCommand(new TeleportCommand(this));
-        getServer().getPluginManager().registerEvents(new WorldLoadListener(this), this);
-        getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), this);
-        validatorList = new HashSet<>();
-        getLogger().info(ChatColor.AQUA + "======== [Loading validators] ========");
-        configHandler.getSectionPlugin().getPlugins().forEach(s -> {
-            if (getServer().getPluginManager().getPlugin(s) != null) {
-                PluginLocationValidator validator = ValidatorFactory.createFrom(s);
-                if (validator != null) {
-                    if (validator.isLoaded()) {
-                        getLogger().info(ChatColor.GREEN + s + " -- Successfully loaded");
-                    } else {
-                        getLogger().warning(ChatColor.RED + s + " is not loaded yet. Trying to fix by loading later...");
-                    }
-                    validatorList.add(validator);
-                }
-            } else {
-                getLogger().warning(ChatColor.RED + s + " -- Not Found.");
-            }
-        });
-        getServer().getPluginManager().registerEvents(new PluginLoadListener(this), this);
-        getLogger().info(ChatColor.AQUA + "======================================");
-        populateWorldQueue();
+    public static EcoHandler getEcoHandler() {
+        return ecoHandler;
     }
 
     @Override
@@ -190,5 +138,72 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
 
     public DeathTracker getDeathTracker() {
         return deathTracker;
+    }
+
+    @Override
+    public void onEnable() {
+        // Plugin startup logic
+        saveDefaultConfig();
+        bukkitAudience = BukkitAudiences.create(this);
+        manager = new PaperCommandManager(this);
+        configHandler = new ConfigHandler(this);
+        configHandler.reload();
+        locationFactory = new LocationFactory(configHandler);
+        deathTracker = new DeathTracker(this);
+        //check if the first argument is a world or player
+        worldQueue = new WorldQueue();
+        manager.getCommandContexts().registerContext(PlayerWorldContext.class, c -> {
+            String arg1 = c.popFirstArg();
+            World world = Bukkit.getWorld(arg1);
+            Player player = Bukkit.getPlayer(arg1);
+            PlayerWorldContext context = new PlayerWorldContext();
+            if (world != null) {
+                context.setWorld(world);
+                return context;
+            } else if (player != null) {
+                context.setPlayer(player);
+                return context;
+            } else {
+                throw new InvalidCommandArgument(true);
+            }
+        });
+        cooldowns = new HashMap<>();
+        if (setupEconomy()) {
+            getLogger().info("Vault found. Hooking into it.");
+            EcoFactory.createDefault(econ);
+        } else {
+            getLogger().warning("Vault not found. Currency based options are disabled.");
+        }
+        manager.registerCommand(new TeleportCommand(this));
+        getServer().getPluginManager().registerEvents(new WorldLoadListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), this);
+        validatorList = new HashSet<>();
+        getLogger().info(ChatColor.AQUA + "======== [Loading validators] ========");
+        configHandler.getSectionPlugin().getPlugins().forEach(s -> {
+            if (getServer().getPluginManager().getPlugin(s) != null) {
+                PluginLocationValidator validator = ValidatorFactory.createFrom(s);
+                if (validator != null) {
+                    if (validator.isLoaded()) {
+                        getLogger().info(ChatColor.GREEN + s + " -- Successfully loaded");
+                    } else {
+                        getLogger().warning(ChatColor.RED + s + " is not loaded yet. Trying to fix by loading later...");
+                    }
+                    validatorList.add(validator);
+                }
+            } else {
+                getLogger().warning(ChatColor.RED + s + " -- Not Found.");
+            }
+        });
+        getServer().getPluginManager().registerEvents(new PluginLoadListener(this), this);
+        getLogger().info(ChatColor.AQUA + "======================================");
+        populateWorldQueue();
+    }
+
+    public BukkitAudiences getBukkitAudience() {
+        return bukkitAudience;
+    }
+
+    public Economy getEcon() {
+        return econ;
     }
 }

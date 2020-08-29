@@ -1,6 +1,9 @@
 package me.darkeyedragon.randomtp.api.config.section.subsection;
 
-public interface SubSectionEconomy{
-    String getInsufficientFunds();
-    String getPayment();
+import net.kyori.adventure.text.Component;
+
+public interface SubSectionEconomy {
+    Component getInsufficientFunds();
+
+    Component getPayment();
 }
