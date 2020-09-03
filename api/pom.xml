@@ -8,6 +8,8 @@
     <artifactId>Api</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 
+    <name>RandomTeleport-Api</name>
+
     <parent>
         <groupId>me.darkeyedragon</groupId>
         <artifactId>randomtp</artifactId>
