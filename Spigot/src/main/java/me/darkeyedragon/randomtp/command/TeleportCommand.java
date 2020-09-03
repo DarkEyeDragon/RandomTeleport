@@ -21,10 +21,21 @@ import me.darkeyedragon.randomtp.util.MessageUtil;
 import me.darkeyedragon.randomtp.util.WorldUtil;
 import me.darkeyedragon.randomtp.world.location.LocationFactory;
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.Sign;
+import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.Rotatable;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.List;
 
 @CommandAlias("rtp|randomtp|randomteleport")
 public class TeleportCommand extends BaseCommand {
@@ -215,5 +226,41 @@ public class TeleportCommand extends BaseCommand {
         } else {
             MessageUtil.sendMessage(plugin, sender, ChatColor.RED + "Only positive numbers are allowed.");
         }
+    }
+
+    @Subcommand("createSign")
+    @CommandPermission("rtp.admin.createsign")
+    public void createSign(Player player, World world) {
+        List<Block> lastTwoTargetBlocks = player.getLastTwoTargetBlocks(null, 100);
+        if (lastTwoTargetBlocks.size() != 2 || !lastTwoTargetBlocks.get(1).getType().isOccluding()) return;
+        Block targetBlock = lastTwoTargetBlocks.get(1);
+        Block adjacentBlock = lastTwoTargetBlocks.get(0);
+        BlockFace blockFace = targetBlock.getFace(adjacentBlock);
+        if (blockFace == null) {
+            MessageUtil.sendMessage(plugin, player, "You done fucked up boi");
+            return;
+        }
+        Material material;
+        Location location = targetBlock.getRelative(blockFace).getLocation();
+        Block signBlock = location.getBlock();
+        if (blockFace == BlockFace.UP) {
+            material = Material.SPRUCE_SIGN;
+            location.getBlock().setType(material);
+            Rotatable rotatable = (Rotatable) signBlock.getBlockData();
+            rotatable.setRotation(player.getFacing().getOppositeFace());
+        } else {
+            material = Material.SPRUCE_WALL_SIGN;
+            location.getBlock().setType(material);
+            Directional directional = (Directional) signBlock.getBlockData();
+            directional.setFacing(blockFace);
+        }
+        Sign sign = (Sign) signBlock.getState();
+        List<Component> components = configMessage.getSubSectionSign().getComponents(WorldUtil.toRandomWorld(world));
+        //TODO get someone else to implement components on signs
+        for (int i = 0; i < components.size(); i++) {
+            if (i > 4) break;
+            sign.setLine(i, MiniMessage.get().serialize(components.get(i)));
+        }
+        sign.update();
     }
 }

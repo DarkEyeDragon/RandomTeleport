@@ -15,6 +15,9 @@ message:
   economy:
     insufficient_funds: "&cYou do not have enough money to rtp!"
     payment: "&aYou just paid &b%price &ato rtp!"
+  sign:
+    - "<aqua>[RandomTeleport]</aqua>"
+    - "teleport to %world"
 #The amount of pre-generated locations in the queue
 queue:
   size: 5

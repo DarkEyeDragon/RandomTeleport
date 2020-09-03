@@ -2,6 +2,7 @@ package me.darkeyedragon.randomtp.config.section;
 
 import me.darkeyedragon.randomtp.api.config.section.SectionMessage;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SubSectionEconomy;
+import me.darkeyedragon.randomtp.api.config.section.subsection.SubSectionSign;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.util.CustomTime;
@@ -9,6 +10,9 @@ import me.darkeyedragon.randomtp.util.TimeUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.ChatColor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConfigMessage implements SectionMessage {
 
@@ -20,11 +24,13 @@ public class ConfigMessage implements SectionMessage {
     private String countdown;
     private String noWorldPermission;
     private final Economy economy;
+    private final Sign sign;
     private String emptyQueue;
 
 
     public ConfigMessage() {
         this.economy = new Economy();
+        this.sign = new Sign();
     }
 
     public ConfigMessage init(String init) {
@@ -69,6 +75,10 @@ public class ConfigMessage implements SectionMessage {
 
     public Economy getEconomy() {
         return economy;
+    }
+
+    public SubSectionSign getSign() {
+        return sign;
     }
 
     @Override
@@ -159,6 +169,11 @@ public class ConfigMessage implements SectionMessage {
         return this.economy;
     }
 
+    @Override
+    public SubSectionSign getSubSectionSign() {
+        return this.sign;
+    }
+
 
     public static class Economy implements SubSectionEconomy {
 
@@ -194,4 +209,38 @@ public class ConfigMessage implements SectionMessage {
         }
     }
 
+    private static class Sign implements SubSectionSign {
+
+        private final List<String> list;
+        private List<Component> componentList;
+
+        public Sign() {
+            list = new ArrayList<>(4);
+            componentList = new ArrayList<>(4);
+        }
+
+        @Override
+        public List<Component> getComponents(RandomWorld world) {
+            if (componentList.isEmpty()) {
+                for (String item : list) {
+                    String message = item;
+                    message = message.replace("%world", world.getName());
+                    componentList.add(MiniMessage.get().parse(message));
+                }
+            }
+            return componentList;
+        }
+
+        @Override
+        public Sign setComponents(List<String> list) {
+            if (list.isEmpty()) return this;
+            this.list.clear();
+            this.componentList.clear();
+            for (String item : list) {
+                String newItem = ChatColor.translateAlternateColorCodes('&', item);
+                this.list.add(newItem);
+            }
+            return this;
+        }
+    }
 }

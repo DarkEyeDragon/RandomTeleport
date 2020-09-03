@@ -69,6 +69,7 @@ public class ConfigHandler implements RandomConfigHandler {
         configMessage.getEconomy()
                 .insufficientFunds(getInsufficientFundsMessage())
                 .payment(getPaymentMessage());
+        configMessage.getSign().setComponents(getSignLines());
     }
 
     public void populateConfigQueue() {
@@ -258,5 +259,9 @@ public class ConfigHandler implements RandomConfigHandler {
             return TimeUtil.stringToTicks(message);
         }
         throw new NumberFormatException("Not a valid number");
+    }
+
+    public List<String> getSignLines() {
+        return plugin.getConfig().getStringList("message.sign");
     }
 }

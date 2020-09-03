@@ -1,6 +1,7 @@
 package me.darkeyedragon.randomtp.api.config.section;
 
 import me.darkeyedragon.randomtp.api.config.section.subsection.SubSectionEconomy;
+import me.darkeyedragon.randomtp.api.config.section.subsection.SubSectionSign;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import net.kyori.adventure.text.Component;
@@ -23,4 +24,6 @@ public interface SectionMessage {
     Component getEmptyQueue();
 
     SubSectionEconomy getSubSectionEconomy();
+
+    SubSectionSign getSubSectionSign();
 }
