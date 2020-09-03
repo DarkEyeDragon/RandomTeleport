@@ -18,7 +18,7 @@
 
     <modules>
         <module>Api</module>
-        <module>spigot</module>
+        <module>Spigot</module>
     </modules>
 
     <dependencies>
