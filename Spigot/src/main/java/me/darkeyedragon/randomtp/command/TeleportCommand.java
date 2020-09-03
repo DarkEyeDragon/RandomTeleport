@@ -21,21 +21,10 @@ import me.darkeyedragon.randomtp.util.MessageUtil;
 import me.darkeyedragon.randomtp.util.WorldUtil;
 import me.darkeyedragon.randomtp.world.location.LocationFactory;
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.Sign;
-import org.bukkit.block.data.Directional;
-import org.bukkit.block.data.Rotatable;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.util.List;
 
 @CommandAlias("rtp|randomtp|randomteleport")
 public class TeleportCommand extends BaseCommand {
@@ -228,7 +217,7 @@ public class TeleportCommand extends BaseCommand {
         }
     }
 
-    @Subcommand("createSign")
+    /*@Subcommand("createSign")
     @CommandPermission("rtp.admin.createsign")
     public void createSign(Player player, World world) {
         List<Block> lastTwoTargetBlocks = player.getLastTwoTargetBlocks(null, 100);
@@ -262,5 +251,5 @@ public class TeleportCommand extends BaseCommand {
             sign.setLine(i, MiniMessage.get().serialize(components.get(i)));
         }
         sign.update();
-    }
+    }*/
 }
