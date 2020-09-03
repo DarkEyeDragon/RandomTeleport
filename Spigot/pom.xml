@@ -71,6 +71,7 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <finalName>${name}-${version}</finalName>
                         </configuration>
                     </execution>
                 </executions>
