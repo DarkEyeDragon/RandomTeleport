@@ -20,7 +20,7 @@ import me.darkeyedragon.randomtp.failsafe.listener.PlayerDeathListener;
 import me.darkeyedragon.randomtp.listener.PluginLoadListener;
 import me.darkeyedragon.randomtp.listener.WorldLoadListener;
 import me.darkeyedragon.randomtp.util.WorldUtil;
-import me.darkeyedragon.randomtp.validator.ValidatorFactory;
+import me.darkeyedragon.randomtp.validator.Validator;
 import me.darkeyedragon.randomtp.world.location.LocationFactory;
 import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -181,8 +181,9 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
         getLogger().info(ChatColor.AQUA + "======== [Loading validators] ========");
         configHandler.getSectionPlugin().getPlugins().forEach(s -> {
             if (getServer().getPluginManager().getPlugin(s) != null) {
-                PluginLocationValidator validator = ValidatorFactory.createFrom(s);
+                PluginLocationValidator validator = Validator.getValidator(s);
                 if (validator != null) {
+                    validator.load();
                     if (validator.isLoaded()) {
                         getLogger().info(ChatColor.GREEN + s + " -- Successfully loaded");
                     } else {

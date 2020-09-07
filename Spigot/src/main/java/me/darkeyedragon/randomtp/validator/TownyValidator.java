@@ -8,12 +8,17 @@ import org.bukkit.Location;
 
 public class TownyValidator implements PluginLocationValidator {
 
-    private final TownyAPI instance;
+    private final String name;
+    private TownyAPI instance;
     private boolean isLoaded;
 
-    public TownyValidator() {
-        this.instance = TownyAPI.getInstance();
-        this.isLoaded = instance != null;
+    public TownyValidator(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     @Override
@@ -28,12 +33,14 @@ public class TownyValidator implements PluginLocationValidator {
     }
 
     @Override
+    public void load() {
+        this.instance = TownyAPI.getInstance();
+        setLoaded(instance != null);
+    }
+
+    @Override
     public void setLoaded(boolean loaded) {
         this.isLoaded = loaded;
     }
 
-    @Override
-    public Validator getValidator() {
-        return Validator.TOWNY;
-    }
 }
