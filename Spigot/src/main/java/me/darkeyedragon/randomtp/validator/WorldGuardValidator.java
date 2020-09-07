@@ -10,12 +10,17 @@ import me.darkeyedragon.randomtp.util.location.LocationUtil;
 import org.bukkit.Location;
 
 public class WorldGuardValidator implements PluginLocationValidator {
-    private final WorldGuard instance;
+    private final String name;
+    private WorldGuard instance;
     private boolean isLoaded;
 
-    public WorldGuardValidator() {
-        instance = WorldGuard.getInstance();
-        this.isLoaded = instance != null;
+    public WorldGuardValidator(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     @Override
@@ -37,12 +42,14 @@ public class WorldGuardValidator implements PluginLocationValidator {
     }
 
     @Override
+    public void load() {
+        instance = WorldGuard.getInstance();
+        setLoaded(instance != null);
+    }
+
+    @Override
     public void setLoaded(boolean loaded) {
         isLoaded = loaded;
     }
 
-    @Override
-    public Validator getValidator() {
-        return Validator.WORLD_GUARD;
-    }
 }
