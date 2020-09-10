@@ -4,6 +4,7 @@ import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
 import me.darkeyedragon.randomtp.api.RandomPlugin;
 import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
+import me.darkeyedragon.randomtp.api.config.Blacklist;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.QueueListener;
@@ -27,7 +28,9 @@ import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -37,7 +40,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
+public final class RandomTeleport extends JavaPlugin implements RandomPlugin<Material> {
 
     private HashMap<UUID, Long> cooldowns;
     private PaperCommandManager manager;
@@ -50,6 +53,7 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
     //Economy
     private Economy econ;
     private static EcoHandler ecoHandler;
+    private Blacklist<Material> blacklist;
 
     public static EcoHandler getEcoHandler() {
         return ecoHandler;
@@ -116,6 +120,11 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
         return validatorList;
     }
 
+    @Override
+    public Blacklist<Material> getBlacklist() {
+        return blacklist;
+    }
+
     public ConfigHandler getConfigHandler() {
         return configHandler;
     }
@@ -144,10 +153,16 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
     public void onEnable() {
         // Plugin startup logic
         saveDefaultConfig();
+        blacklist = new Blacklist<>();
         bukkitAudience = BukkitAudiences.create(this);
         manager = new PaperCommandManager(this);
         configHandler = new ConfigHandler(this);
-        configHandler.reload();
+        try {
+            configHandler.reload();
+        } catch (InvalidConfigurationException e) {
+            e.printStackTrace();
+            Bukkit.getPluginManager().disablePlugin(this);
+        }
         locationFactory = new LocationFactory(configHandler);
         deathTracker = new DeathTracker(this);
         //check if the first argument is a world or player

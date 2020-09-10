@@ -17,16 +17,16 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
-public abstract class BaseLocationSearcher implements LocationSearcher {
+public abstract class BaseLocationSearcher<T> implements LocationSearcher {
     protected static final String OCEAN = "ocean";
     protected Set<RandomMaterial> blacklistMaterial;
     protected Set<RandomBiome> blacklistBiome;
-    protected final RandomPlugin plugin;
+    protected final RandomPlugin<T> plugin;
 
     protected final byte CHUNK_SIZE = 16; //The size (in blocks) of a chunk in all directions
     protected final byte CHUNK_SHIFT = 4; //The amount of bits needed to translate between locations and chunks
 
-    public BaseLocationSearcher(RandomPlugin plugin) {
+    public BaseLocationSearcher(RandomPlugin<T> plugin) {
         //Illegal material types
         blacklistMaterial = new HashSet<>();
         blacklistBiome = new HashSet<>();
@@ -101,8 +101,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         if (block.isLiquid()) return false;
         if (!isSafeAbove(loc)) return false;
         if (!isSafeForPlugins(loc)) return false;
-        if (!isSafeSurrounding(loc)) return false;
-        return true;
+        return isSafeSurrounding(loc);
     }
 
     @Override

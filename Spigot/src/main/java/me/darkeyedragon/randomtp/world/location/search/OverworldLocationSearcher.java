@@ -8,7 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
 
-public class OverworldLocationSearcher extends BaseLocationSearcher {
+public class OverworldLocationSearcher extends BaseLocationSearcher<Material> {
     /**
      * A simple utility class to help with {@link Location}
      *

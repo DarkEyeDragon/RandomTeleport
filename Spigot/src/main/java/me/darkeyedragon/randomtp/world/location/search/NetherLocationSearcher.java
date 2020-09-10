@@ -8,14 +8,14 @@ import me.darkeyedragon.randomtp.api.world.location.search.BaseLocationSearcher;
 import me.darkeyedragon.randomtp.world.block.SpigotMaterial;
 import org.bukkit.Material;
 
-public class NetherLocationSearcher extends BaseLocationSearcher {
+public class NetherLocationSearcher extends BaseLocationSearcher<Material> {
 
     private final int MAX_HEIGHT = 120; //Everything above this is nether ceiling
 
     /**
      * A simple utility class to help with {@link org.bukkit.Location}
      *
-     * @param plugin
+     * @param plugin the plugin instance
      */
     public NetherLocationSearcher(RandomTeleport plugin) {
         super(plugin);

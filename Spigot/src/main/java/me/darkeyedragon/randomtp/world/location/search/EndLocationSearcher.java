@@ -6,7 +6,7 @@ import me.darkeyedragon.randomtp.world.block.SpigotMaterial;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
-public class EndLocationSearcher extends BaseLocationSearcher {
+public class EndLocationSearcher extends BaseLocationSearcher<Material> {
 
     protected final int MIN_DISTANCE = 150;
     protected final int MAX_DISTANCE = 150;
