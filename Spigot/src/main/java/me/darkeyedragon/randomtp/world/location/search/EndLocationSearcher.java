@@ -1,12 +1,11 @@
 package me.darkeyedragon.randomtp.world.location.search;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
+import me.darkeyedragon.randomtp.api.config.Dimension;
 import me.darkeyedragon.randomtp.api.world.location.search.BaseLocationSearcher;
-import me.darkeyedragon.randomtp.world.block.SpigotMaterial;
 import org.bukkit.Location;
-import org.bukkit.Material;
 
-public class EndLocationSearcher extends BaseLocationSearcher<Material> {
+public class EndLocationSearcher extends BaseLocationSearcher {
 
     protected final int MIN_DISTANCE = 150;
     protected final int MAX_DISTANCE = 150;
@@ -17,21 +16,7 @@ public class EndLocationSearcher extends BaseLocationSearcher<Material> {
      * @param plugin The plugin instance
      */
     public EndLocationSearcher(RandomTeleport plugin) {
-        super(plugin);
-        blacklistMaterial.add(new SpigotMaterial(Material.LAVA));
-        blacklistMaterial.add(new SpigotMaterial(Material.CACTUS));
-        blacklistMaterial.add(new SpigotMaterial(Material.FIRE));
-        blacklistMaterial.add(new SpigotMaterial(Material.MAGMA_BLOCK));
-        blacklistMaterial.add(new SpigotMaterial(Material.TRIPWIRE));
-        blacklistMaterial.add(new SpigotMaterial(Material.ACACIA_PRESSURE_PLATE));
-        blacklistMaterial.add(new SpigotMaterial(Material.BIRCH_PRESSURE_PLATE));
-        blacklistMaterial.add(new SpigotMaterial(Material.JUNGLE_PRESSURE_PLATE));
-        blacklistMaterial.add(new SpigotMaterial(Material.OAK_PRESSURE_PLATE));
-        blacklistMaterial.add(new SpigotMaterial(Material.SPRUCE_PRESSURE_PLATE));
-        blacklistMaterial.add(new SpigotMaterial(Material.STONE_PRESSURE_PLATE));
-        blacklistMaterial.add(new SpigotMaterial(Material.DARK_OAK_PRESSURE_PLATE));
-        blacklistMaterial.add(new SpigotMaterial(Material.HEAVY_WEIGHTED_PRESSURE_PLATE));
-        blacklistMaterial.add(new SpigotMaterial(Material.LIGHT_WEIGHTED_PRESSURE_PLATE));
+        super(plugin, plugin.getConfigHandler().getConfigBlacklist().getBlacklist().getDimension(Dimension.END));
     }
 
     /*@Override

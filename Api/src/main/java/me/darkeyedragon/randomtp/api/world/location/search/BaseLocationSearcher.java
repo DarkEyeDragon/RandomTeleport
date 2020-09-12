@@ -2,34 +2,32 @@ package me.darkeyedragon.randomtp.api.world.location.search;
 
 import me.darkeyedragon.randomtp.api.RandomPlugin;
 import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
+import me.darkeyedragon.randomtp.api.config.DimensionData;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
-import me.darkeyedragon.randomtp.api.world.RandomBiome;
+import me.darkeyedragon.randomtp.api.world.RandomBlockType;
 import me.darkeyedragon.randomtp.api.world.RandomChunk;
-import me.darkeyedragon.randomtp.api.world.RandomMaterial;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.block.BlockFace;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 
 import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
-public abstract class BaseLocationSearcher<T> implements LocationSearcher {
+public abstract class BaseLocationSearcher implements LocationSearcher {
     protected static final String OCEAN = "ocean";
-    protected Set<RandomMaterial> blacklistMaterial;
-    protected Set<RandomBiome> blacklistBiome;
-    protected final RandomPlugin<T> plugin;
+    protected final RandomPlugin plugin;
+    private final DimensionData dimensionData;
 
     protected final byte CHUNK_SIZE = 16; //The size (in blocks) of a chunk in all directions
     protected final byte CHUNK_SHIFT = 4; //The amount of bits needed to translate between locations and chunks
 
-    public BaseLocationSearcher(RandomPlugin<T> plugin) {
+    public BaseLocationSearcher(RandomPlugin plugin, DimensionData dimensionData) {
+        this.dimensionData = dimensionData;
         //Illegal material types
-        blacklistMaterial = new HashSet<>();
-        blacklistBiome = new HashSet<>();
+        //blacklistMaterial = new HashSet<>();
+        //blacklistBiome = new HashSet<>();
         this.plugin = plugin;
     }
 
@@ -92,8 +90,9 @@ public abstract class BaseLocationSearcher<T> implements LocationSearcher {
         RandomWorld world = loc.getWorld();
         if (world == null) return false;
         RandomBlock block = loc.getBlock();
-        if (block.getType().isAir()) return false;
-        if (blacklistMaterial.contains(loc.getBlock().getType())) {
+        if (block.getBlockType().getType().isAir()) return false;
+        RandomBlockType blockType = loc.getBlock().getBlockType();
+        if (dimensionData.getBlockTypes().contains(blockType)) {
             return false;
         }
         //TODO FIX
@@ -128,7 +127,7 @@ public abstract class BaseLocationSearcher<T> implements LocationSearcher {
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {
                 RandomBlock block = chunk.getWorld().getHighestBlockAt((chunk.getX() << CHUNK_SHIFT) + x, (chunk.getZ() << CHUNK_SHIFT) + z);
-                if (blacklistBiome.contains(block.getBiome())) {
+                if (dimensionData.getBiomes().contains(block.getBiome())) {
                     return false;
                 }
             }
@@ -148,8 +147,8 @@ public abstract class BaseLocationSearcher<T> implements LocationSearcher {
         for (BlockFace blockFace : blockfaces) {
             RandomBlock relativeBlock = block.getRelative(blockFace);
             if (relativeBlock.isEmpty()) return false;
-            if (!relativeBlock.getType().isSolid()) return false;
-            if (blacklistMaterial.contains(relativeBlock.getType())) return false;
+            if (!relativeBlock.getBlockType().getType().isSolid()) return false;
+            if (dimensionData.getBlockTypes().contains(relativeBlock.getBlockType())) ;
         }
         return true;
     }

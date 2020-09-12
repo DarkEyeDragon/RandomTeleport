@@ -2,19 +2,18 @@ package me.darkeyedragon.randomtp.config.section;
 
 import me.darkeyedragon.randomtp.api.config.Blacklist;
 import me.darkeyedragon.randomtp.api.config.section.SectionBlacklist;
-import org.bukkit.Material;
 
-public class ConfigBlacklist implements SectionBlacklist<Material> {
+public class ConfigBlacklist implements SectionBlacklist {
 
-    final Blacklist<Material> blacklist;
+    final Blacklist blacklist;
 
-    public ConfigBlacklist(Blacklist<Material> blacklist) {
+    public ConfigBlacklist(Blacklist blacklist) {
         this.blacklist = blacklist;
     }
 
 
     @Override
-    public Blacklist<Material> getBlacklist() {
+    public Blacklist getBlacklist() {
         return blacklist;
     }
 }

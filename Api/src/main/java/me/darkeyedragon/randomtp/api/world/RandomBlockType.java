@@ -1,6 +1,6 @@
 package me.darkeyedragon.randomtp.api.world;
 
-public interface RandomBlockType<T> {
+public interface RandomBlockType {
 
-    T getType();
+    RandomMaterial getType();
 }

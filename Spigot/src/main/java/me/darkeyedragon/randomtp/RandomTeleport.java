@@ -28,7 +28,6 @@ import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
@@ -40,7 +39,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public final class RandomTeleport extends JavaPlugin implements RandomPlugin<Material> {
+public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
 
     private HashMap<UUID, Long> cooldowns;
     private PaperCommandManager manager;
@@ -53,7 +52,7 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin<Mat
     //Economy
     private Economy econ;
     private static EcoHandler ecoHandler;
-    private Blacklist<Material> blacklist;
+    private Blacklist blacklist;
 
     public static EcoHandler getEcoHandler() {
         return ecoHandler;
@@ -120,11 +119,6 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin<Mat
         return validatorList;
     }
 
-    @Override
-    public Blacklist<Material> getBlacklist() {
-        return blacklist;
-    }
-
     public ConfigHandler getConfigHandler() {
         return configHandler;
     }
@@ -153,7 +147,6 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin<Mat
     public void onEnable() {
         // Plugin startup logic
         saveDefaultConfig();
-        blacklist = new Blacklist<>();
         bukkitAudience = BukkitAudiences.create(this);
         manager = new PaperCommandManager(this);
         configHandler = new ConfigHandler(this);

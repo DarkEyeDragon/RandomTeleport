@@ -7,8 +7,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class DimensionData<T> {
-    private final Set<RandomBlockType<T>> blockTypes;
+public class DimensionData {
+    private final Set<RandomBlockType> blockTypes;
     private final Set<Biome> biomes;
 
     public DimensionData() {
@@ -16,7 +16,7 @@ public class DimensionData<T> {
         biomes = new HashSet<>();
     }
 
-    public Set<RandomBlockType<T>> getBlockTypes() {
+    public Set<RandomBlockType> getBlockTypes() {
         return blockTypes;
     }
 
@@ -34,12 +34,12 @@ public class DimensionData<T> {
         }
     }
 
-    public void addBlockType(RandomBlockType<T> blockType) {
+    public void addBlockType(RandomBlockType blockType) {
         blockTypes.add(blockType);
     }
 
-    public void addAllBlockTypes(Collection<RandomBlockType<T>> blockTypes) {
-        for (RandomBlockType<T> blockType : blockTypes) {
+    public void addAllBlockTypes(Collection<RandomBlockType> blockTypes) {
+        for (RandomBlockType blockType : blockTypes) {
             addBlockType(blockType);
         }
     }

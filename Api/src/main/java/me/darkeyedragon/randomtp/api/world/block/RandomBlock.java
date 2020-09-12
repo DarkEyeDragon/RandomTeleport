@@ -1,7 +1,7 @@
 package me.darkeyedragon.randomtp.api.world.block;
 
 import me.darkeyedragon.randomtp.api.world.RandomBiome;
-import me.darkeyedragon.randomtp.api.world.RandomMaterial;
+import me.darkeyedragon.randomtp.api.world.RandomBlockType;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 
 public interface RandomBlock {
@@ -21,5 +21,5 @@ public interface RandomBlock {
 
     int hashCode();
 
-    RandomMaterial getType();
+    RandomBlockType getBlockType();
 }

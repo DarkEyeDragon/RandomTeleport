@@ -271,9 +271,9 @@ public class ConfigHandler implements RandomConfigHandler {
         return plugin.getConfig().getStringList("message.sign");
     }
 
-    private Blacklist<Material> getBlacklist() throws InvalidConfigurationException {
+    private Blacklist getBlacklist() throws InvalidConfigurationException {
 
-        Blacklist<Material> blacklist = new Blacklist<>();
+        Blacklist blacklist = new Blacklist();
 
         for (Dimension dimension : Dimension.values()) {
             blacklist.addDimension(dimension, getDimData(dimension));
@@ -281,10 +281,10 @@ public class ConfigHandler implements RandomConfigHandler {
         return blacklist;
     }
 
-    private DimensionData<Material> getDimData(Dimension dimension) throws InvalidConfigurationException {
+    private DimensionData getDimData(Dimension dimension) throws InvalidConfigurationException {
         ConfigurationSection blacklistSec = plugin.getConfig().getConfigurationSection("blacklist");
         if (blacklistSec == null) throw new InvalidConfigurationException("blacklist section missing!");
-        DimensionData<Material> dimensionData = new DimensionData<>();
+        DimensionData dimensionData = new DimensionData();
 
         ConfigurationSection section;
         switch (dimension) {
@@ -325,5 +325,9 @@ public class ConfigHandler implements RandomConfigHandler {
             }
         }
         return dimensionData;
+    }
+
+    public ConfigBlacklist getConfigBlacklist() {
+        return configBlacklist;
     }
 }

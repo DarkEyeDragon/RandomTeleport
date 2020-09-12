@@ -1,6 +1,5 @@
 package me.darkeyedragon.randomtp.world.location;
 
-import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 
@@ -35,18 +34,22 @@ public class WorldConfigSection implements SectionWorldDetail {
         return world.getName();
     }
 
+    @Override
     public int getRadius() {
         return radius;
     }
 
+    @Override
     public RandomWorld getWorld() {
         return world;
     }
 
+    @Override
     public boolean useWorldBorder() {
         return useWorldBorder;
     }
 
+    @Override
     public boolean needsWorldPermission() {
         return needsWorldPermission;
     }
