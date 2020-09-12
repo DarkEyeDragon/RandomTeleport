@@ -96,7 +96,11 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         RandomBlock block = loc.getBlock();
         if (block.getBlockType().getType().isAir()) return false;
         RandomBlockType blockType = loc.getBlock().getBlockType();
-        if (!isValidGlobal(loc)) return false;
+        //Check if it passes the global blacklist
+        if (!isValidGlobalBlockType(loc)) return false;
+        DimensionData dimensionData = blacklist.getDimensionData(dimension);
+        //Check if it passes the dimension blacklist
+        if (dimensionData.getBlockTypes().contains(blockType)) return false;
         //TODO FIX
         if (block.isPassable()) return false;
         if (block.isLiquid()) return false;
@@ -129,7 +133,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {
                 RandomBlock block = chunk.getWorld().getHighestBlockAt((chunk.getX() << CHUNK_SHIFT) + x, (chunk.getZ() << CHUNK_SHIFT) + z);
-                if (blacklist.getDimensionData(dimension).getBiomes().contains(block.getBiome())) {
+                if (isValidGlobalBiome(block) && blacklist.getDimensionData(dimension).getBiomes().contains(block.getBiome())) {
                     return false;
                 }
             }
@@ -155,11 +159,19 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         return true;
     }
 
-    protected boolean isValidGlobal(RandomLocation location) {
+    /**
+     * @param location the {@link RandomLocation} to validate
+     * @return true if the global blacklist does not contain the {@link RandomBlockType}
+     */
+    protected boolean isValidGlobalBlockType(RandomLocation location) {
         RandomBlock randomBlock = location.getBlock();
         DimensionData dimensionData = blacklist.getDimensionData(Dimension.GLOBAL);
-        if (dimensionData.getBlockTypes().contains(randomBlock.getBlockType())) return false;
-        if (dimensionData.getBiomes().contains(location.getBlock().getBiome())) return false;
-        return true;
+        return !dimensionData.getBlockTypes().contains(randomBlock.getBlockType());
     }
+
+    protected boolean isValidGlobalBiome(RandomBlock block) {
+        DimensionData dimensionData = blacklist.getDimensionData(Dimension.GLOBAL);
+        return !dimensionData.getBiomes().contains(block.getBiome());
+    }
+
 }
