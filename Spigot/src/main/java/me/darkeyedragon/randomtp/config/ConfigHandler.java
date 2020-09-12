@@ -7,17 +7,18 @@ import me.darkeyedragon.randomtp.api.config.DimensionData;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.config.section.*;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
-import me.darkeyedragon.randomtp.api.world.Biome;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.config.section.*;
 import me.darkeyedragon.randomtp.util.TimeUtil;
 import me.darkeyedragon.randomtp.util.WorldUtil;
+import me.darkeyedragon.randomtp.world.SpigotBiome;
 import me.darkeyedragon.randomtp.world.SpigotBlockType;
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 
@@ -276,7 +277,7 @@ public class ConfigHandler implements RandomConfigHandler {
         Blacklist blacklist = new Blacklist();
 
         for (Dimension dimension : Dimension.values()) {
-            blacklist.addDimension(dimension, getDimData(dimension));
+            blacklist.addDimensionData(dimension, getDimData(dimension));
         }
         return blacklist;
     }
@@ -319,7 +320,7 @@ public class ConfigHandler implements RandomConfigHandler {
         List<String> biomeStrings = section.getStringList("biome");
         for (String s : biomeStrings) {
             try {
-                dimensionData.addBiome(Biome.valueOf(s));
+                dimensionData.addBiome(new SpigotBiome(Biome.valueOf(s)));
             } catch (IllegalArgumentException ex) {
                 plugin.getLogger().warning(s + " is not a valid biome.");
             }

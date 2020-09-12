@@ -16,11 +16,11 @@ public class Blacklist {
         return dimensions;
     }
 
-    public DimensionData getDimension(Dimension dimension) {
+    public DimensionData getDimensionData(Dimension dimension) {
         return dimensions.get(dimension);
     }
 
-    public void addDimension(Dimension dimension, DimensionData dimensionData) {
+    public void addDimensionData(Dimension dimension, DimensionData dimensionData) {
         dimensions.put(dimension, dimensionData);
     }
 }

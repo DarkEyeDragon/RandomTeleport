@@ -2,6 +2,8 @@ package me.darkeyedragon.randomtp.api.world.location.search;
 
 import me.darkeyedragon.randomtp.api.RandomPlugin;
 import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
+import me.darkeyedragon.randomtp.api.config.Blacklist;
+import me.darkeyedragon.randomtp.api.config.Dimension;
 import me.darkeyedragon.randomtp.api.config.DimensionData;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.world.RandomBlockType;
@@ -16,19 +18,21 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class BaseLocationSearcher implements LocationSearcher {
-    protected static final String OCEAN = "ocean";
+
     protected final RandomPlugin plugin;
-    private final DimensionData dimensionData;
+    private final Dimension dimension;
+    private final Blacklist blacklist;
 
     protected final byte CHUNK_SIZE = 16; //The size (in blocks) of a chunk in all directions
     protected final byte CHUNK_SHIFT = 4; //The amount of bits needed to translate between locations and chunks
 
-    public BaseLocationSearcher(RandomPlugin plugin, DimensionData dimensionData) {
-        this.dimensionData = dimensionData;
+    public BaseLocationSearcher(RandomPlugin plugin, Blacklist blacklist, Dimension dimension) {
+        this.blacklist = blacklist;
         //Illegal material types
         //blacklistMaterial = new HashSet<>();
         //blacklistBiome = new HashSet<>();
         this.plugin = plugin;
+        this.dimension = dimension;
     }
 
     /* This is the final method that will be called from the other end, to get a location */
@@ -92,9 +96,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         RandomBlock block = loc.getBlock();
         if (block.getBlockType().getType().isAir()) return false;
         RandomBlockType blockType = loc.getBlock().getBlockType();
-        if (dimensionData.getBlockTypes().contains(blockType)) {
-            return false;
-        }
+        if (!isValidGlobal(loc)) return false;
         //TODO FIX
         if (block.isPassable()) return false;
         if (block.isLiquid()) return false;
@@ -127,7 +129,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {
                 RandomBlock block = chunk.getWorld().getHighestBlockAt((chunk.getX() << CHUNK_SHIFT) + x, (chunk.getZ() << CHUNK_SHIFT) + z);
-                if (dimensionData.getBiomes().contains(block.getBiome())) {
+                if (blacklist.getDimensionData(dimension).getBiomes().contains(block.getBiome())) {
                     return false;
                 }
             }
@@ -148,8 +150,16 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
             RandomBlock relativeBlock = block.getRelative(blockFace);
             if (relativeBlock.isEmpty()) return false;
             if (!relativeBlock.getBlockType().getType().isSolid()) return false;
-            if (dimensionData.getBlockTypes().contains(relativeBlock.getBlockType())) ;
+            if (blacklist.getDimensionData(dimension).getBlockTypes().contains(relativeBlock.getBlockType())) ;
         }
+        return true;
+    }
+
+    protected boolean isValidGlobal(RandomLocation location) {
+        RandomBlock randomBlock = location.getBlock();
+        DimensionData dimensionData = blacklist.getDimensionData(Dimension.GLOBAL);
+        if (dimensionData.getBlockTypes().contains(randomBlock.getBlockType())) return false;
+        if (dimensionData.getBiomes().contains(location.getBlock().getBiome())) return false;
         return true;
     }
 }

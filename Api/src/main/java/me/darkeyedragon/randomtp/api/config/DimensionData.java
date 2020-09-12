@@ -1,6 +1,6 @@
 package me.darkeyedragon.randomtp.api.config;
 
-import me.darkeyedragon.randomtp.api.world.Biome;
+import me.darkeyedragon.randomtp.api.world.RandomBiome;
 import me.darkeyedragon.randomtp.api.world.RandomBlockType;
 
 import java.util.Collection;
@@ -9,7 +9,7 @@ import java.util.Set;
 
 public class DimensionData {
     private final Set<RandomBlockType> blockTypes;
-    private final Set<Biome> biomes;
+    private final Set<RandomBiome> biomes;
 
     public DimensionData() {
         blockTypes = new HashSet<>();
@@ -20,16 +20,16 @@ public class DimensionData {
         return blockTypes;
     }
 
-    public Set<Biome> getBiomes() {
+    public Set<RandomBiome> getBiomes() {
         return biomes;
     }
 
-    public void addBiome(Biome biome) {
+    public void addBiome(RandomBiome biome) {
         biomes.add(biome);
     }
 
-    public void addAllBiomes(Collection<Biome> biomes) {
-        for (Biome biome : biomes) {
+    public void addAllBiomes(Collection<RandomBiome> biomes) {
+        for (RandomBiome biome : biomes) {
             addBiome(biome);
         }
     }

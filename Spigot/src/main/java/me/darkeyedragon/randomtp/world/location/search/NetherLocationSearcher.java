@@ -17,7 +17,7 @@ public class NetherLocationSearcher extends BaseLocationSearcher {
      * @param plugin the plugin instance
      */
     public NetherLocationSearcher(RandomTeleport plugin) {
-        super(plugin, plugin.getConfigHandler().getConfigBlacklist().getBlacklist().getDimension(Dimension.NETHER));
+        super(plugin, plugin.getConfigHandler().getConfigBlacklist().getBlacklist(), Dimension.NETHER);
     }
 
     /* Will search through the chunk to find a location that is safe, returning null if none is found. */
