@@ -307,12 +307,11 @@ public class ConfigHandler implements RandomConfigHandler {
         if (section == null) throw new InvalidConfigurationException("blacklist.global section missing!");
         List<String> blockStrings = section.getStringList("block");
         Material[] materials = Material.values();
-        System.out.println("TAG:" + Tag.ACACIA_LOGS.getKey().toString());
         for (String s : blockStrings) {
             if (s.startsWith("$")) {
                 Iterable<Tag<Material>> tags = Bukkit.getTags(Tag.REGISTRY_BLOCKS, Material.class);
                 for (Tag<Material> tag : tags) {
-                    if (tag.getKey().getKey().equalsIgnoreCase(s)) {
+                    if (tag.getKey().getKey().equalsIgnoreCase(s.substring(1))) {
                         for (Material value : tag.getValues()) {
                             dimensionData.addBlockType(new SpigotBlockType(value));
                         }
