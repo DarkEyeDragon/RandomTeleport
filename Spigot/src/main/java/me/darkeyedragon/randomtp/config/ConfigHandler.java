@@ -14,10 +14,7 @@ import me.darkeyedragon.randomtp.util.WorldUtil;
 import me.darkeyedragon.randomtp.world.SpigotBiome;
 import me.darkeyedragon.randomtp.world.SpigotBlockType;
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -26,6 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ConfigHandler implements RandomConfigHandler {
 
@@ -307,11 +306,30 @@ public class ConfigHandler implements RandomConfigHandler {
         }
         if (section == null) throw new InvalidConfigurationException("blacklist.global section missing!");
         List<String> blockStrings = section.getStringList("block");
+        Material[] materials = Material.values();
+        System.out.println("TAG:" + Tag.ACACIA_LOGS.getKey().toString());
         for (String s : blockStrings) {
-            try {
-                dimensionData.addBlockType(new SpigotBlockType(Material.valueOf(s)));
-            } catch (IllegalArgumentException ex) {
-                plugin.getLogger().warning(s + " is not a valid block.");
+            if (s.startsWith("$")) {
+                Iterable<Tag<Material>> tags = Bukkit.getTags(Tag.REGISTRY_BLOCKS, Material.class);
+                for (Tag<Material> tag : tags) {
+                    if (tag.getKey().getKey().equalsIgnoreCase(s)) {
+                        for (Material value : tag.getValues()) {
+                            dimensionData.addBlockType(new SpigotBlockType(value));
+                        }
+                    }
+                }
+            } else {
+                Pattern pattern = Pattern.compile(s);
+                for (Material material : materials) {
+                    Matcher matcher = pattern.matcher(material.name());
+                    while (matcher.find()) {
+                        try {
+                            dimensionData.addBlockType(new SpigotBlockType(Material.valueOf(matcher.group(0))));
+                        } catch (IllegalArgumentException ex) {
+                            plugin.getLogger().warning(s + " is not a valid block.");
+                        }
+                    }
+                }
             }
         }
         if (dimension == Dimension.GLOBAL) {
@@ -319,10 +337,16 @@ public class ConfigHandler implements RandomConfigHandler {
         }
         List<String> biomeStrings = section.getStringList("biome");
         for (String s : biomeStrings) {
-            try {
-                dimensionData.addBiome(new SpigotBiome(Biome.valueOf(s)));
-            } catch (IllegalArgumentException ex) {
-                plugin.getLogger().warning(s + " is not a valid biome.");
+            Pattern pattern = Pattern.compile(s);
+            for (Material material : materials) {
+                Matcher matcher = pattern.matcher(material.name());
+                while (matcher.find()) {
+                    try {
+                        dimensionData.addBiome(new SpigotBiome(Biome.valueOf(s.toUpperCase())));
+                    } catch (IllegalArgumentException ex) {
+                        plugin.getLogger().warning(s + " is not a valid biome.");
+                    }
+                }
             }
         }
         return dimensionData;
