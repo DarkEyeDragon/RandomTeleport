@@ -59,15 +59,19 @@ debug:
   show_queue_population: true
 economy:
   price: 0
+#The items to blacklist. Block uses the Material enum for names, find all of them here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+#Blocks also support Tags ($PRESSURE_PLATES = all types of pressure plates) a full list can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Tag.html
+#All Tags are prefixed with $
+#Also supports regex.
 blacklist:
   global:
     block:
       - LAVA
       - CACTUS
-      - FIRE
+      - $FIRE
       - MAGMA_BLOCK
       - TRIPWIRE
-      - ".*PRESSURE_PLATE"
+      - $PRESSURE_PLATES
   overworld:
     biome:
       - ".*OCEAN"
