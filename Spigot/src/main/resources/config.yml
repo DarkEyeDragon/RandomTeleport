@@ -59,3 +59,22 @@ debug:
   show_queue_population: true
 economy:
   price: 0
+blacklist:
+  global:
+    block:
+      - LAVA
+      - CACTUS
+      - FIRE
+      - MAGMA_BLOCK
+      - TRIPWIRE
+      - ".*PRESSURE_PLATE"
+  overworld:
+    biome:
+      - ".*OCEAN"
+    block: []
+  nether:
+    biome: []
+    block: []
+  end:
+    biome: []
+    block: []

@@ -25,4 +25,5 @@ public class SpigotMaterial implements RandomMaterial {
     public boolean isAir() {
         return material.isAir();
     }
+
 }

@@ -2,35 +2,37 @@ package me.darkeyedragon.randomtp.api.world.location.search;
 
 import me.darkeyedragon.randomtp.api.RandomPlugin;
 import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
+import me.darkeyedragon.randomtp.api.config.Blacklist;
+import me.darkeyedragon.randomtp.api.config.Dimension;
+import me.darkeyedragon.randomtp.api.config.DimensionData;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
-import me.darkeyedragon.randomtp.api.world.RandomBiome;
+import me.darkeyedragon.randomtp.api.world.RandomBlockType;
 import me.darkeyedragon.randomtp.api.world.RandomChunk;
-import me.darkeyedragon.randomtp.api.world.RandomMaterial;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.block.BlockFace;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 
 import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class BaseLocationSearcher implements LocationSearcher {
-    protected static final String OCEAN = "ocean";
-    protected Set<RandomMaterial> blacklistMaterial;
-    protected Set<RandomBiome> blacklistBiome;
+
     protected final RandomPlugin plugin;
+    private final Dimension dimension;
+    private final Blacklist blacklist;
 
     protected final byte CHUNK_SIZE = 16; //The size (in blocks) of a chunk in all directions
     protected final byte CHUNK_SHIFT = 4; //The amount of bits needed to translate between locations and chunks
 
-    public BaseLocationSearcher(RandomPlugin plugin) {
+    public BaseLocationSearcher(RandomPlugin plugin, Blacklist blacklist, Dimension dimension) {
+        this.blacklist = blacklist;
         //Illegal material types
-        blacklistMaterial = new HashSet<>();
-        blacklistBiome = new HashSet<>();
+        //blacklistMaterial = new HashSet<>();
+        //blacklistBiome = new HashSet<>();
         this.plugin = plugin;
+        this.dimension = dimension;
     }
 
     /* This is the final method that will be called from the other end, to get a location */
@@ -92,17 +94,19 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         RandomWorld world = loc.getWorld();
         if (world == null) return false;
         RandomBlock block = loc.getBlock();
-        if (block.getType().isAir()) return false;
-        if (blacklistMaterial.contains(loc.getBlock().getType())) {
-            return false;
-        }
+        if (block.getBlockType().getType().isAir()) return false;
+        RandomBlockType blockType = loc.getBlock().getBlockType();
+        //Check if it passes the global blacklist
+        if (!isValidGlobalBlockType(loc)) return false;
+        DimensionData dimensionData = blacklist.getDimensionData(dimension);
+        //Check if it passes the dimension blacklist
+        if (dimensionData.getBlockTypes().contains(blockType)) return false;
         //TODO FIX
         if (block.isPassable()) return false;
         if (block.isLiquid()) return false;
         if (!isSafeAbove(loc)) return false;
         if (!isSafeForPlugins(loc)) return false;
-        if (!isSafeSurrounding(loc)) return false;
-        return true;
+        return isSafeSurrounding(loc);
     }
 
     @Override
@@ -129,7 +133,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {
                 RandomBlock block = chunk.getWorld().getHighestBlockAt((chunk.getX() << CHUNK_SHIFT) + x, (chunk.getZ() << CHUNK_SHIFT) + z);
-                if (blacklistBiome.contains(block.getBiome())) {
+                if (isValidGlobalBiome(block) && blacklist.getDimensionData(dimension).getBiomes().contains(block.getBiome())) {
                     return false;
                 }
             }
@@ -149,9 +153,25 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         for (BlockFace blockFace : blockfaces) {
             RandomBlock relativeBlock = block.getRelative(blockFace);
             if (relativeBlock.isEmpty()) return false;
-            if (!relativeBlock.getType().isSolid()) return false;
-            if (blacklistMaterial.contains(relativeBlock.getType())) return false;
+            if (!relativeBlock.getBlockType().getType().isSolid()) return false;
+            if (blacklist.getDimensionData(dimension).getBlockTypes().contains(relativeBlock.getBlockType())) ;
         }
         return true;
     }
+
+    /**
+     * @param location the {@link RandomLocation} to validate
+     * @return true if the global blacklist does not contain the {@link RandomBlockType}
+     */
+    protected boolean isValidGlobalBlockType(RandomLocation location) {
+        RandomBlock randomBlock = location.getBlock();
+        DimensionData dimensionData = blacklist.getDimensionData(Dimension.GLOBAL);
+        return !dimensionData.getBlockTypes().contains(randomBlock.getBlockType());
+    }
+
+    protected boolean isValidGlobalBiome(RandomBlock block) {
+        DimensionData dimensionData = blacklist.getDimensionData(Dimension.GLOBAL);
+        return !dimensionData.getBiomes().contains(block.getBiome());
+    }
+
 }

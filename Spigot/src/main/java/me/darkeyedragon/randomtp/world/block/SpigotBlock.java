@@ -1,11 +1,12 @@
 package me.darkeyedragon.randomtp.world.block;
 
 import me.darkeyedragon.randomtp.api.world.RandomBiome;
-import me.darkeyedragon.randomtp.api.world.RandomMaterial;
+import me.darkeyedragon.randomtp.api.world.RandomBlockType;
 import me.darkeyedragon.randomtp.api.world.block.BlockFace;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.world.SpigotBiome;
+import me.darkeyedragon.randomtp.world.SpigotBlockType;
 import me.darkeyedragon.randomtp.world.SpigotWorld;
 import org.bukkit.block.Block;
 
@@ -48,8 +49,8 @@ public class SpigotBlock implements RandomBlock {
     }
 
     @Override
-    public RandomMaterial getType() {
-        return new SpigotMaterial(block.getType());
+    public RandomBlockType getBlockType() {
+        return new SpigotBlockType(block.getType());
     }
 
 }
