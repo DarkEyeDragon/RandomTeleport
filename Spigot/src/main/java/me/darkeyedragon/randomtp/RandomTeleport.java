@@ -26,6 +26,7 @@ import me.darkeyedragon.randomtp.world.location.LocationFactory;
 import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -119,6 +120,13 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
         return validatorList;
     }
 
+    @Override
+    public void initStats() {
+        //Add bStats metrics
+        Metrics metrics = new Metrics(this, 8852);
+        this.getLogger().info("Using bStats: " + metrics.isEnabled());
+    }
+
     public ConfigHandler getConfigHandler() {
         return configHandler;
     }
@@ -206,6 +214,7 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
         getServer().getPluginManager().registerEvents(new PluginLoadListener(this), this);
         getLogger().info(ChatColor.AQUA + "======================================");
         populateWorldQueue();
+        initStats();
     }
 
     public BukkitAudiences getBukkitAudience() {

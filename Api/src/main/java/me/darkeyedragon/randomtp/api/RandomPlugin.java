@@ -7,4 +7,6 @@ import java.util.Set;
 public interface RandomPlugin {
 
     Set<PluginLocationValidator> getValidatorList();
+
+    void initStats();
 }
