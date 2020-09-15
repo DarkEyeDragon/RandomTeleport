@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
 
@@ -202,6 +203,17 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
             } else {
                 getLogger().warning(ChatColor.RED + s + " -- Not Found.");
             }
+        });
+        manager.getCommandCompletions().registerAsyncCompletion("permWorlds", c -> {
+            Player player = c.getPlayer();
+            return getWorldQueue().getWorldQueueMap().keySet().stream()
+                    .filter(world -> {
+                        if (!configHandler.getSectionWorld().getSectionWorldDetail(world).needsWorldPermission()) {
+                            return true;
+                        }
+                        return player.hasPermission("rtp.world." + world.getName());
+                    })
+                    .map(RandomWorld::getName).collect(Collectors.toList());
         });
         getServer().getPluginManager().registerEvents(new PluginLoadListener(this), this);
         getLogger().info(ChatColor.AQUA + "======================================");

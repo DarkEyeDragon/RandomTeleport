@@ -60,7 +60,7 @@ public class TeleportCommand extends BaseCommand {
 
     @Default
     @CommandPermission("rtp.teleport.self")
-    @CommandCompletion("@players|@worlds")
+    @CommandCompletion("@players|@permWorlds")
     public void onTeleport(CommandSender sender, @Optional PlayerWorldContext target, @Optional @CommandPermission("rtp.teleport.world") World world) {
         Player player;
         RandomWorld newWorld;
