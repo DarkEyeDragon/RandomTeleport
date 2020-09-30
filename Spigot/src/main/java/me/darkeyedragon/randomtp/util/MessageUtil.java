@@ -14,6 +14,6 @@ public class MessageUtil {
     }
 
     public static void sendMessage(RandomTeleport plugin, CommandSender sender, Component component) {
-        plugin.getBukkitAudience().audience(sender).sendMessage(component);
+        plugin.getBukkitAudience().sender(sender).sendMessage(component);
     }
 }
