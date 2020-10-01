@@ -13,6 +13,6 @@ public class MessageUtil {
 
     public static void sendMessage(RandomTeleport plugin, CommandSender sender, Component component) {
         if (MiniMessage.get().serialize(component).isEmpty()) return;
-        plugin.getBukkitAudience().audience(sender).sendMessage(component);
+        plugin.getBukkitAudience().sender(sender).sendMessage(component);
     }
 }
