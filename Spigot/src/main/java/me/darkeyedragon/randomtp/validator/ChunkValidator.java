@@ -5,7 +5,7 @@ import org.bukkit.Location;
 
 /**
  * This class is used to allow other plugins to add checks to the RTP plugin.
- * Note that every validator must have the name of the plugin + Validator as name!
+ * Note that every validator must have the name of the plugin + Validator as name! TODO isn't this a lie?
  * Example: {@link FactionsUuidValidator}, {@link WorldGuardValidator}
  */
 public interface ChunkValidator {
