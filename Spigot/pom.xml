@@ -18,11 +18,7 @@
     </parent>
 
     <description>Yeet a player to a random location, and hopefully they won't die in the process</description>
-    <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+
     <build>
         <defaultGoal>clean package</defaultGoal>
         <plugins>
@@ -32,7 +28,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <compilerArgs>
-                        <arg>-parameters</arg>
+                        <arg>-parameters</arg> <!-- for ACF -->
                     </compilerArgs>
                 </configuration>
             </plugin>
@@ -41,24 +37,28 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.2.1</version>
                 <configuration>
+                    <minimizeJar>true</minimizeJar>
                     <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml
                     </dependencyReducedPomLocation>
                     <relocations>
                         <relocation>
-                            <pattern>co.aikar.commands</pattern>
-                            <shadedPattern>me.darkeyedragon.randomtp.acf</shadedPattern>
+                            <pattern>co.aikar</pattern>
+                            <shadedPattern>me.darkeyedragon.randomtp.shaded.aikar</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>io.papermc.lib</pattern>
-                            <shadedPattern>me.darkeyedragon.randomtp.paperlib</shadedPattern>
+                            <shadedPattern>me.darkeyedragon.randomtp.shaded.paperlib</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>net.kyori</pattern>
+                            <shadedPattern>me.darkeyedragon.randomtp.shaded.kyori</shadedPattern>
                         </relocation>
                     </relocations>
                     <filters>
                         <filter>
-                            <artifact>paperlib</artifact>
+                            <artifact>*.*</artifact>
                             <excludes>
-                                <exclude>io/papermc/lib/features/blockstatesnapshot</exclude>
-                                <exclude>io/papermc/lib/features/chunkisgenerated</exclude>
+                                <exclude>org/checkerframework/**</exclude> <!-- From kyori adventure, no need to shade annotations -->
                             </excludes>
                         </filter>
                     </filters>
@@ -71,7 +71,7 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <finalName>${name}-${version}.${build}</finalName>
+                            <finalName>${project.name}-${project.version}.${build}</finalName>
                         </configuration>
                     </execution>
                 </executions>
@@ -143,11 +143,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>16.0.1</version>
-        </dependency>
-        <dependency>
             <groupId>co.aikar</groupId>
             <artifactId>acf-paper</artifactId>
             <version>0.5.0-SNAPSHOT</version>
@@ -191,13 +186,13 @@
         <dependency>
             <groupId>br.net.fabiozumbi12.RedProtect</groupId>
             <artifactId>RedProtect-Core</artifactId>
-            <version>LATEST</version>
+            <version>7.7.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>br.net.fabiozumbi12.RedProtect</groupId>
             <artifactId>RedProtect-Spigot-1.13</artifactId>
-            <version>LATEST</version>
+            <version>7.7.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
