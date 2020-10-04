@@ -1,6 +1,9 @@
 package me.darkeyedragon.randomtp.config;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
+import me.darkeyedragon.randomtp.api.config.Blacklist;
+import me.darkeyedragon.randomtp.api.config.Dimension;
+import me.darkeyedragon.randomtp.api.config.DimensionData;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.config.section.*;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
@@ -8,26 +11,22 @@ import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.config.section.*;
 import me.darkeyedragon.randomtp.util.TimeUtil;
 import me.darkeyedragon.randomtp.util.WorldUtil;
+import me.darkeyedragon.randomtp.world.SpigotBiome;
+import me.darkeyedragon.randomtp.world.SpigotBlockType;
 import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.World;
+import org.bukkit.*;
+import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ConfigHandler implements RandomConfigHandler {
-
-    //Paths
-    public static String MESSAGE_PATH = "message";
-    public static String QUEUE_PATH = "queue";
-    public static String WORLDS_PATH = "worlds";
-    public static String TELEPORT_PATH = "teleport";
-    public static String PLUGINS_PATH = "plugins";
-    public static String DEBUG_PATH = "debug";
 
     private final RandomTeleport plugin;
     private ConfigMessage configMessage;
@@ -38,6 +37,8 @@ public class ConfigHandler implements RandomConfigHandler {
     private ConfigEconomy configEconomy;
     private ConfigDebug configDebug;
 
+    private ConfigBlacklist configBlacklist;
+
     public ConfigHandler(RandomTeleport plugin) {
         this.plugin = plugin;
     }
@@ -46,7 +47,7 @@ public class ConfigHandler implements RandomConfigHandler {
      * (re)loads the config.
      * When invalid fiels are found, they will be defaulted to prevent errors.
      */
-    public void reload() {
+    public void reload() throws InvalidConfigurationException {
         populateConfigPlugins();
         populateConfigMessage();
         populateConfigQueue();
@@ -54,6 +55,11 @@ public class ConfigHandler implements RandomConfigHandler {
         populateConfigTeleport();
         populateConfigDebug();
         populateConfigEconomy();
+        populateBlacklist();
+    }
+
+    public void populateBlacklist() throws InvalidConfigurationException {
+        configBlacklist = new ConfigBlacklist(getBlacklist());
     }
 
     public void populateConfigMessage() {
@@ -263,5 +269,89 @@ public class ConfigHandler implements RandomConfigHandler {
 
     public List<String> getSignLines() {
         return plugin.getConfig().getStringList("message.sign");
+    }
+
+    private Blacklist getBlacklist() throws InvalidConfigurationException {
+
+        Blacklist blacklist = new Blacklist();
+
+        for (Dimension dimension : Dimension.values()) {
+            blacklist.addDimensionData(dimension, getDimData(dimension));
+        }
+        return blacklist;
+    }
+
+    private DimensionData getDimData(Dimension dimension) throws InvalidConfigurationException {
+        ConfigurationSection blacklistSec = plugin.getConfig().getConfigurationSection("blacklist");
+        if (blacklistSec == null) throw new InvalidConfigurationException("blacklist section missing!");
+        DimensionData dimensionData = new DimensionData();
+
+        ConfigurationSection section;
+        switch (dimension) {
+            case GLOBAL:
+                section = blacklistSec.getConfigurationSection("global");
+                break;
+            case OVERWORLD:
+                section = blacklistSec.getConfigurationSection("overworld");
+                break;
+            case NETHER:
+                section = blacklistSec.getConfigurationSection("nether");
+                break;
+            case END:
+                section = blacklistSec.getConfigurationSection("end");
+                break;
+            default:
+                section = null;
+                break;
+        }
+        if (section == null) throw new InvalidConfigurationException("blacklist.global section missing!");
+        List<String> blockStrings = section.getStringList("block");
+        Material[] materials = Material.values();
+        for (String s : blockStrings) {
+            if (s.startsWith("$")) {
+                Iterable<Tag<Material>> tags = Bukkit.getTags(Tag.REGISTRY_BLOCKS, Material.class);
+                for (Tag<Material> tag : tags) {
+                    if (tag.getKey().getKey().equalsIgnoreCase(s.substring(1))) {
+                        for (Material value : tag.getValues()) {
+                            dimensionData.addBlockType(new SpigotBlockType(value));
+                        }
+                    }
+                }
+            } else {
+                Pattern pattern = Pattern.compile(s);
+                for (Material material : materials) {
+                    Matcher matcher = pattern.matcher(material.name());
+                    while (matcher.find()) {
+                        try {
+                            dimensionData.addBlockType(new SpigotBlockType(Material.valueOf(matcher.group(0))));
+                        } catch (IllegalArgumentException ex) {
+                            plugin.getLogger().warning(s + " is not a valid block.");
+                        }
+                    }
+                }
+            }
+        }
+        if (dimension == Dimension.GLOBAL) {
+            return dimensionData;
+        }
+        List<String> biomeStrings = section.getStringList("biome");
+        for (String s : biomeStrings) {
+            Pattern pattern = Pattern.compile(s);
+            for (Material material : materials) {
+                Matcher matcher = pattern.matcher(material.name());
+                while (matcher.find()) {
+                    try {
+                        dimensionData.addBiome(new SpigotBiome(Biome.valueOf(s.toUpperCase())));
+                    } catch (IllegalArgumentException ex) {
+                        plugin.getLogger().warning(s + " is not a valid biome.");
+                    }
+                }
+            }
+        }
+        return dimensionData;
+    }
+
+    public ConfigBlacklist getConfigBlacklist() {
+        return configBlacklist;
     }
 }

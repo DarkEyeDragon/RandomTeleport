@@ -4,6 +4,7 @@ import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
 import me.darkeyedragon.randomtp.api.RandomPlugin;
 import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
+import me.darkeyedragon.randomtp.api.config.Blacklist;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.QueueListener;
@@ -20,7 +21,7 @@ import me.darkeyedragon.randomtp.failsafe.listener.PlayerDeathListener;
 import me.darkeyedragon.randomtp.listener.PluginLoadListener;
 import me.darkeyedragon.randomtp.listener.WorldLoadListener;
 import me.darkeyedragon.randomtp.util.WorldUtil;
-import me.darkeyedragon.randomtp.validator.ValidatorFactory;
+import me.darkeyedragon.randomtp.validator.Validator;
 import me.darkeyedragon.randomtp.world.location.LocationFactory;
 import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -28,6 +29,7 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -50,6 +52,7 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
     //Economy
     private Economy econ;
     private static EcoHandler ecoHandler;
+    private Blacklist blacklist;
 
     public static EcoHandler getEcoHandler() {
         return ecoHandler;
@@ -147,7 +150,12 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
         bukkitAudience = BukkitAudiences.create(this);
         manager = new PaperCommandManager(this);
         configHandler = new ConfigHandler(this);
-        configHandler.reload();
+        try {
+            configHandler.reload();
+        } catch (InvalidConfigurationException e) {
+            e.printStackTrace();
+            Bukkit.getPluginManager().disablePlugin(this);
+        }
         locationFactory = new LocationFactory(configHandler);
         deathTracker = new DeathTracker(this);
         //check if the first argument is a world or player
@@ -181,8 +189,9 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
         getLogger().info(ChatColor.AQUA + "======== [Loading validators] ========");
         configHandler.getSectionPlugin().getPlugins().forEach(s -> {
             if (getServer().getPluginManager().getPlugin(s) != null) {
-                PluginLocationValidator validator = ValidatorFactory.createFrom(s);
+                PluginLocationValidator validator = Validator.getValidator(s);
                 if (validator != null) {
+                    validator.load();
                     if (validator.isLoaded()) {
                         getLogger().info(ChatColor.GREEN + s + " -- Successfully loaded");
                     } else {

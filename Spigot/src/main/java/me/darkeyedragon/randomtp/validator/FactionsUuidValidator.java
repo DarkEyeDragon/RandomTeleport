@@ -13,12 +13,17 @@ import org.bukkit.Location;
  */
 public class FactionsUuidValidator implements PluginLocationValidator {
 
-    private final Board instance;
+    private final String name;
+    private Board instance;
     private boolean isLoaded;
 
-    public FactionsUuidValidator() {
-        instance = Board.getInstance();
-        this.isLoaded = instance != null;
+    public FactionsUuidValidator(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     @Override
@@ -35,12 +40,14 @@ public class FactionsUuidValidator implements PluginLocationValidator {
     }
 
     @Override
+    public void load() {
+        instance = Board.getInstance();
+        setLoaded(instance != null);
+    }
+
+    @Override
     public void setLoaded(boolean loaded) {
         this.isLoaded = loaded;
     }
 
-    @Override
-    public Validator getValidator() {
-        return Validator.FACTIONS;
-    }
 }

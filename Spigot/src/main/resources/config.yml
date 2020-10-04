@@ -28,9 +28,9 @@ worlds:
   world:
     #Use the worldborder (if set) for offset. This is the vanilla worldborder.
     use_worldborder: true
-    #Wether or not the user needs the rtp.world.<worldname> permission
+    #Whether or not the user needs the rtp.world.<worldname> permission
     needs_world_permission: false
-    #Radus and offset will be ignored if use_worldborder is true.
+    #Radius and offset will be ignored if use_worldborder is true.
     radius: 21474836
     offsetX: 0
     offsetZ: 0
@@ -59,3 +59,26 @@ debug:
   show_queue_population: true
 economy:
   price: 0
+#The items to blacklist. Block uses the Material enum for names, find all of them here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+#Blocks also support Tags ($PRESSURE_PLATES = all types of pressure plates) a full list can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Tag.html
+#All Tags are prefixed with $
+#Also supports regex.
+blacklist:
+  global:
+    block:
+      - LAVA
+      - CACTUS
+      - $FIRE
+      - MAGMA_BLOCK
+      - TRIPWIRE
+      - $PRESSURE_PLATES
+  overworld:
+    biome:
+      - ".*OCEAN"
+    block: []
+  nether:
+    biome: []
+    block: []
+  end:
+    biome: []
+    block: []

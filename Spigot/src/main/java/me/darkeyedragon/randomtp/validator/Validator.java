@@ -1,31 +1,30 @@
 package me.darkeyedragon.randomtp.validator;
 
-import javax.management.ValueExp;
+import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
 
-public enum Validator implements me.darkeyedragon.randomtp.api.addon.Validator {
-    FACTIONS("Factions"),
-    WORLD_GUARD("WorldGuard"),
-    GRIEF_PREVENTION("GriefPrevention"),
-    GRIEF_DEFENDER("GriefDefender"),
-    TOWNY("Towny"),
-    RED_PROTECT("RedProtect");
+public enum Validator {
+    FACTIONS(new FactionsUuidValidator("Factions")),
+    WORLD_GUARD(new WorldGuardValidator("WorldGuard")),
+    GRIEF_PREVENTION(new GriefPreventionValidator("GriefPrevention")),
+    TOWNY(new TownyValidator("Towny")),
+    RED_PROTECT(new RedProtectValidator("RedProtect"));
 
-    final String name;
+    final PluginLocationValidator validator;
 
-    Validator(String name) {
-        this.name = name;
+    Validator(PluginLocationValidator validator) {
+        this.validator = validator;
     }
 
-    public static Validator getValidator(String name) {
+    public static PluginLocationValidator getValidator(String name) {
         for (Validator validator : Validator.values()) {
-            if (validator.name.equalsIgnoreCase(name)) {
-                return validator;
+            if (validator.validator.getName().equalsIgnoreCase(name)) {
+                return validator.validator;
             }
         }
-        throw new IllegalArgumentException("Invalid name");
+        return null;
     }
 
     public String getName() {
-        return name;
+        return validator.getName();
     }
 }

@@ -10,12 +10,17 @@ import org.bukkit.plugin.Plugin;
 
 public class GriefPreventionValidator implements PluginLocationValidator {
 
-    private final Plugin instance;
+    private final String name;
+    private Plugin instance;
     private boolean isLoaded;
 
-    public GriefPreventionValidator() {
-        instance = GriefPrevention.instance;
-        isLoaded = instance != null;
+    public GriefPreventionValidator(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     @Override
@@ -31,12 +36,14 @@ public class GriefPreventionValidator implements PluginLocationValidator {
     }
 
     @Override
+    public void load() {
+        instance = GriefPrevention.instance;
+        setLoaded(instance != null);
+    }
+
+    @Override
     public void setLoaded(boolean loaded) {
         this.isLoaded = loaded;
     }
 
-    @Override
-    public Validator getValidator() {
-        return Validator.GRIEF_PREVENTION;
-    }
 }

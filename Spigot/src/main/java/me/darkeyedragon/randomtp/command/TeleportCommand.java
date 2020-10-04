@@ -24,6 +24,7 @@ import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 
 @CommandAlias("rtp|randomtp|randomteleport")
@@ -123,7 +124,13 @@ public class TeleportCommand extends BaseCommand {
         sender.sendMessage(ChatColor.GREEN + "Reloading config...");
         plugin.saveDefaultConfig();
         plugin.reloadConfig();
-        plugin.getConfigHandler().reload();
+        try {
+            plugin.getConfigHandler().reload();
+        } catch (InvalidConfigurationException e) {
+            MessageUtil.sendMessage(plugin, sender, ChatColor.RED + "Your config is not configured properly. Error:");
+            MessageUtil.sendMessage(plugin, sender, ChatColor.RED + e.getMessage());
+            e.printStackTrace();
+        }
         //Set the new config object references
         setConfigs();
         MessageUtil.sendMessage(plugin, sender, ChatColor.GREEN + "Clearing queue...");

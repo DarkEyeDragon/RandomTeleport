@@ -8,12 +8,17 @@ import org.bukkit.Location;
 
 public class RedProtectValidator implements PluginLocationValidator {
 
-    private final RedProtect instance;
+    private final String name;
+    private RedProtect instance;
     private boolean isLoaded;
 
-    public RedProtectValidator() {
-        instance = RedProtect.get();
-        this.isLoaded = instance != null;
+    public RedProtectValidator(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     @Override
@@ -28,12 +33,14 @@ public class RedProtectValidator implements PluginLocationValidator {
     }
 
     @Override
+    public void load() {
+        instance = RedProtect.get();
+        this.isLoaded = instance != null;
+    }
+
+    @Override
     public void setLoaded(boolean loaded) {
         this.isLoaded = loaded;
     }
 
-    @Override
-    public Validator getValidator() {
-        return Validator.RED_PROTECT;
-    }
 }

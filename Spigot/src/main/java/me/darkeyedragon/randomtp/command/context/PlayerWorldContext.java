@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 
 public class PlayerWorldContext {
     private Player player;
-    private World world;
+    private RandomWorld world;
 
     public boolean isPlayer() {
         return player != null;
@@ -26,10 +26,14 @@ public class PlayerWorldContext {
     }
 
     public RandomWorld getWorld() {
-        return WorldUtil.toRandomWorld(world);
+        return world;
     }
 
     public void setWorld(World world) {
+        this.world = WorldUtil.toRandomWorld(world);
+    }
+
+    public void setWorld(RandomWorld world) {
         this.world = world;
     }
 }

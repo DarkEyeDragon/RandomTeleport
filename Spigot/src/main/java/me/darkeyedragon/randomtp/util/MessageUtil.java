@@ -8,12 +8,11 @@ import org.bukkit.command.CommandSender;
 public class MessageUtil {
 
     public static void sendMessage(RandomTeleport plugin, CommandSender sender, String message) {
-        if (message.isEmpty()) return;
-
         sendMessage(plugin, sender, MiniMessage.get().parse(message));
     }
 
     public static void sendMessage(RandomTeleport plugin, CommandSender sender, Component component) {
+        if (MiniMessage.get().serialize(component).isEmpty()) return;
         plugin.getBukkitAudience().sender(sender).sendMessage(component);
     }
 }
