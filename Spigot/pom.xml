@@ -42,8 +42,12 @@
                     </dependencyReducedPomLocation>
                     <relocations>
                         <relocation>
-                            <pattern>co.aikar</pattern>
-                            <shadedPattern>me.darkeyedragon.randomtp.shaded.aikar</shadedPattern>
+                            <pattern>co.aikar.commands</pattern>
+                            <shadedPattern>me.darkeyedragon.randomtp.shaded.acf</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>co.aikar.locales</pattern>
+                            <shadedPattern>me.darkeyedragon.randomtp.shaded.locales</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>io.papermc.lib</pattern>
