@@ -159,5 +159,11 @@
             <version>7.3.0</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>me.darkeyedragon.randomtp</groupId>
+            <artifactId>Common</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>

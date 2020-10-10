@@ -2,7 +2,6 @@ package me.darkeyedragon.randomtp;
 
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
-import me.darkeyedragon.randomtp.api.RandomPlugin;
 import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
 import me.darkeyedragon.randomtp.api.config.Blacklist;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
@@ -13,9 +12,11 @@ import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.command.TeleportCommand;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
+import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPlugin;
+import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
-import me.darkeyedragon.randomtp.eco.EcoFactory;
-import me.darkeyedragon.randomtp.eco.EcoHandler;
+import me.darkeyedragon.randomtp.common.eco.EcoHandler;
+import me.darkeyedragon.randomtp.eco.BukkitEcoHandler;
 import me.darkeyedragon.randomtp.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.failsafe.listener.PlayerDeathListener;
 import me.darkeyedragon.randomtp.listener.PluginLoadListener;
@@ -39,7 +40,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
+public final class RandomTeleport extends RandomTeleportPluginImpl{
+
+
+    private final JavaPlugin plugin;
+
 
     private HashMap<UUID, Long> cooldowns;
     private PaperCommandManager manager;
@@ -54,14 +59,15 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
     private static EcoHandler ecoHandler;
     private Blacklist blacklist;
 
-    public static EcoHandler getEcoHandler() {
-        return ecoHandler;
+    public RandomTeleport(JavaPlugin plugin) {
+        this.plugin = plugin;
+
     }
 
-    @Override
-    public void onDisable() {
-        // Plugin shutdown logic
-        worldQueue.clear();
+
+
+    public EcoHandler getEcoHandler() {
+        return ecoHandler;
     }
 
     public void populateWorldQueue() {
@@ -87,27 +93,29 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
             locationQueue.subscribe(new QueueListener<RandomLocation>() {
                 @Override
                 public void onAdd(RandomLocation element) {
-                    getLogger().info("Safe location added for " + world.getName() + " (" + locationQueue.size() + "/" + size + ")");
+                    plugin.getLogger().info("Safe location added for " + world.getName() + " (" + locationQueue.size() + "/" + size + ")");
                 }
 
                 @Override
                 public void onRemove(RandomLocation element) {
-                    getLogger().info("Safe location consumed for " + world.getName() + " (" + locationQueue.size() + "/" + size + ")");
+                    plugin.getLogger().info("Safe location consumed for " + world.getName() + " (" + locationQueue.size() + "/" + size + ")");
                 }
             });
         }
     }
 
     //Economy logic
-    private boolean setupEconomy() {
-        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+    @Override
+    public boolean setupEconomy() {
+        if (plugin.getServer().getPluginManager().getPlugin("Vault") == null) {
             return false;
         }
-        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        RegisteredServiceProvider<Economy> rsp = plugin.getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp == null) {
             return false;
         }
         econ = rsp.getProvider();
+        ecoHandler = new BukkitEcoHandler(econ);
         return true;
     }
 
@@ -144,17 +152,18 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
     }
 
     @Override
-    public void onEnable() {
+    public void init() {
         // Plugin startup logic
-        saveDefaultConfig();
-        bukkitAudience = BukkitAudiences.create(this);
-        manager = new PaperCommandManager(this);
+        super.init();
+        plugin.saveDefaultConfig();
+        bukkitAudience = BukkitAudiences.create(plugin);
+        manager = new PaperCommandManager(plugin);
         configHandler = new ConfigHandler(this);
         try {
             configHandler.reload();
         } catch (InvalidConfigurationException e) {
             e.printStackTrace();
-            Bukkit.getPluginManager().disablePlugin(this);
+            Bukkit.getPluginManager().disablePlugin(plugin);
         }
         locationFactory = new LocationFactory(configHandler);
         deathTracker = new DeathTracker(this);
@@ -177,34 +186,33 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
         });
         cooldowns = new HashMap<>();
         if (setupEconomy()) {
-            getLogger().info("Vault found. Hooking into it.");
-            EcoFactory.createDefault(econ);
+            plugin.getLogger().info("Vault found. Hooking into it.");
         } else {
-            getLogger().warning("Vault not found. Currency based options are disabled.");
+            plugin.getLogger().warning("Vault not found. Currency based options are disabled.");
         }
         manager.registerCommand(new TeleportCommand(this));
-        getServer().getPluginManager().registerEvents(new WorldLoadListener(this), this);
-        getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), this);
+        plugin.getServer().getPluginManager().registerEvents(new WorldLoadListener(this), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), plugin);
         validatorList = new HashSet<>();
-        getLogger().info(ChatColor.AQUA + "======== [Loading validators] ========");
+        plugin.getLogger().info(ChatColor.AQUA + "======== [Loading validators] ========");
         configHandler.getSectionPlugin().getPlugins().forEach(s -> {
-            if (getServer().getPluginManager().getPlugin(s) != null) {
+            if (plugin.getServer().getPluginManager().getPlugin(s) != null) {
                 PluginLocationValidator validator = Validator.getValidator(s);
                 if (validator != null) {
                     validator.load();
                     if (validator.isLoaded()) {
-                        getLogger().info(ChatColor.GREEN + s + " -- Successfully loaded");
+                        plugin.getLogger().info(ChatColor.GREEN + s + " -- Successfully loaded");
                     } else {
-                        getLogger().warning(ChatColor.RED + s + " is not loaded yet. Trying to fix by loading later...");
+                        plugin.getLogger().warning(ChatColor.RED + s + " is not loaded yet. Trying to fix by loading later...");
                     }
                     validatorList.add(validator);
                 }
             } else {
-                getLogger().warning(ChatColor.RED + s + " -- Not Found.");
+                plugin.getLogger().warning(ChatColor.RED + s + " -- Not Found.");
             }
         });
-        getServer().getPluginManager().registerEvents(new PluginLoadListener(this), this);
-        getLogger().info(ChatColor.AQUA + "======================================");
+        plugin.getServer().getPluginManager().registerEvents(new PluginLoadListener(this), plugin);
+        plugin.getLogger().info(ChatColor.AQUA + "======================================");
         populateWorldQueue();
     }
 

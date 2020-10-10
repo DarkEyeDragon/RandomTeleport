@@ -4,10 +4,8 @@ import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
+import me.darkeyedragon.randomtp.common.eco.EcoHandler;
 import me.darkeyedragon.randomtp.config.ConfigHandler;
-import me.darkeyedragon.randomtp.eco.EcoFactory;
-import me.darkeyedragon.randomtp.eco.EcoHandler;
-import me.darkeyedragon.randomtp.exception.EcoNotSupportedException;
 import me.darkeyedragon.randomtp.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.util.MessageUtil;
 import me.darkeyedragon.randomtp.util.location.LocationUtil;
@@ -41,17 +39,16 @@ public class Teleport {
         final long delay;
         double price = configHandler.getSectionEconomy().getPrice();
         if (property.isUseEco()) {
-            try {
-                ecoHandler = EcoFactory.getInstance();
-                if (!ecoHandler.hasEnough(player, price)) {
+            ecoHandler = plugin.getEcoHandler();
+            if (ecoHandler != null) {
+                if (!ecoHandler.hasEnough(player.getUniqueId(), price)) {
                     MessageUtil.sendMessage(plugin, player, configHandler.getSectionMessage().getSubSectionEconomy().getInsufficientFunds());
                     return;
                 }
-            } catch (EcoNotSupportedException e) {
+            } else {
                 MessageUtil.sendMessage(plugin, property.getCommandSender(), ChatColor.RED + "Economy based features are disabled. Vault not found. Set the rtp cost to 0 or install vault.");
                 Bukkit.getLogger().severe("Economy based features are disabled. Vault not found. Set the rtp cost to 0 or install vault.");
             }
-
         }
         //Teleport instantly if the command sender has bypass permission
         if (property.isIgnoreTeleportDelay()) {
@@ -129,8 +126,8 @@ public class Teleport {
             if (configHandler.getSectionTeleport().getDeathTimer() > 0) {
                 addToDeathTimer(player);
             }
-            if (property.isUseEco() && EcoFactory.isUseEco()) {
-                ecoHandler.makePayment(player, configHandler.getSectionEconomy().getPrice());
+            if (property.isUseEco() && plugin.getEcoHandler() != null) {
+                ecoHandler.makePayment(player.getUniqueId(), configHandler.getSectionEconomy().getPrice());
                 MessageUtil.sendMessage(plugin, player, configHandler.getSectionMessage().getSubSectionEconomy().getPayment());
             }
             drawWarpParticles(player);
