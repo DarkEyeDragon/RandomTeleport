@@ -30,14 +30,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
 
@@ -169,10 +167,20 @@ public final class RandomTeleport extends JavaPlugin implements RandomPlugin {
                 context.setWorld(world);
                 return context;
             } else if (player != null) {
-                context.setPlayer(player);
+                context.addPlayer(player);
                 return context;
             } else {
-                throw new InvalidCommandArgument(true);
+                if(!arg1.isEmpty()){
+                    List<Entity> entityList = Bukkit.selectEntities(c.getSender(), arg1);
+                    for (Entity entity : entityList) {
+                        if(entity instanceof Player){
+                            context.addPlayer((Player)entity);
+                        }
+                    }
+                    return context;
+                }else{
+                    throw new InvalidCommandArgument(true);
+                }
             }
         });
         cooldowns = new HashMap<>();
