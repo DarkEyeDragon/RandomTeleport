@@ -1,8 +1,10 @@
 package me.darkeyedragon.randomtp.world.location.search;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
+import me.darkeyedragon.randomtp.api.RandomPlugin;
 import me.darkeyedragon.randomtp.api.config.Dimension;
 import me.darkeyedragon.randomtp.api.world.location.search.BaseLocationSearcher;
+import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPlugin;
 import org.bukkit.Location;
 
 public class EndLocationSearcher extends BaseLocationSearcher {
@@ -15,7 +17,7 @@ public class EndLocationSearcher extends BaseLocationSearcher {
      *
      * @param plugin The plugin instance
      */
-    public EndLocationSearcher(RandomTeleport plugin) {
+    public EndLocationSearcher(RandomTeleportPlugin plugin) {
         super(plugin, plugin.getConfigHandler().getConfigBlacklist().getBlacklist(), Dimension.END);
     }
 

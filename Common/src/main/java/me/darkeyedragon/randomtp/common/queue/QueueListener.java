@@ -1,4 +1,4 @@
-package me.darkeyedragon.randomtp.api.queue;
+package me.darkeyedragon.randomtp.common.queue;
 
 public interface QueueListener<T> {
     void onAdd(T element);

@@ -6,6 +6,7 @@ import me.darkeyedragon.randomtp.api.world.RandomChunk;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.search.BaseLocationSearcher;
+import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPlugin;
 
 public class NetherLocationSearcher extends BaseLocationSearcher {
 
@@ -16,7 +17,7 @@ public class NetherLocationSearcher extends BaseLocationSearcher {
      *
      * @param plugin the plugin instance
      */
-    public NetherLocationSearcher(RandomTeleport plugin) {
+    public NetherLocationSearcher(RandomTeleportPlugin plugin) {
         super(plugin, plugin.getConfigHandler().getConfigBlacklist().getBlacklist(), Dimension.NETHER);
     }
 

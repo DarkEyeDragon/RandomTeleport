@@ -1,4 +1,4 @@
-package me.darkeyedragon.randomtp.api.queue;
+package me.darkeyedragon.randomtp.common.queue;
 
 import java.util.ArrayList;
 import java.util.Collection;
