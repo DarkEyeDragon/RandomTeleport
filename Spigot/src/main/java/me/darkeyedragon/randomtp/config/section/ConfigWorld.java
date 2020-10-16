@@ -6,7 +6,7 @@ import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.common.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
-import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
+import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
 import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
 import org.bukkit.configuration.ConfigurationSection;
 

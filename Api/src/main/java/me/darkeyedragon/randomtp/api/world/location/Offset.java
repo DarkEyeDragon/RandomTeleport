@@ -1,4 +1,4 @@
-package me.darkeyedragon.randomtp.common.world.location;
+package me.darkeyedragon.randomtp.api.world.location;
 
 public class Offset {
     private int x;

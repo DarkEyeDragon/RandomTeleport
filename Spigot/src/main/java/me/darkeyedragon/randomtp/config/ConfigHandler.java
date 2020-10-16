@@ -8,12 +8,13 @@ import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.config.section.*;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
+import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.config.section.*;
 import me.darkeyedragon.randomtp.util.TimeUtil;
 import me.darkeyedragon.randomtp.util.WorldUtil;
 import me.darkeyedragon.randomtp.world.SpigotBiome;
 import me.darkeyedragon.randomtp.world.SpigotBlockType;
-import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
+import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
@@ -178,7 +179,7 @@ public class ConfigHandler implements RandomConfigHandler {
         for (String key : keys) {
             World world = Bukkit.getWorld(key);
             if (world == null) {
-                plugin.getLogger().warning("World " + key + " does not exist! Skipping...");
+                plugin.getLogger().warn("World " + key + " does not exist! Skipping...");
                 continue;
             }
             boolean useWorldBorder = section.getBoolean(key + ".use_worldborder");
@@ -188,7 +189,7 @@ public class ConfigHandler implements RandomConfigHandler {
             int offsetZ = section.getInt(key + ".offsetZ");
             plugin.getLogger().info(ChatColor.GREEN + key + " found! Loading...");
             RandomWorld randomWorld = WorldUtil.toRandomWorld(world);
-            sectionWorldDetailSet.add(new WorldConfigSection(offsetX, offsetZ, radius, randomWorld, useWorldBorder, needsWorldPermission));
+            sectionWorldDetailSet.add(new WorldConfigSection(new Offset(offsetX, offsetZ, radius), randomWorld, useWorldBorder, needsWorldPermission));
         }
         return sectionWorldDetailSet;
     }

@@ -8,6 +8,7 @@ import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.api.config.section.SectionMessage;
 import me.darkeyedragon.randomtp.api.config.section.SectionQueue;
 import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
+import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.common.queue.LocationQueue;
 import me.darkeyedragon.randomtp.common.queue.QueueListener;
 import me.darkeyedragon.randomtp.common.queue.WorldQueue;
@@ -20,7 +21,7 @@ import me.darkeyedragon.randomtp.teleport.TeleportProperty;
 import me.darkeyedragon.randomtp.util.MessageUtil;
 import me.darkeyedragon.randomtp.util.WorldUtil;
 import me.darkeyedragon.randomtp.world.location.LocationFactory;
-import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
+import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -156,7 +157,8 @@ public class TeleportCommand extends BaseCommand {
                 if (offsetZ == null) offsetZ = 0;
             }
             //WorldUtil.WORLD_MAP.put(Bukkit.getWorld(randomWorld.getUUID()), randomWorld);
-            configWorld.add(new WorldConfigSection(offsetX, offsetZ, radius, randomWorld, useWorldBorder, needsWorldPermission));
+
+            configWorld.add(new WorldConfigSection(new Offset(offsetX, offsetZ, radius), randomWorld, useWorldBorder, needsWorldPermission));
             LocationQueue locationQueue = plugin.getQueue(randomWorld);
             if (locationQueue != null) {
                 MessageUtil.sendMessage(plugin, sender, ChatColor.GREEN + "Successfully added to config.");

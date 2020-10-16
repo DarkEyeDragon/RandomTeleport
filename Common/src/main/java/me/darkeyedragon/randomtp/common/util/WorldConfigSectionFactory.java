@@ -5,7 +5,8 @@ import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetai
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.RandomWorldBorder;
 import me.darkeyedragon.randomtp.common.config.ConfigHandler;
-import me.darkeyedragon.randomtp.common.world.location.Offset;
+import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
+import me.darkeyedragon.randomtp.api.world.location.Offset;
 
 public class WorldConfigSectionFactory {
 
@@ -25,9 +26,7 @@ public class WorldConfigSectionFactory {
             offset.setZ(worldBorder.getCenter().getZ());
             offset.setRadius((int) Math.floor(worldBorder.getSize() / 2 - worldBorder.getWarningDistance()));
         } else {
-            offset.setX(sectionWorldDetail.getX());
-            offset.setZ(sectionWorldDetail.getZ());
-            offset.setRadius(sectionWorldDetail.getRadius());
+            offset = sectionWorldDetail.getOffset());
         }
         return new WorldConfigSection(offset, sectionWorldDetail.getWorld(), sectionWorldDetail.useWorldBorder(), sectionWorldDetail.needsWorldPermission());
     }

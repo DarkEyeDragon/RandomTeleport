@@ -9,7 +9,7 @@ import me.darkeyedragon.randomtp.config.ConfigHandler;
 import me.darkeyedragon.randomtp.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.util.MessageUtil;
 import me.darkeyedragon.randomtp.util.location.LocationUtil;
-import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
+import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
 import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
