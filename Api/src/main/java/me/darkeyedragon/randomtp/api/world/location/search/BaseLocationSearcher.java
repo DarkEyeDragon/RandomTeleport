@@ -11,6 +11,7 @@ import me.darkeyedragon.randomtp.api.world.RandomChunk;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.block.BlockFace;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
+import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 
 import java.util.EnumSet;
@@ -79,9 +80,10 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
 
     CompletableFuture<RandomChunk> getRandomChunkAsync(SectionWorldDetail sectionWorldDetail) {
         ThreadLocalRandom rnd = ThreadLocalRandom.current();
-        int chunkRadius = sectionWorldDetail.getRadius() >> CHUNK_SHIFT;
-        int chunkOffsetX = sectionWorldDetail.getX() >> CHUNK_SHIFT;
-        int chunkOffsetZ = sectionWorldDetail.getZ() >> CHUNK_SHIFT;
+        Offset offset = sectionWorldDetail.getOffset();
+        int chunkRadius = offset.getRadius() >> CHUNK_SHIFT;
+        int chunkOffsetX = offset.getX() >> CHUNK_SHIFT;
+        int chunkOffsetZ = offset.getZ() >> CHUNK_SHIFT;
         int x = rnd.nextInt(-chunkRadius, chunkRadius);
         int z = rnd.nextInt(-chunkRadius, chunkRadius);
         RandomWorld world = sectionWorldDetail.getWorld();

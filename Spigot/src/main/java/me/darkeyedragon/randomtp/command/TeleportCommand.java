@@ -5,6 +5,7 @@ import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.annotation.*;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import me.darkeyedragon.randomtp.RandomTeleport;
+import me.darkeyedragon.randomtp.SpigotImpl;
 import me.darkeyedragon.randomtp.api.config.section.SectionMessage;
 import me.darkeyedragon.randomtp.api.config.section.SectionQueue;
 import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
@@ -15,12 +16,12 @@ import me.darkeyedragon.randomtp.common.queue.WorldQueue;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
-import me.darkeyedragon.randomtp.config.ConfigHandler;
+import me.darkeyedragon.randomtp.config.BukkitConfigHandler;
 import me.darkeyedragon.randomtp.teleport.Teleport;
 import me.darkeyedragon.randomtp.teleport.TeleportProperty;
 import me.darkeyedragon.randomtp.util.MessageUtil;
 import me.darkeyedragon.randomtp.util.WorldUtil;
-import me.darkeyedragon.randomtp.world.location.LocationFactory;
+import me.darkeyedragon.randomtp.common.world.location.LocationFactory;
 import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -32,8 +33,9 @@ import org.bukkit.entity.Player;
 public class TeleportCommand extends BaseCommand {
 
     //private BaseLocationSearcher locationHelper;
-    private ConfigHandler configHandler;
+    private BukkitConfigHandler bukkitConfigHandler;
     private final RandomTeleport plugin;
+    private final SpigotImpl impl;
     private WorldQueue worldQueue;
     private LocationFactory locationFactory;
     private boolean teleportSuccess;
@@ -45,16 +47,17 @@ public class TeleportCommand extends BaseCommand {
     private SectionQueue configQueue;
     private SectionWorld configWorld;
 
-    public TeleportCommand(RandomTeleport plugin) {
-        this.plugin = plugin;
+    public TeleportCommand(SpigotImpl impl) {
+        this.plugin = impl.getInstance();
+        this.impl = impl;
         setConfigs();
     }
 
     private void setConfigs() {
-        this.configHandler = plugin.getConfigHandler();
-        this.configMessage = configHandler.getSectionMessage();
-        this.configQueue = configHandler.getSectionQueue();
-        this.configWorld = configHandler.getSectionWorld();
+        this.bukkitConfigHandler = plugin.getConfigHandler();
+        this.configMessage = bukkitConfigHandler.getSectionMessage();
+        this.configQueue = bukkitConfigHandler.getSectionQueue();
+        this.configWorld = bukkitConfigHandler.getSectionWorld();
         this.locationFactory = plugin.getLocationFactory();
         this.worldQueue = plugin.getWorldQueue();
     }
@@ -111,11 +114,11 @@ public class TeleportCommand extends BaseCommand {
             }
         }
         final RandomWorld finalWorld = newWorld;
-        final boolean useEco = configHandler.getSectionEconomy().useEco();
+        final boolean useEco = bukkitConfigHandler.getSectionEconomy().useEco();
         final boolean bypassEco = player.hasPermission("rtp.eco.bypass");
         final boolean logic = useEco && !bypassEco;
-        TeleportProperty teleportProperty = new TeleportProperty(sender, player, finalWorld, sender.hasPermission("rtp.teleport.bypass"), sender.hasPermission("rtp.teleportdelay.bypass"), logic, configHandler, configHandler.getSectionTeleport().getCooldown());
-        Teleport teleport = new Teleport(plugin, teleportProperty);
+        TeleportProperty teleportProperty = new TeleportProperty(sender, player, finalWorld, sender.hasPermission("rtp.teleport.bypass"), sender.hasPermission("rtp.teleportdelay.bypass"), logic, bukkitConfigHandler, bukkitConfigHandler.getSectionTeleport().getCooldown());
+        Teleport teleport = new Teleport(impl, teleportProperty);
         teleport.random();
     }
 
@@ -123,8 +126,8 @@ public class TeleportCommand extends BaseCommand {
     @CommandPermission("rtp.admin.reload")
     public void onReload(CommandSender sender) {
         sender.sendMessage(ChatColor.GREEN + "Reloading config...");
-        plugin.saveDefaultConfig();
-        plugin.reloadConfig();
+        impl.saveDefaultConfig();
+        impl.reloadConfig();
         try {
             plugin.getConfigHandler().reload();
         } catch (InvalidConfigurationException e) {

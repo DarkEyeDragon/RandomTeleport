@@ -4,7 +4,7 @@ import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
 import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
 import me.darkeyedragon.randomtp.api.config.Blacklist;
-import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
+import me.darkeyedragon.randomtp.common.logging.PluginLogger;
 import me.darkeyedragon.randomtp.common.queue.LocationQueue;
 import me.darkeyedragon.randomtp.common.queue.QueueListener;
 import me.darkeyedragon.randomtp.common.queue.WorldQueue;
@@ -13,17 +13,16 @@ import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.command.TeleportCommand;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
-import me.darkeyedragon.randomtp.config.ConfigHandler;
+import me.darkeyedragon.randomtp.config.BukkitConfigHandler;
 import me.darkeyedragon.randomtp.common.eco.EcoHandler;
 import me.darkeyedragon.randomtp.eco.BukkitEcoHandler;
 import me.darkeyedragon.randomtp.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.failsafe.listener.PlayerDeathListener;
 import me.darkeyedragon.randomtp.listener.PluginLoadListener;
 import me.darkeyedragon.randomtp.listener.WorldLoadListener;
-import me.darkeyedragon.randomtp.util.WorldUtil;
+import me.darkeyedragon.randomtp.log.BukkitLogger;
 import me.darkeyedragon.randomtp.validator.Validator;
-import me.darkeyedragon.randomtp.world.location.LocationFactory;
-import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
+import me.darkeyedragon.randomtp.common.world.location.LocationFactory;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -49,7 +48,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl{
     private PaperCommandManager manager;
     private Set<PluginLocationValidator> validatorList;
     private WorldQueue worldQueue;
-    private ConfigHandler configHandler;
+    private BukkitConfigHandler bukkitConfigHandler;
     private LocationFactory locationFactory;
     private DeathTracker deathTracker;
     private BukkitAudiences bukkitAudience;
@@ -60,35 +59,22 @@ public final class RandomTeleport extends RandomTeleportPluginImpl{
 
     public RandomTeleport(JavaPlugin plugin) {
         this.plugin = plugin;
-
     }
+    PluginLogger logger;
 
 
+    @Override
+    public PluginLogger getLogger() {
+        return logger;
+    }
 
     public EcoHandler getEcoHandler() {
         return ecoHandler;
     }
 
-    public void populateWorldQueue() {
-        Bukkit.getLogger().info("Populating WorldQueue");
-        long startTime = System.currentTimeMillis();
-        for (RandomWorld world : configHandler.getSectionWorld().getWorlds()) {
-            //TODO Figure out how to deal with this
-            WorldUtil.WORLD_MAP.put(Bukkit.getWorld(world.getUUID()), world);
-            //Add a new world to the world queue and generate random locations
-            LocationQueue locationQueue = new LocationQueue(configHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(world, this));
-            //Subscribe to the locationqueue to be notified of changes
-            subscribe(locationQueue, world);
-            SectionWorldDetail sectionWorldDetail = getLocationFactory().getWorldConfigSection(world);
-            locationQueue.generate(sectionWorldDetail);
-            getWorldQueue().put(world, locationQueue);
-        }
-        Bukkit.getLogger().info("WorldQueue population finished in " + (System.currentTimeMillis() - startTime) + "ms");
-    }
-
     public void subscribe(LocationQueue locationQueue, RandomWorld world) {
-        if (configHandler.getSectionDebug().isShowQueuePopulation()) {
-            int size = configHandler.getSectionQueue().getSize();
+        if (bukkitConfigHandler.getSectionDebug().isShowQueuePopulation()) {
+            int size = bukkitConfigHandler.getSectionQueue().getSize();
             locationQueue.subscribe(new QueueListener<RandomLocation>() {
                 @Override
                 public void onAdd(RandomLocation element) {
@@ -126,8 +112,8 @@ public final class RandomTeleport extends RandomTeleportPluginImpl{
         return validatorList;
     }
 
-    public ConfigHandler getConfigHandler() {
-        return configHandler;
+    public BukkitConfigHandler getConfigHandler() {
+        return bukkitConfigHandler;
     }
 
     public WorldQueue getWorldQueue() {
@@ -154,17 +140,19 @@ public final class RandomTeleport extends RandomTeleportPluginImpl{
     public void init() {
         // Plugin startup logic
         super.init();
+        logger = new BukkitLogger();
+
         plugin.saveDefaultConfig();
         bukkitAudience = BukkitAudiences.create(plugin);
         manager = new PaperCommandManager(plugin);
-        configHandler = new ConfigHandler(this);
+        bukkitConfigHandler = new BukkitConfigHandler(this);
         try {
-            configHandler.reload();
+            bukkitConfigHandler.reload();
         } catch (InvalidConfigurationException e) {
             e.printStackTrace();
             Bukkit.getPluginManager().disablePlugin(plugin);
         }
-        locationFactory = new LocationFactory(configHandler);
+        locationFactory = new LocationFactory(bukkitConfigHandler);
         deathTracker = new DeathTracker(this);
         //check if the first argument is a world or player
         worldQueue = new WorldQueue();
@@ -194,7 +182,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl{
         plugin.getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), plugin);
         validatorList = new HashSet<>();
         plugin.getLogger().info(ChatColor.AQUA + "======== [Loading validators] ========");
-        configHandler.getSectionPlugin().getPlugins().forEach(s -> {
+        bukkitConfigHandler.getSectionPlugin().getPlugins().forEach(s -> {
             if (plugin.getServer().getPluginManager().getPlugin(s) != null) {
                 PluginLocationValidator validator = Validator.getValidator(s);
                 if (validator != null) {

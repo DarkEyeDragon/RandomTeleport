@@ -7,6 +7,8 @@ import me.darkeyedragon.randomtp.common.queue.WorldQueue;
 import me.darkeyedragon.randomtp.common.eco.EcoHandler;
 import me.darkeyedragon.randomtp.common.logging.PluginLogger;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
+import me.darkeyedragon.randomtp.common.world.location.LocationFactory;
+import me.darkeyedragon.randomtp.sponge.config.SpongeConfigHandler;
 import me.darkeyedragon.randomtp.sponge.eco.SpongeEcoHandler;
 import me.darkeyedragon.randomtp.sponge.logging.SpongeLogger;
 import org.slf4j.Logger;
@@ -35,12 +37,16 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
     private PluginContainer plugin;
     private WorldQueue worldQueue;
     private EcoHandler ecoHandler;
+    private LocationFactory locationFactory;
+    private  RandomConfigHandler configHandler;
 
     @Listener
     public void onServerStart(GameStartedServerEvent event) {
         super.init();
+        configHandler = new SpongeConfigHandler();
         worldQueue = new WorldQueue();
         pluginLogger = new SpongeLogger(logger);
+        locationFactory = new LocationFactory(configHandler);
     }
 
     @Override
@@ -71,11 +77,16 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
 
     @Override
     public RandomConfigHandler getConfigHandler() {
-        return ;
+        return configHandler;
     }
 
     @Override
     public WorldQueue getWorldQueue() {
         return worldQueue;
+    }
+
+    @Override
+    public LocationFactory getLocationFactory() {
+        return locationFactory;
     }
 }

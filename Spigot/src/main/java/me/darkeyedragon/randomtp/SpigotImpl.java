@@ -13,6 +13,10 @@ public class SpigotImpl extends JavaPlugin {
         randomTeleport.init();
     }
 
+    public RandomTeleport getInstance() {
+        return randomTeleport;
+    }
+
     @Override
     public void onDisable() {
 

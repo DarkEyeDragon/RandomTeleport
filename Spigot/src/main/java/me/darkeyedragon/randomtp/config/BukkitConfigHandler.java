@@ -1,6 +1,7 @@
 package me.darkeyedragon.randomtp.config;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
+import me.darkeyedragon.randomtp.SpigotImpl;
 import me.darkeyedragon.randomtp.api.config.Blacklist;
 import me.darkeyedragon.randomtp.api.config.Dimension;
 import me.darkeyedragon.randomtp.api.config.DimensionData;
@@ -27,9 +28,9 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ConfigHandler implements RandomConfigHandler {
+public class BukkitConfigHandler implements RandomConfigHandler {
 
-    private final RandomTeleport plugin;
+    private final SpigotImpl impl;
     private ConfigMessage configMessage;
     private ConfigQueue configQueue;
     private ConfigWorld configWorld;
@@ -40,8 +41,8 @@ public class ConfigHandler implements RandomConfigHandler {
 
     private ConfigBlacklist configBlacklist;
 
-    public ConfigHandler(RandomTeleport plugin) {
-        this.plugin = plugin;
+    public BukkitConfigHandler(SpigotImpl impl) {
+        this.impl = impl;
     }
 
     /**
@@ -86,7 +87,7 @@ public class ConfigHandler implements RandomConfigHandler {
     }
 
     public void populateWorldConfigSection() {
-        configWorld = new ConfigWorld(plugin, getOffsets());
+        configWorld = new ConfigWorld(impl.getInstance(), getOffsets());
     }
 
     public void populateConfigTeleport() {
@@ -113,8 +114,8 @@ public class ConfigHandler implements RandomConfigHandler {
                 .price(getPrice());
     }
 
-    public RandomTeleport getPlugin() {
-        return plugin;
+    public RandomTeleport getImpl() {
+        return impl;
     }
 
     @Override
@@ -153,33 +154,33 @@ public class ConfigHandler implements RandomConfigHandler {
     }
 
     private String getInitTeleportMessage() {
-        return plugin.getConfig().getString("message.initteleport");
+        return impl.getConfig().getString("message.initteleport");
     }
 
     private String getNoWorldPermissionMessage() {
-        return plugin.getConfig().getString("message.no_world_permission");
+        return impl.getConfig().getString("message.no_world_permission");
     }
 
     private String getTeleportMessage() {
-        return plugin.getConfig().getString("message.teleport");
+        return impl.getConfig().getString("message.teleport");
     }
 
     private String getDepletedQueueMessage() {
-        return plugin.getConfig().getString("message.depleted_queue", "&6Locations queue depleted... Forcing generation of a new location");
+        return impl.getConfig().getString("message.depleted_queue", "&6Locations queue depleted... Forcing generation of a new location");
     }
 
     private String getCountdownRemainingMessage() {
-        return plugin.getConfig().getString("message.countdown");
+        return impl.getConfig().getString("message.countdown");
     }
 
     private Set<SectionWorldDetail> getOffsets() {
-        final ConfigurationSection section = plugin.getConfig().getConfigurationSection("worlds");
+        final ConfigurationSection section = impl.getConfig().getConfigurationSection("worlds");
         Set<String> keys = Objects.requireNonNull(section).getKeys(false);
         Set<SectionWorldDetail> sectionWorldDetailSet = new HashSet<>(keys.size());
         for (String key : keys) {
             World world = Bukkit.getWorld(key);
             if (world == null) {
-                plugin.getLogger().warn("World " + key + " does not exist! Skipping...");
+                impl.getInstance().getLogger().warn("World " + key + " does not exist! Skipping...");
                 continue;
             }
             boolean useWorldBorder = section.getBoolean(key + ".use_worldborder");
@@ -187,7 +188,7 @@ public class ConfigHandler implements RandomConfigHandler {
             int radius = section.getInt(key + ".radius");
             int offsetX = section.getInt(key + ".offsetX");
             int offsetZ = section.getInt(key + ".offsetZ");
-            plugin.getLogger().info(ChatColor.GREEN + key + " found! Loading...");
+            impl.getLogger().info(ChatColor.GREEN + key + " found! Loading...");
             RandomWorld randomWorld = WorldUtil.toRandomWorld(world);
             sectionWorldDetailSet.add(new WorldConfigSection(new Offset(offsetX, offsetZ, radius), randomWorld, useWorldBorder, needsWorldPermission));
         }
@@ -195,27 +196,27 @@ public class ConfigHandler implements RandomConfigHandler {
     }
 
     private String getInsufficientFundsMessage() {
-        return plugin.getConfig().getString("message.economy.insufficient_funds", "&cYou do not have enough money to rtp!");
+        return impl.getConfig().getString("message.economy.insufficient_funds", "&cYou do not have enough money to rtp!");
     }
 
     private double getPrice() {
-        return plugin.getConfig().getDouble("economy.price", 0);
+        return impl.getConfig().getDouble("economy.price", 0);
     }
 
     private String getPaymentMessage() {
-        String message = plugin.getConfig().getString("message.economy.payment", "&aYou just paid &b%price &ato rtp!");
+        String message = impl.getConfig().getString("message.economy.payment", "&aYou just paid &b%price &ato rtp!");
         message = ChatColor.translateAlternateColorCodes('&', message);
         message = message.replaceAll("%price", getPrice() + "");
         return message;
     }
 
     private long getCooldown() throws NumberFormatException {
-        String message = plugin.getConfig().getString("teleport.cooldown", "60m");
+        String message = impl.getConfig().getString("teleport.cooldown", "60m");
         return TimeUtil.stringToLong(message);
     }
 
     private long getTeleportDelay() {
-        String message = plugin.getConfig().getString("teleport.delay", "0s");
+        String message = impl.getConfig().getString("teleport.delay", "0s");
         if (message != null) {
             return TimeUtil.stringToTicks(message);
         }
@@ -223,45 +224,45 @@ public class ConfigHandler implements RandomConfigHandler {
     }
 
     private int getInitDelay() {
-        return plugin.getConfig().getInt("queue.init_delay", 60);
+        return impl.getConfig().getInt("queue.init_delay", 60);
     }
 
     private boolean getDebugShowQueuePopulation() {
-        return plugin.getConfig().getBoolean("debug.show_queue_population", true);
+        return impl.getConfig().getBoolean("debug.show_queue_population", true);
     }
 
     private List<String> getPlugins() {
-        return plugin.getConfig().getStringList("plugins");
+        return impl.getConfig().getStringList("plugins");
     }
 
     private int getQueueSize() {
-        return plugin.getConfig().getInt("queue.size", 5);
+        return impl.getConfig().getInt("queue.size", 5);
     }
 
     private String getCancelMessage() {
-        return plugin.getConfig().getString("message.teleport_canceled", "&cYou moved! Teleportation canceled");
+        return impl.getConfig().getString("message.teleport_canceled", "&cYou moved! Teleportation canceled");
     }
 
     private String getInitTeleportDelay() {
-        return plugin.getConfig().getString("message.initteleport_delay", "&aYou will be teleported in &6%s seconds. Do not move");
+        return impl.getConfig().getString("message.initteleport_delay", "&aYou will be teleported in &6%s seconds. Do not move");
     }
 
     private boolean isCanceledOnMove() {
-        return plugin.getConfig().getBoolean("teleport.cancel_on_move", false);
+        return impl.getConfig().getBoolean("teleport.cancel_on_move", false);
     }
 
     private String getEmptyQueueMessage() {
-        return plugin.getConfig().getString("message.empty_queue", "&cThere are no locations available for this world! Try again in a bit or ask an admin to reload the config.");
+        return impl.getConfig().getString("message.empty_queue", "&cThere are no locations available for this world! Try again in a bit or ask an admin to reload the config.");
     }
 
 
     public void setTeleportPrice(double price) {
-        plugin.getConfig().set("economy.price", price);
-        plugin.saveConfig();
+        impl.getConfig().set("economy.price", price);
+        impl.saveConfig();
     }
 
     private long getTeleportDeathTimer() {
-        String message = plugin.getConfig().getString("teleport.death_timer", "10s");
+        String message = impl.getConfig().getString("teleport.death_timer", "10s");
         if (message != null) {
             return TimeUtil.stringToTicks(message);
         }
@@ -269,10 +270,10 @@ public class ConfigHandler implements RandomConfigHandler {
     }
 
     public List<String> getSignLines() {
-        return plugin.getConfig().getStringList("message.sign");
+        return impl.getConfig().getStringList("message.sign");
     }
 
-    private Blacklist getBlacklist() throws InvalidConfigurationException {
+    public Blacklist getBlacklist(){
 
         Blacklist blacklist = new Blacklist();
 
@@ -283,7 +284,7 @@ public class ConfigHandler implements RandomConfigHandler {
     }
 
     private DimensionData getDimData(Dimension dimension) throws InvalidConfigurationException {
-        ConfigurationSection blacklistSec = plugin.getConfig().getConfigurationSection("blacklist");
+        ConfigurationSection blacklistSec = impl.getConfig().getConfigurationSection("blacklist");
         if (blacklistSec == null) throw new InvalidConfigurationException("blacklist section missing!");
         DimensionData dimensionData = new DimensionData();
 
@@ -326,7 +327,7 @@ public class ConfigHandler implements RandomConfigHandler {
                         try {
                             dimensionData.addBlockType(new SpigotBlockType(Material.valueOf(matcher.group(0))));
                         } catch (IllegalArgumentException ex) {
-                            plugin.getLogger().warning(s + " is not a valid block.");
+                            impl.getInstance().getLogger().warn(s + " is not a valid block.");
                         }
                     }
                 }
@@ -344,7 +345,7 @@ public class ConfigHandler implements RandomConfigHandler {
                     try {
                         dimensionData.addBiome(new SpigotBiome(Biome.valueOf(s.toUpperCase())));
                     } catch (IllegalArgumentException ex) {
-                        plugin.getLogger().warning(s + " is not a valid biome.");
+                        impl.getInstance().getLogger().warn(s + " is not a valid biome.");
                     }
                 }
             }
