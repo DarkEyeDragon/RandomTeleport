@@ -6,8 +6,35 @@ import me.darkeyedragon.randomtp.api.config.section.subsection.SubSectionSign;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import net.kyori.adventure.text.Component;
+import ninja.leaping.configurate.objectmapping.Setting;
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
+@ConfigSerializable
 public class ConfigMessage implements SectionMessage {
+
+    @Setting
+    String initteleport;
+    @Setting
+    String initteleport_delay;
+    @Setting
+    String teleport_canceled;
+    @Setting
+    String teleport;
+    @Setting
+    String depleted_queue;
+    @Setting
+    String countdown;
+    @Setting
+    String no_world_permission;
+    @Setting
+    String empty_queue;
+    @Setting
+    String economy;
+    @Setting
+    String insufficient_funds;
+    @Setting
+    String payment;
+
     @Override
     public Component getInitTeleport() {
         return null;

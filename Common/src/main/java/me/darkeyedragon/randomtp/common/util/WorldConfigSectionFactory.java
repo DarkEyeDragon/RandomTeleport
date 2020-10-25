@@ -1,6 +1,5 @@
 package me.darkeyedragon.randomtp.common.util;
 
-import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.RandomWorldBorder;
@@ -16,7 +15,7 @@ public class WorldConfigSectionFactory {
         this.configHandler = configHandler;
     }
 
-    public SectionWorld getWorldConfigSection(RandomWorld randomWorld) {
+    public SectionWorldDetail getWorldConfigSection(RandomWorld randomWorld) {
         SectionWorldDetail sectionWorldDetail = configHandler.getSectionWorld().getSectionWorldDetail(randomWorld);
         Offset offset = new Offset();
         if (sectionWorldDetail == null) return null;

@@ -23,7 +23,7 @@ public class DeathTracker {
      * @param time   the amount of time before the player is removed again.
      */
     public void add(Player player, long time) {
-        trackedPlayers.put(player, Bukkit.getScheduler().runTaskLater(randomTeleport, () -> remove(player), time));
+        trackedPlayers.put(player, Bukkit.getScheduler().runTaskLater(randomTeleport.getPlugin(), () -> remove(player), time));
     }
 
     public boolean contains(Player player) {

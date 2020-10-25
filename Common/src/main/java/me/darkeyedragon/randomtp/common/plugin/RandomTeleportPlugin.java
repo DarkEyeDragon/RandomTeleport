@@ -9,7 +9,7 @@ import me.darkeyedragon.randomtp.common.world.location.LocationFactory;
 
 import java.util.Set;
 
-public interface RandomTeleportPlugin {
+public interface RandomTeleportPlugin<T> {
 
 
     PluginLogger getLogger();
@@ -29,4 +29,5 @@ public interface RandomTeleportPlugin {
     LocationFactory getLocationFactory();
     //DeathTracker getDeathTracker();
 
+    T getInstance();
 }

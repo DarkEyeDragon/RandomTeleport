@@ -1,10 +1,10 @@
 package me.darkeyedragon.randomtp.api.world.location.search;
 
-import me.darkeyedragon.randomtp.api.RandomPlugin;
+import me.darkeyedragon.randomtp.api.ValidatorProvider;
 import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
-import me.darkeyedragon.randomtp.api.config.Blacklist;
 import me.darkeyedragon.randomtp.api.config.Dimension;
 import me.darkeyedragon.randomtp.api.config.DimensionData;
+import me.darkeyedragon.randomtp.api.config.RandomBlacklist;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.world.RandomBlockType;
 import me.darkeyedragon.randomtp.api.world.RandomChunk;
@@ -20,14 +20,14 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class BaseLocationSearcher implements LocationSearcher {
 
-    protected final RandomPlugin plugin;
+    protected final ValidatorProvider plugin;
     private final Dimension dimension;
-    private final Blacklist blacklist;
+    private final RandomBlacklist blacklist;
 
     protected final byte CHUNK_SIZE = 16; //The size (in blocks) of a chunk in all directions
     protected final byte CHUNK_SHIFT = 4; //The amount of bits needed to translate between locations and chunks
 
-    public BaseLocationSearcher(RandomPlugin plugin, Blacklist blacklist, Dimension dimension) {
+    public BaseLocationSearcher(ValidatorProvider plugin, RandomBlacklist blacklist, Dimension dimension) {
         this.blacklist = blacklist;
         //Illegal material types
         //blacklistMaterial = new HashSet<>();

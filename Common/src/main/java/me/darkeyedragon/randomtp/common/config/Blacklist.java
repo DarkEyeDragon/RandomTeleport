@@ -1,12 +1,15 @@
-package me.darkeyedragon.randomtp.api.config;
+package me.darkeyedragon.randomtp.common.config;
+
+import me.darkeyedragon.randomtp.api.config.Dimension;
+import me.darkeyedragon.randomtp.api.config.DimensionData;
+import me.darkeyedragon.randomtp.api.config.RandomBlacklist;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Blacklist {
+public class Blacklist implements RandomBlacklist {
 
     private final Map<Dimension, DimensionData> dimensions;
-
 
     public Blacklist() {
         dimensions = new HashMap<>();

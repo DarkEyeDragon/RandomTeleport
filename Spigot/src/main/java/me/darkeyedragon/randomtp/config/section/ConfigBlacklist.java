@@ -1,6 +1,6 @@
 package me.darkeyedragon.randomtp.config.section;
 
-import me.darkeyedragon.randomtp.api.config.Blacklist;
+import me.darkeyedragon.randomtp.common.config.Blacklist;
 import me.darkeyedragon.randomtp.api.config.section.SectionBlacklist;
 
 public class ConfigBlacklist implements SectionBlacklist {

@@ -1,6 +1,5 @@
 package me.darkeyedragon.randomtp.common.config;
 
-import me.darkeyedragon.randomtp.api.config.Blacklist;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.config.section.*;
 
@@ -40,6 +39,11 @@ public class ConfigHandler implements RandomConfigHandler {
 
     @Override
     public SectionWorld getSectionWorld() {
+        return null;
+    }
+
+    @Override
+    public SectionBlacklist getSectionBlacklist() {
         return null;
     }
 }

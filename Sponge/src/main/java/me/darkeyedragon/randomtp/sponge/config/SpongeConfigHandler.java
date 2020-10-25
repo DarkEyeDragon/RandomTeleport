@@ -1,6 +1,5 @@
 package me.darkeyedragon.randomtp.sponge.config;
 
-import me.darkeyedragon.randomtp.api.config.Blacklist;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.config.section.*;
 import me.darkeyedragon.randomtp.sponge.config.section.*;
@@ -9,7 +8,7 @@ import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class SpongeConfigHandler implements RandomConfigHandler {
 
@@ -24,9 +23,10 @@ public class SpongeConfigHandler implements RandomConfigHandler {
 
     private HoconConfigurationLoader loader;
 
-    @Override
-    public void init() {
-        loader = HoconConfigurationLoader.builder().setPath(new File("randomtp.conf").toPath()).build();
+    public SpongeConfigHandler() {
+        loader = HoconConfigurationLoader.builder()
+                .setPath(Paths.get("randomtp.conf"))
+                .build();
         try {
             CommentedConfigurationNode root = loader.load();
 
@@ -68,6 +68,11 @@ public class SpongeConfigHandler implements RandomConfigHandler {
     @Override
     public SectionWorld getSectionWorld() {
         return configWorld;
+    }
+
+    @Override
+    public SectionBlacklist getSectionBlacklist() {
+        return configBlacklist;
     }
 
 }

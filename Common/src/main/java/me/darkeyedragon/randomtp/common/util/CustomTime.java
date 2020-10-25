@@ -1,4 +1,4 @@
-package me.darkeyedragon.randomtp.util;
+package me.darkeyedragon.randomtp.common.util;
 
 public class CustomTime {
     private long totalSeconds;

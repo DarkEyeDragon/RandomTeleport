@@ -1,8 +1,7 @@
 package me.darkeyedragon.randomtp.config;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
-import me.darkeyedragon.randomtp.SpigotImpl;
-import me.darkeyedragon.randomtp.api.config.Blacklist;
+import me.darkeyedragon.randomtp.common.config.Blacklist;
 import me.darkeyedragon.randomtp.api.config.Dimension;
 import me.darkeyedragon.randomtp.api.config.DimensionData;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
@@ -11,7 +10,7 @@ import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetai
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.config.section.*;
-import me.darkeyedragon.randomtp.util.TimeUtil;
+import me.darkeyedragon.randomtp.common.util.TimeUtil;
 import me.darkeyedragon.randomtp.util.WorldUtil;
 import me.darkeyedragon.randomtp.world.SpigotBiome;
 import me.darkeyedragon.randomtp.world.SpigotBlockType;
@@ -20,6 +19,7 @@ import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +30,8 @@ import java.util.regex.Pattern;
 
 public class BukkitConfigHandler implements RandomConfigHandler {
 
-    private final SpigotImpl impl;
+    private final RandomTeleport instance;
+    private final JavaPlugin plugin;
     private ConfigMessage configMessage;
     private ConfigQueue configQueue;
     private ConfigWorld configWorld;
@@ -38,11 +39,11 @@ public class BukkitConfigHandler implements RandomConfigHandler {
     private ConfigPlugin configPlugin;
     private ConfigEconomy configEconomy;
     private ConfigDebug configDebug;
-
     private ConfigBlacklist configBlacklist;
 
-    public BukkitConfigHandler(SpigotImpl impl) {
-        this.impl = impl;
+    public BukkitConfigHandler(RandomTeleport instance) {
+        this.instance = instance;
+        this.plugin = instance.getPlugin();
     }
 
     /**
@@ -87,7 +88,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
     }
 
     public void populateWorldConfigSection() {
-        configWorld = new ConfigWorld(impl.getInstance(), getOffsets());
+        configWorld = new ConfigWorld(instance, getOffsets());
     }
 
     public void populateConfigTeleport() {
@@ -114,10 +115,6 @@ public class BukkitConfigHandler implements RandomConfigHandler {
                 .price(getPrice());
     }
 
-    public RandomTeleport getImpl() {
-        return impl;
-    }
-
     @Override
     public SectionMessage getSectionMessage() {
         return configMessage;
@@ -131,6 +128,11 @@ public class BukkitConfigHandler implements RandomConfigHandler {
     @Override
     public SectionWorld getSectionWorld() {
         return configWorld;
+    }
+
+    @Override
+    public SectionBlacklist getSectionBlacklist() {
+        return configBlacklist;
     }
 
     @Override
@@ -154,33 +156,33 @@ public class BukkitConfigHandler implements RandomConfigHandler {
     }
 
     private String getInitTeleportMessage() {
-        return impl.getConfig().getString("message.initteleport");
+        return plugin.getConfig().getString("message.initteleport");
     }
 
     private String getNoWorldPermissionMessage() {
-        return impl.getConfig().getString("message.no_world_permission");
+        return plugin.getConfig().getString("message.no_world_permission");
     }
 
     private String getTeleportMessage() {
-        return impl.getConfig().getString("message.teleport");
+        return plugin.getConfig().getString("message.teleport");
     }
 
     private String getDepletedQueueMessage() {
-        return impl.getConfig().getString("message.depleted_queue", "&6Locations queue depleted... Forcing generation of a new location");
+        return plugin.getConfig().getString("message.depleted_queue", "&6Locations queue depleted... Forcing generation of a new location");
     }
 
     private String getCountdownRemainingMessage() {
-        return impl.getConfig().getString("message.countdown");
+        return plugin.getConfig().getString("message.countdown");
     }
 
     private Set<SectionWorldDetail> getOffsets() {
-        final ConfigurationSection section = impl.getConfig().getConfigurationSection("worlds");
+        final ConfigurationSection section = plugin.getConfig().getConfigurationSection("worlds");
         Set<String> keys = Objects.requireNonNull(section).getKeys(false);
         Set<SectionWorldDetail> sectionWorldDetailSet = new HashSet<>(keys.size());
         for (String key : keys) {
             World world = Bukkit.getWorld(key);
             if (world == null) {
-                impl.getInstance().getLogger().warn("World " + key + " does not exist! Skipping...");
+                instance.getInstance().getLogger().warn("World " + key + " does not exist! Skipping...");
                 continue;
             }
             boolean useWorldBorder = section.getBoolean(key + ".use_worldborder");
@@ -188,7 +190,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
             int radius = section.getInt(key + ".radius");
             int offsetX = section.getInt(key + ".offsetX");
             int offsetZ = section.getInt(key + ".offsetZ");
-            impl.getLogger().info(ChatColor.GREEN + key + " found! Loading...");
+            plugin.getLogger().info(ChatColor.GREEN + key + " found! Loading...");
             RandomWorld randomWorld = WorldUtil.toRandomWorld(world);
             sectionWorldDetailSet.add(new WorldConfigSection(new Offset(offsetX, offsetZ, radius), randomWorld, useWorldBorder, needsWorldPermission));
         }
@@ -196,27 +198,27 @@ public class BukkitConfigHandler implements RandomConfigHandler {
     }
 
     private String getInsufficientFundsMessage() {
-        return impl.getConfig().getString("message.economy.insufficient_funds", "&cYou do not have enough money to rtp!");
+        return plugin.getConfig().getString("message.economy.insufficient_funds", "&cYou do not have enough money to rtp!");
     }
 
     private double getPrice() {
-        return impl.getConfig().getDouble("economy.price", 0);
+        return plugin.getConfig().getDouble("economy.price", 0);
     }
 
     private String getPaymentMessage() {
-        String message = impl.getConfig().getString("message.economy.payment", "&aYou just paid &b%price &ato rtp!");
+        String message = plugin.getConfig().getString("message.economy.payment", "&aYou just paid &b%price &ato rtp!");
         message = ChatColor.translateAlternateColorCodes('&', message);
         message = message.replaceAll("%price", getPrice() + "");
         return message;
     }
 
     private long getCooldown() throws NumberFormatException {
-        String message = impl.getConfig().getString("teleport.cooldown", "60m");
+        String message = plugin.getConfig().getString("teleport.cooldown", "60m");
         return TimeUtil.stringToLong(message);
     }
 
     private long getTeleportDelay() {
-        String message = impl.getConfig().getString("teleport.delay", "0s");
+        String message = plugin.getConfig().getString("teleport.delay", "0s");
         if (message != null) {
             return TimeUtil.stringToTicks(message);
         }
@@ -224,45 +226,45 @@ public class BukkitConfigHandler implements RandomConfigHandler {
     }
 
     private int getInitDelay() {
-        return impl.getConfig().getInt("queue.init_delay", 60);
+        return plugin.getConfig().getInt("queue.init_delay", 60);
     }
 
     private boolean getDebugShowQueuePopulation() {
-        return impl.getConfig().getBoolean("debug.show_queue_population", true);
+        return plugin.getConfig().getBoolean("debug.show_queue_population", true);
     }
 
     private List<String> getPlugins() {
-        return impl.getConfig().getStringList("plugins");
+        return plugin.getConfig().getStringList("plugins");
     }
 
     private int getQueueSize() {
-        return impl.getConfig().getInt("queue.size", 5);
+        return plugin.getConfig().getInt("queue.size", 5);
     }
 
     private String getCancelMessage() {
-        return impl.getConfig().getString("message.teleport_canceled", "&cYou moved! Teleportation canceled");
+        return plugin.getConfig().getString("message.teleport_canceled", "&cYou moved! Teleportation canceled");
     }
 
     private String getInitTeleportDelay() {
-        return impl.getConfig().getString("message.initteleport_delay", "&aYou will be teleported in &6%s seconds. Do not move");
+        return plugin.getConfig().getString("message.initteleport_delay", "&aYou will be teleported in &6%s seconds. Do not move");
     }
 
     private boolean isCanceledOnMove() {
-        return impl.getConfig().getBoolean("teleport.cancel_on_move", false);
+        return plugin.getConfig().getBoolean("teleport.cancel_on_move", false);
     }
 
     private String getEmptyQueueMessage() {
-        return impl.getConfig().getString("message.empty_queue", "&cThere are no locations available for this world! Try again in a bit or ask an admin to reload the config.");
+        return plugin.getConfig().getString("message.empty_queue", "&cThere are no locations available for this world! Try again in a bit or ask an admin to reload the config.");
     }
 
 
     public void setTeleportPrice(double price) {
-        impl.getConfig().set("economy.price", price);
-        impl.saveConfig();
+        plugin.getConfig().set("economy.price", price);
+        plugin.saveConfig();
     }
 
     private long getTeleportDeathTimer() {
-        String message = impl.getConfig().getString("teleport.death_timer", "10s");
+        String message = plugin.getConfig().getString("teleport.death_timer", "10s");
         if (message != null) {
             return TimeUtil.stringToTicks(message);
         }
@@ -270,10 +272,10 @@ public class BukkitConfigHandler implements RandomConfigHandler {
     }
 
     public List<String> getSignLines() {
-        return impl.getConfig().getStringList("message.sign");
+        return plugin.getConfig().getStringList("message.sign");
     }
 
-    public Blacklist getBlacklist(){
+    public Blacklist getBlacklist() throws InvalidConfigurationException {
 
         Blacklist blacklist = new Blacklist();
 
@@ -284,7 +286,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
     }
 
     private DimensionData getDimData(Dimension dimension) throws InvalidConfigurationException {
-        ConfigurationSection blacklistSec = impl.getConfig().getConfigurationSection("blacklist");
+        ConfigurationSection blacklistSec = plugin.getConfig().getConfigurationSection("blacklist");
         if (blacklistSec == null) throw new InvalidConfigurationException("blacklist section missing!");
         DimensionData dimensionData = new DimensionData();
 
@@ -327,7 +329,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
                         try {
                             dimensionData.addBlockType(new SpigotBlockType(Material.valueOf(matcher.group(0))));
                         } catch (IllegalArgumentException ex) {
-                            impl.getInstance().getLogger().warn(s + " is not a valid block.");
+                            instance.getInstance().getLogger().warn(s + " is not a valid block.");
                         }
                     }
                 }
@@ -345,7 +347,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
                     try {
                         dimensionData.addBiome(new SpigotBiome(Biome.valueOf(s.toUpperCase())));
                     } catch (IllegalArgumentException ex) {
-                        impl.getInstance().getLogger().warn(s + " is not a valid biome.");
+                        instance.getInstance().getLogger().warn(s + " is not a valid biome.");
                     }
                 }
             }

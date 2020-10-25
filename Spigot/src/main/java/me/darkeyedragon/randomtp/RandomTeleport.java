@@ -3,7 +3,7 @@ package me.darkeyedragon.randomtp;
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
 import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
-import me.darkeyedragon.randomtp.api.config.Blacklist;
+import me.darkeyedragon.randomtp.common.config.Blacklist;
 import me.darkeyedragon.randomtp.common.logging.PluginLogger;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.QueueListener;
@@ -41,8 +41,7 @@ import java.util.UUID;
 public final class RandomTeleport extends RandomTeleportPluginImpl{
 
 
-    private final JavaPlugin plugin;
-
+    private final SpigotImpl plugin;
 
     private HashMap<UUID, Long> cooldowns;
     private PaperCommandManager manager;
@@ -57,7 +56,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl{
     private static EcoHandler ecoHandler;
     private Blacklist blacklist;
 
-    public RandomTeleport(JavaPlugin plugin) {
+    public RandomTeleport(SpigotImpl plugin) {
         this.plugin = plugin;
     }
     PluginLogger logger;
@@ -132,6 +131,11 @@ public final class RandomTeleport extends RandomTeleportPluginImpl{
         return locationFactory;
     }
 
+    @Override
+    public RandomTeleportPluginImpl getInstance() {
+        return this;
+    }
+
     public DeathTracker getDeathTracker() {
         return deathTracker;
     }
@@ -177,7 +181,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl{
         } else {
             plugin.getLogger().warning("Vault not found. Currency based options are disabled.");
         }
-        manager.registerCommand(new TeleportCommand(this));
+        manager.registerCommand(new TeleportCommand((SpigotImpl) plugin));
         plugin.getServer().getPluginManager().registerEvents(new WorldLoadListener(this), plugin);
         plugin.getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), plugin);
         validatorList = new HashSet<>();
@@ -201,6 +205,10 @@ public final class RandomTeleport extends RandomTeleportPluginImpl{
         plugin.getServer().getPluginManager().registerEvents(new PluginLoadListener(this), plugin);
         plugin.getLogger().info(ChatColor.AQUA + "======================================");
         populateWorldQueue();
+    }
+
+    public SpigotImpl getPlugin() {
+        return plugin;
     }
 
     public BukkitAudiences getBukkitAudience() {

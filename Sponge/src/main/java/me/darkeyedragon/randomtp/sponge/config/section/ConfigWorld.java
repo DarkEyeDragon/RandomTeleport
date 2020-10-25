@@ -5,6 +5,7 @@ import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetai
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 
+import java.util.List;
 import java.util.Set;
 
 public class ConfigWorld implements SectionWorld {
