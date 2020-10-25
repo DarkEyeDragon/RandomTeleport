@@ -20,14 +20,16 @@ public class SpongeConfigHandler implements RandomConfigHandler {
     private ConfigPlugin configPlugin;
     private ConfigQueue configQueue;
     private ConfigTeleport configTeleport;
+    private ConfigWorld configWorld;
 
     private HoconConfigurationLoader loader;
-    private CommentedConfigurationNode root;
+
     @Override
     public void init() {
         loader = HoconConfigurationLoader.builder().setPath(new File("randomtp.conf").toPath()).build();
         try {
-            root = loader.load();
+            CommentedConfigurationNode root = loader.load();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -35,37 +37,37 @@ public class SpongeConfigHandler implements RandomConfigHandler {
 
     @Override
     public SectionDebug getSectionDebug() {
-        return null;
+        return configDebug;
     }
 
     @Override
     public SectionEconomy getSectionEconomy() {
-        return null;
+        return configEconomy;
     }
 
     @Override
     public SectionMessage getSectionMessage() {
-        return null;
+        return configMessage;
     }
 
     @Override
     public SectionPlugin getSectionPlugin() {
-        return null;
+        return configPlugin;
     }
 
     @Override
     public SectionQueue getSectionQueue() {
-        return null;
+        return configQueue;
     }
 
     @Override
     public SectionTeleport getSectionTeleport() {
-        return null;
+        return configTeleport;
     }
 
     @Override
     public SectionWorld getSectionWorld() {
-        return null;
+        return configWorld;
     }
-    
+
 }
