@@ -1,5 +1,6 @@
 package me.darkeyedragon.randomtp.common.config;
 
+import me.darkeyedragon.randomtp.api.config.Blacklist;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.config.section.*;
 

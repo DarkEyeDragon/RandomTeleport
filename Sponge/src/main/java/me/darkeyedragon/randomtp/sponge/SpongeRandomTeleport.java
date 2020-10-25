@@ -3,7 +3,7 @@ package me.darkeyedragon.randomtp.sponge;
 import com.google.inject.Inject;
 import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
-import me.darkeyedragon.randomtp.common.queue.WorldQueue;
+import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 import me.darkeyedragon.randomtp.common.eco.EcoHandler;
 import me.darkeyedragon.randomtp.common.logging.PluginLogger;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;

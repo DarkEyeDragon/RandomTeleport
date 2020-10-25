@@ -1,11 +1,11 @@
-package me.darkeyedragon.randomtp.common.queue;
+package me.darkeyedragon.randomtp.api.queue;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 
-class ObservableQueue<T> extends ArrayBlockingQueue<T> {
+public class ObservableQueue<T> extends ArrayBlockingQueue<T> {
 
     List<QueueListener<T>> listeners;
 

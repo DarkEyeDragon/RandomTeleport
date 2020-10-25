@@ -1,7 +1,7 @@
 package me.darkeyedragon.randomtp.api.config.section;
 
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
-import me.darkeyedragon.randomtp.common.queue.LocationQueue;
+import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 
 import java.util.Set;

@@ -1,4 +1,4 @@
-package me.darkeyedragon.randomtp.common.queue;
+package me.darkeyedragon.randomtp.api.queue;
 
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;

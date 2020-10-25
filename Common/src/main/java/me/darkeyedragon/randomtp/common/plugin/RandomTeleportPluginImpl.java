@@ -2,10 +2,10 @@ package me.darkeyedragon.randomtp.common.plugin;
 
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
+import me.darkeyedragon.randomtp.api.queue.LocationQueue;
+import me.darkeyedragon.randomtp.api.queue.QueueListener;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
-import me.darkeyedragon.randomtp.common.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
-import me.darkeyedragon.randomtp.common.queue.QueueListener;
 
 public abstract class RandomTeleportPluginImpl implements RandomTeleportPlugin{
 

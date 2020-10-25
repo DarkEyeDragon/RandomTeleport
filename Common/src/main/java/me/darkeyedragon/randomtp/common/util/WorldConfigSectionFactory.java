@@ -26,7 +26,7 @@ public class WorldConfigSectionFactory {
             offset.setZ(worldBorder.getCenter().getZ());
             offset.setRadius((int) Math.floor(worldBorder.getSize() / 2 - worldBorder.getWarningDistance()));
         } else {
-            offset = sectionWorldDetail.getOffset());
+            offset = sectionWorldDetail.getOffset();
         }
         return new WorldConfigSection(offset, sectionWorldDetail.getWorld(), sectionWorldDetail.useWorldBorder(), sectionWorldDetail.needsWorldPermission());
     }
