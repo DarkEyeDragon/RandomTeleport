@@ -1,16 +1,23 @@
 package me.darkeyedragon.randomtp.sponge.config;
 
+import com.google.inject.Inject;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.config.section.*;
 import me.darkeyedragon.randomtp.sponge.config.section.*;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
+import org.spongepowered.api.config.DefaultConfig;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class SpongeConfigHandler implements RandomConfigHandler {
+
+    @Inject
+    @DefaultConfig(sharedRoot = true)
+    private Path defaultConfig;
 
     private ConfigDebug configDebug;
     private ConfigBlacklist configBlacklist;
@@ -25,7 +32,7 @@ public class SpongeConfigHandler implements RandomConfigHandler {
 
     public SpongeConfigHandler() {
         loader = HoconConfigurationLoader.builder()
-                .setPath(Paths.get("randomtp.conf"))
+                .setPath(defaultConfig)
                 .build();
         try {
             CommentedConfigurationNode root = loader.load();
