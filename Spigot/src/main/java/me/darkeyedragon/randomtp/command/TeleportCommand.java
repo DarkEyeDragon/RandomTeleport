@@ -160,8 +160,6 @@ public class TeleportCommand extends BaseCommand {
                 if (offsetX == null) offsetX = 0;
                 if (offsetZ == null) offsetZ = 0;
             }
-            //WorldUtil.WORLD_MAP.put(Bukkit.getWorld(randomWorld.getUUID()), randomWorld);
-
             configWorld.add(new WorldConfigSection(new Offset(offsetX, offsetZ, radius), randomWorld, useWorldBorder, needsWorldPermission));
             LocationQueue locationQueue = instance.getQueue(randomWorld);
             if (locationQueue != null) {

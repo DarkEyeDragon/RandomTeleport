@@ -51,7 +51,7 @@ public class ConfigWorld implements SectionWorld {
     @Override
     public boolean contains(RandomWorld world) {
         for (SectionWorldDetail sectionWorldDetail : sectionWorldDetailSet) {
-            if (sectionWorldDetail.getWorld() == world) return true;
+            if (sectionWorldDetail.getWorld().equals(world)) return true;
         }
         return false;
     }

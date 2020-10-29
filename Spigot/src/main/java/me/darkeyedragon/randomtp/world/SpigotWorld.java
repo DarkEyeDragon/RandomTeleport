@@ -65,4 +65,18 @@ public class SpigotWorld implements RandomWorld {
     public RandomEnvironment getEnvironment() {
         return WorldUtil.toRandomEnvironment(world.getEnvironment());
     }
+
+    @Override
+    public int hashCode() {
+        return world.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(world == obj) return true;
+        if(obj instanceof RandomWorld){
+            return this.getUUID().equals(((RandomWorld)obj).getUUID());
+        }
+        return false;
+    }
 }
