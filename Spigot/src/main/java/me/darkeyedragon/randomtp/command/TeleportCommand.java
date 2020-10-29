@@ -30,6 +30,9 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @CommandAlias("rtp|randomtp|randomteleport")
 public class TeleportCommand extends BaseCommand {
 
@@ -67,7 +70,8 @@ public class TeleportCommand extends BaseCommand {
     @CommandPermission("rtp.teleport.self")
     @CommandCompletion("@players|@worlds")
     public void onTeleport(CommandSender sender, @Optional PlayerWorldContext target, @Optional @CommandPermission("rtp.teleport.world") World world) {
-        Player player;
+        Player player = null;
+        List<Player> targets = new ArrayList<>();
         RandomWorld newWorld;
         if (target == null) {
             if (sender instanceof Player) {
@@ -81,9 +85,9 @@ public class TeleportCommand extends BaseCommand {
                 throw new InvalidCommandArgument(true);
             }
         } else {
-            if (target.isPlayer()) {
+            if (target.getPlayers().size() > 0) {
                 if (sender.hasPermission("rtp.teleport.other")) {
-                    player = target.getPlayer();
+                    targets = target.getPlayers();
                     newWorld = WorldUtil.toRandomWorld(world);
                     if (!configWorld.contains(newWorld)) {
                         MessageUtil.sendMessage(instance, sender, configMessage.getNoWorldPermission(newWorld));
@@ -115,10 +119,20 @@ public class TeleportCommand extends BaseCommand {
             }
         }
         final RandomWorld finalWorld = newWorld;
+        if(player == null){
+            for (Player target1 : targets) {
+                teleport(sender, target1, finalWorld);
+            }
+        }else{
+            teleport(sender, player, finalWorld);
+        }
+    }
+
+    private void teleport(CommandSender sender, Player player, RandomWorld world) {
         final boolean useEco = bukkitConfigHandler.getSectionEconomy().useEco();
         final boolean bypassEco = player.hasPermission("rtp.eco.bypass");
         final boolean logic = useEco && !bypassEco;
-        TeleportProperty teleportProperty = new TeleportProperty(sender, player, finalWorld, sender.hasPermission("rtp.teleport.bypass"), sender.hasPermission("rtp.teleportdelay.bypass"), logic, bukkitConfigHandler, bukkitConfigHandler.getSectionTeleport().getCooldown());
+        TeleportProperty teleportProperty = new TeleportProperty(sender, player, world, sender.hasPermission("rtp.teleport.bypass"), sender.hasPermission("rtp.teleportdelay.bypass"), logic, bukkitConfigHandler, bukkitConfigHandler.getSectionTeleport().getCooldown());
         Teleport teleport = new Teleport(plugin, teleportProperty);
         teleport.random();
     }
