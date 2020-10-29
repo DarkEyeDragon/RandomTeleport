@@ -11,8 +11,8 @@ public class Blacklist implements RandomBlacklist {
 
     private final Map<Dimension, DimensionData> dimensions;
 
-    public Blacklist() {
-        dimensions = new HashMap<>();
+    public Blacklist(Map<Dimension, DimensionData> dimensions) {
+        this.dimensions = dimensions;
     }
 
     public Map<Dimension, DimensionData> getDimensions() {

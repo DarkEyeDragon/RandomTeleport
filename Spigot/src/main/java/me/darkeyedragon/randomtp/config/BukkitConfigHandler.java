@@ -276,13 +276,14 @@ public class BukkitConfigHandler implements RandomConfigHandler {
     }
 
     public Blacklist getBlacklist() throws InvalidConfigurationException {
-
-        Blacklist blacklist = new Blacklist();
+        //TODO FIX
+        /*Blacklist blacklist = new Blacklist();
 
         for (Dimension dimension : Dimension.values()) {
             blacklist.addDimensionData(dimension, getDimData(dimension));
         }
-        return blacklist;
+        return blacklist;*/
+        return null;
     }
 
     private DimensionData getDimData(Dimension dimension) throws InvalidConfigurationException {
