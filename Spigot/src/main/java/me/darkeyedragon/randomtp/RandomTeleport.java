@@ -3,7 +3,6 @@ package me.darkeyedragon.randomtp;
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
 import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
-import me.darkeyedragon.randomtp.common.config.Blacklist;
 import me.darkeyedragon.randomtp.common.logging.PluginLogger;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.QueueListener;
@@ -53,7 +52,6 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
     //Economy
     private Economy econ;
     private static EcoHandler ecoHandler;
-    private Blacklist blacklist;
 
     public RandomTeleport(SpigotImpl plugin) {
         this.plugin = plugin;
@@ -122,7 +120,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         return worldQueue.get(world);
     }
 
-    public PaperCommandManager getManager() {
+    public PaperCommandManager getCommandManager() {
         return manager;
     }
 
