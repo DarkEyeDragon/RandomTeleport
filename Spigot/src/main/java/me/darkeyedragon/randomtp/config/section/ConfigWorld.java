@@ -30,7 +30,7 @@ public class ConfigWorld implements SectionWorld {
     @Override
     public SectionWorldDetail getSectionWorldDetail(RandomWorld randomWorld) {
         for (SectionWorldDetail sectionWorldDetail : sectionWorldDetailSet) {
-            if (sectionWorldDetail.getWorld() == randomWorld) {
+            if (sectionWorldDetail.getWorld().equals(randomWorld)) {
                 return sectionWorldDetail;
             }
         }
