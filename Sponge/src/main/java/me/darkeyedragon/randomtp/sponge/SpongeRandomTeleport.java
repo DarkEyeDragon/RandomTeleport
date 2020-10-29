@@ -1,7 +1,6 @@
 package me.darkeyedragon.randomtp.sponge;
 
 import com.google.inject.Inject;
-import me.darkeyedragon.randomtp.api.ValidatorProvider;
 import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
@@ -28,7 +27,7 @@ import java.util.Set;
         name = "SpongeRandomTeleport",
         version = "1.0-SNAPSHOT"
 )
-public class SpongeRandomTeleport extends RandomTeleportPluginImpl implements ValidatorProvider {
+public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
 
     @Inject
     private Logger logger;
@@ -61,7 +60,7 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl implements Va
     }
 
     @Override
-    public Set<PluginLocationValidator> getValidatorList() {
+    public Set<PluginLocationValidator> getValidatorSet() {
         return null;
     }
 

@@ -1,6 +1,5 @@
 package me.darkeyedragon.randomtp;
 
-import me.darkeyedragon.randomtp.config.BukkitConfigHandler;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class SpigotImpl extends JavaPlugin {

@@ -1,6 +1,5 @@
 package me.darkeyedragon.randomtp.api.world.location.search;
 
-import me.darkeyedragon.randomtp.api.ValidatorProvider;
 import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
 import me.darkeyedragon.randomtp.api.config.Dimension;
 import me.darkeyedragon.randomtp.api.config.DimensionData;
@@ -15,25 +14,23 @@ import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 
 import java.util.EnumSet;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class BaseLocationSearcher implements LocationSearcher {
 
-    protected final ValidatorProvider plugin;
+    protected final Set<PluginLocationValidator> validatorSet;
     private final Dimension dimension;
     private final RandomBlacklist blacklist;
 
     protected final byte CHUNK_SIZE = 16; //The size (in blocks) of a chunk in all directions
     protected final byte CHUNK_SHIFT = 4; //The amount of bits needed to translate between locations and chunks
 
-    public BaseLocationSearcher(ValidatorProvider plugin, RandomBlacklist blacklist, Dimension dimension) {
+    public BaseLocationSearcher(Set<PluginLocationValidator> validatorSet, RandomBlacklist blacklist, Dimension dimension) {
         this.blacklist = blacklist;
-        //Illegal material types
-        //blacklistMaterial = new HashSet<>();
-        //blacklistBiome = new HashSet<>();
-        this.plugin = plugin;
         this.dimension = dimension;
+        this.validatorSet = validatorSet;
     }
 
     /* This is the final method that will be called from the other end, to get a location */
@@ -113,7 +110,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
 
     @Override
     public boolean isSafeForPlugins(RandomLocation location) {
-        for (PluginLocationValidator validator : plugin.getValidatorList()) {
+        for (PluginLocationValidator validator : validatorSet) {
             if (!validator.isValid(location)) {
                 return false;
             }

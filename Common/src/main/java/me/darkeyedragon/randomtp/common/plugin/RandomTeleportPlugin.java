@@ -18,7 +18,7 @@ public interface RandomTeleportPlugin<T> {
 
     EcoHandler getEcoHandler();
 
-    Set<PluginLocationValidator> getValidatorList();
+    Set<PluginLocationValidator> getValidatorSet();
 
     boolean setupEconomy();
 

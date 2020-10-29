@@ -1,6 +1,5 @@
 package me.darkeyedragon.randomtp.common.world.location.search;
 
-import me.darkeyedragon.randomtp.api.ValidatorProvider;
 import me.darkeyedragon.randomtp.api.config.Dimension;
 import me.darkeyedragon.randomtp.api.world.location.search.BaseLocationSearcher;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPlugin;
@@ -18,7 +17,7 @@ public class EndLocationSearcher extends BaseLocationSearcher {
      * @param plugin The plugin instance
      */
     public EndLocationSearcher(RandomTeleportPlugin<RandomTeleportPluginImpl> plugin) {
-        super((ValidatorProvider) plugin.getInstance(), plugin.getConfigHandler().getSectionBlacklist().getBlacklist(), Dimension.END);
+        super(plugin.getInstance().getValidatorSet(), plugin.getConfigHandler().getSectionBlacklist().getBlacklist(), Dimension.END);
     }
 
     /*@Override

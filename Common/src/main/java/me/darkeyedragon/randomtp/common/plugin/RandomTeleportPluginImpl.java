@@ -14,7 +14,7 @@ public abstract class RandomTeleportPluginImpl implements RandomTeleportPlugin<R
         populateWorldQueue();
     }
 
-    public final void populateWorldQueue() {
+    private void populateWorldQueue() {
         RandomConfigHandler configHandler = getConfigHandler();
         getLogger().info("Populating WorldQueue");
         long startTime = System.currentTimeMillis();

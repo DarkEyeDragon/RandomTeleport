@@ -1,6 +1,5 @@
 package me.darkeyedragon.randomtp.common.world.location.search;
 
-import me.darkeyedragon.randomtp.api.ValidatorProvider;
 import me.darkeyedragon.randomtp.api.config.Dimension;
 import me.darkeyedragon.randomtp.api.world.RandomChunk;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
@@ -19,7 +18,7 @@ public class NetherLocationSearcher extends BaseLocationSearcher {
      * @param plugin the plugin instance
      */
     public NetherLocationSearcher(RandomTeleportPlugin<RandomTeleportPluginImpl> plugin) {
-        super((ValidatorProvider) plugin.getInstance(), plugin.getConfigHandler().getSectionBlacklist().getBlacklist(), Dimension.NETHER);
+        super(plugin.getInstance().getValidatorSet(), plugin.getConfigHandler().getSectionBlacklist().getBlacklist(), Dimension.NETHER);
     }
 
     /* Will search through the chunk to find a location that is safe, returning null if none is found. */

@@ -31,14 +31,13 @@ import org.bukkit.World;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public final class RandomTeleport extends RandomTeleportPluginImpl{
+public final class RandomTeleport extends RandomTeleportPluginImpl {
 
 
     private final SpigotImpl plugin;
@@ -107,7 +106,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl{
         return cooldowns;
     }
 
-    public Set<PluginLocationValidator> getValidatorList() {
+    public Set<PluginLocationValidator> getValidatorSet() {
         return validatorList;
     }
 
@@ -143,9 +142,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl{
     @Override
     public void init() {
         // Plugin startup logic
-        super.init();
         logger = new BukkitLogger();
-
         plugin.saveDefaultConfig();
         bukkitAudience = BukkitAudiences.create(plugin);
         manager = new PaperCommandManager(plugin);
@@ -204,7 +201,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl{
         });
         plugin.getServer().getPluginManager().registerEvents(new PluginLoadListener(this), plugin);
         plugin.getLogger().info(ChatColor.AQUA + "======================================");
-        populateWorldQueue();
+        super.init();
     }
 
     public SpigotImpl getPlugin() {
