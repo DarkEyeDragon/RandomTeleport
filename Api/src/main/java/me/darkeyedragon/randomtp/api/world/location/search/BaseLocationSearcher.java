@@ -1,38 +1,36 @@
 package me.darkeyedragon.randomtp.api.world.location.search;
 
-import me.darkeyedragon.randomtp.api.RandomPlugin;
 import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
-import me.darkeyedragon.randomtp.api.config.Blacklist;
 import me.darkeyedragon.randomtp.api.config.Dimension;
 import me.darkeyedragon.randomtp.api.config.DimensionData;
+import me.darkeyedragon.randomtp.api.config.RandomBlacklist;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.world.RandomBlockType;
 import me.darkeyedragon.randomtp.api.world.RandomChunk;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.block.BlockFace;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
+import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 
 import java.util.EnumSet;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class BaseLocationSearcher implements LocationSearcher {
 
-    protected final RandomPlugin plugin;
+    protected final Set<PluginLocationValidator> validatorSet;
     private final Dimension dimension;
-    private final Blacklist blacklist;
+    private final RandomBlacklist blacklist;
 
     protected final byte CHUNK_SIZE = 16; //The size (in blocks) of a chunk in all directions
     protected final byte CHUNK_SHIFT = 4; //The amount of bits needed to translate between locations and chunks
 
-    public BaseLocationSearcher(RandomPlugin plugin, Blacklist blacklist, Dimension dimension) {
+    public BaseLocationSearcher(Set<PluginLocationValidator> validatorSet, RandomBlacklist blacklist, Dimension dimension) {
         this.blacklist = blacklist;
-        //Illegal material types
-        //blacklistMaterial = new HashSet<>();
-        //blacklistBiome = new HashSet<>();
-        this.plugin = plugin;
         this.dimension = dimension;
+        this.validatorSet = validatorSet;
     }
 
     /* This is the final method that will be called from the other end, to get a location */
@@ -79,9 +77,10 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
 
     CompletableFuture<RandomChunk> getRandomChunkAsync(SectionWorldDetail sectionWorldDetail) {
         ThreadLocalRandom rnd = ThreadLocalRandom.current();
-        int chunkRadius = sectionWorldDetail.getRadius() >> CHUNK_SHIFT;
-        int chunkOffsetX = sectionWorldDetail.getX() >> CHUNK_SHIFT;
-        int chunkOffsetZ = sectionWorldDetail.getZ() >> CHUNK_SHIFT;
+        Offset offset = sectionWorldDetail.getOffset();
+        int chunkRadius = offset.getRadius() >> CHUNK_SHIFT;
+        int chunkOffsetX = offset.getX() >> CHUNK_SHIFT;
+        int chunkOffsetZ = offset.getZ() >> CHUNK_SHIFT;
         int x = rnd.nextInt(-chunkRadius, chunkRadius);
         int z = rnd.nextInt(-chunkRadius, chunkRadius);
         RandomWorld world = sectionWorldDetail.getWorld();
@@ -111,7 +110,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
 
     @Override
     public boolean isSafeForPlugins(RandomLocation location) {
-        for (PluginLocationValidator validator : plugin.getValidatorList()) {
+        for (PluginLocationValidator validator : validatorSet) {
             if (!validator.isValid(location)) {
                 return false;
             }

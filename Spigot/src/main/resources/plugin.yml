@@ -1,6 +1,6 @@
 name: RandomTeleport
 version: ${project.version}.${build}
-main: me.darkeyedragon.randomtp.RandomTeleport
+main: me.darkeyedragon.randomtp.SpigotImpl
 api-version: 1.13
 authors: [DarkEyeDragon]
 softdepend:

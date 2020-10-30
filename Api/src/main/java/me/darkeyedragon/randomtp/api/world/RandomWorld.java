@@ -23,4 +23,10 @@ public interface RandomWorld {
     RandomWorldBorder getWorldBorder();
 
     RandomEnvironment getEnvironment();
+    /**
+     * This method is required to be overridden to prevent duplicate worlds
+     * @param object the object you want to compare to
+     * @return true if the world is the same
+     */
+    boolean equals(Object object);
 }

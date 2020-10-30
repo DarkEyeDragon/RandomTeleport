@@ -18,7 +18,7 @@ public class PluginLoadListener implements Listener {
 
     @EventHandler
     public void onPluginEnable(PluginEnableEvent event) {
-        new ArrayList<>(plugin.getValidatorList()).replaceAll(chunkValidator -> {
+        new ArrayList<>(plugin.getValidatorSet()).replaceAll(chunkValidator -> {
             if (chunkValidator.getName().equalsIgnoreCase(event.getPlugin().getName()) && !chunkValidator.isLoaded()) {
                 chunkValidator.load();
                 plugin.getLogger().info(ChatColor.GREEN + event.getPlugin().getName() + " as validator.");

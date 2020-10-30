@@ -1,8 +1,7 @@
 package me.darkeyedragon.randomtp.teleport;
 
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
-import me.darkeyedragon.randomtp.config.ConfigHandler;
-import org.bukkit.World;
+import me.darkeyedragon.randomtp.config.BukkitConfigHandler;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -14,17 +13,17 @@ public class TeleportProperty {
     private final boolean bypassCooldown;
     private final boolean ignoreTeleportDelay;
     private final boolean useEco;
-    private final ConfigHandler configHandler;
+    private final BukkitConfigHandler bukkitConfigHandler;
     private final long cooldown;
 
-    public TeleportProperty(CommandSender commandSender, Player player, RandomWorld world, boolean bypassCooldown, boolean ignoreTeleportDelay, boolean useEco, ConfigHandler configHandler, long cooldown) {
+    public TeleportProperty(CommandSender commandSender, Player player, RandomWorld world, boolean bypassCooldown, boolean ignoreTeleportDelay, boolean useEco, BukkitConfigHandler bukkitConfigHandler, long cooldown) {
         this.commandSender = commandSender;
         this.player = player;
         this.world = world;
         this.bypassCooldown = bypassCooldown;
         this.ignoreTeleportDelay = ignoreTeleportDelay;
         this.useEco = useEco;
-        this.configHandler = configHandler;
+        this.bukkitConfigHandler = bukkitConfigHandler;
         this.cooldown = cooldown;
     }
 
@@ -52,8 +51,8 @@ public class TeleportProperty {
         return useEco;
     }
 
-    public ConfigHandler getConfigHandler() {
-        return configHandler;
+    public BukkitConfigHandler getConfigHandler() {
+        return bukkitConfigHandler;
     }
 
     public long getCooldown() {

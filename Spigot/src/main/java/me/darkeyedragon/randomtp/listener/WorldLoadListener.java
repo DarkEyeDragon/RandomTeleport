@@ -1,33 +1,28 @@
 package me.darkeyedragon.randomtp.listener;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
-import me.darkeyedragon.randomtp.config.ConfigHandler;
-import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.event.EventHandler;
+import me.darkeyedragon.randomtp.config.BukkitConfigHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.world.WorldLoadEvent;
 
 public class WorldLoadListener implements Listener {
 
-    private final ConfigHandler configHandler;
+    private final BukkitConfigHandler bukkitConfigHandler;
     private final RandomTeleport plugin;
 
     public WorldLoadListener(RandomTeleport plugin) {
         this.plugin = plugin;
-        this.configHandler = plugin.getConfigHandler();
+        this.bukkitConfigHandler = plugin.getConfigHandler();
     }
 
     /*@EventHandler
     public void onWorldLoad(WorldLoadEvent event) {
         World world = event.getWorld();
-        if (configHandler.getSectionWorld().getWorlds().contains(world)) {
+        if (bukkitConfigHandler.getSectionWorld().getWorlds().contains(world)) {
             //Add a new world to the world queue and generate random locations
-            LocationQueue locationQueue = new LocationQueue(configHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(world, plugin));
+            LocationQueue locationQueue = new LocationQueue(bukkitConfigHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(world, plugin));
             //Subscribe to the locationqueue to be notified of changes
-            if (configHandler.getSectionDebug().isShowQueuePopulation()) {
-                int size = configHandler.getSectionQueue().getSize();
+            if (bukkitConfigHandler.getSectionDebug().isShowQueuePopulation()) {
+                int size = bukkitConfigHandler.getSectionQueue().getSize();
                 locationQueue.subscribe(new QueueListener<Location>() {
                     @Override
                     public void onAdd(Location element) {

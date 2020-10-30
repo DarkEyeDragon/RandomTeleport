@@ -10,4 +10,5 @@ public interface RandomConfigHandler {
     SectionQueue getSectionQueue();
     SectionTeleport getSectionTeleport();
     SectionWorld getSectionWorld();
+    SectionBlacklist getSectionBlacklist();
 }
