@@ -57,12 +57,17 @@
                             <pattern>net.kyori</pattern>
                             <shadedPattern>me.darkeyedragon.randomtp.shaded.kyori</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>org.bstats</pattern>
+                            <shadedPattern>me.darkeyedragon.randomtp.shaded.bstats</shadedPattern>
+                        </relocation>
                     </relocations>
                     <filters>
                         <filter>
                             <artifact>*.*</artifact>
                             <excludes>
-                                <exclude>org/checkerframework/**</exclude> <!-- From kyori adventure, no need to shade annotations -->
+                                <exclude>org/checkerframework/**
+                                </exclude> <!-- From kyori adventure, no need to shade annotations -->
                             </excludes>
                         </filter>
                     </filters>
@@ -124,6 +129,11 @@
         <repository>
             <id>sonatype-snapshots</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+        <!--BStats-->
+        <repository>
+            <id>CodeMC</id>
+            <url>https://repo.codemc.org/repository/maven-public</url>
         </repository>
     </repositories>
 
@@ -215,6 +225,12 @@
             <artifactId>VaultAPI</artifactId>
             <version>1.7</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>1.7</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>
