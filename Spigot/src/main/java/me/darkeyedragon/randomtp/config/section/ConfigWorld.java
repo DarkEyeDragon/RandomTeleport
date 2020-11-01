@@ -6,8 +6,9 @@ import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
-import me.darkeyedragon.randomtp.world.location.WorldConfigSection;
-import me.darkeyedragon.randomtp.world.location.search.LocationSearcherFactory;
+import me.darkeyedragon.randomtp.api.world.location.Offset;
+import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
+import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.Set;
@@ -22,14 +23,14 @@ public class ConfigWorld implements SectionWorld {
 
     public ConfigWorld(RandomTeleport plugin, Set<SectionWorldDetail> sectionWorldDetailsSet) {
         this.plugin = plugin;
-        section = plugin.getConfig().getConfigurationSection("worlds");
+        section = plugin.getPlugin().getConfig().getConfigurationSection("worlds");
         this.sectionWorldDetailSet = sectionWorldDetailsSet;
     }
 
     @Override
     public SectionWorldDetail getSectionWorldDetail(RandomWorld randomWorld) {
         for (SectionWorldDetail sectionWorldDetail : sectionWorldDetailSet) {
-            if (sectionWorldDetail.getWorld() == randomWorld) {
+            if (sectionWorldDetail.getWorld().equals(randomWorld)) {
                 return sectionWorldDetail;
             }
         }
@@ -50,7 +51,7 @@ public class ConfigWorld implements SectionWorld {
     @Override
     public boolean contains(RandomWorld world) {
         for (SectionWorldDetail sectionWorldDetail : sectionWorldDetailSet) {
-            if (sectionWorldDetail.getWorld() == world) return true;
+            if (sectionWorldDetail.getWorld().equals(world)) return true;
         }
         return false;
     }
@@ -62,12 +63,13 @@ public class ConfigWorld implements SectionWorld {
         }
         RandomWorld randomWorld = sectionWorldDetail.getWorld();
         String worldName = randomWorld.getName();
+        Offset offset = sectionWorldDetail.getOffset();
         section.set(worldName + ".use_worldborder", sectionWorldDetail.useWorldBorder());
         section.set(worldName + ".needs_world_permission", sectionWorldDetail.needsWorldPermission());
-        section.set(worldName + ".radius", sectionWorldDetail.getRadius());
-        section.set(worldName + ".offsetX", sectionWorldDetail.getX());
-        section.set(worldName + ".offsetZ", sectionWorldDetail.getZ());
-        plugin.saveConfig();
+        section.set(worldName + ".radius", offset.getRadius());
+        section.set(worldName + ".offsetX", offset.getX());
+        section.set(worldName + ".offsetZ", offset.getZ());
+        plugin.getPlugin().saveConfig();
         sectionWorldDetailSet.add(sectionWorldDetail);
         return generateLocations(randomWorld);
     }
@@ -89,7 +91,7 @@ public class ConfigWorld implements SectionWorld {
         }
         section.set(world.getName(), null);
         sectionWorldDetailSet.remove(getSectionWorldDetail(world));
-        plugin.saveConfig();
+        plugin.getPlugin().saveConfig();
         plugin.getWorldQueue().remove(world);
         return true;
     }

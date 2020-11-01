@@ -5,8 +5,8 @@ import me.darkeyedragon.randomtp.api.config.section.subsection.SubSectionEconomy
 import me.darkeyedragon.randomtp.api.config.section.subsection.SubSectionSign;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
-import me.darkeyedragon.randomtp.util.CustomTime;
-import me.darkeyedragon.randomtp.util.TimeUtil;
+import me.darkeyedragon.randomtp.common.util.CustomTime;
+import me.darkeyedragon.randomtp.common.util.TimeUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.ChatColor;

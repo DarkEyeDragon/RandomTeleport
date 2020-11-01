@@ -1,13 +1,13 @@
 # User-specific stuff
-.idea/
-
-*.iml
-*.ipr
-*.iws
 
 # IntelliJ
 out/
-
+/.idea/
+build/
+out/
+run/
+*.iml
+.idea_modules/
 # Compiled class file
 *.class
 

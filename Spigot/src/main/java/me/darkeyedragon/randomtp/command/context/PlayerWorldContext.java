@@ -5,31 +5,38 @@ import me.darkeyedragon.randomtp.util.WorldUtil;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-public class PlayerWorldContext {
-    private Player player;
-    private World world;
+import java.util.ArrayList;
+import java.util.List;
 
-    public boolean isPlayer() {
-        return player != null;
+public class PlayerWorldContext {
+    private final List<Player> players;
+    private RandomWorld world;
+
+    public PlayerWorldContext() {
+        players = new ArrayList<>(1);
     }
 
     public boolean isWorld() {
         return world != null;
     }
 
-    public Player getPlayer() {
-        return player;
+    public List<Player> getPlayers() {
+        return players;
     }
 
-    public void setPlayer(Player player) {
-        this.player = player;
+    public void addPlayer(Player player) {
+        players.add(player);
     }
 
     public RandomWorld getWorld() {
-        return WorldUtil.toRandomWorld(world);
+        return world;
     }
 
     public void setWorld(World world) {
+        this.world = WorldUtil.toRandomWorld(world);
+    }
+
+    public void setWorld(RandomWorld world) {
         this.world = world;
     }
 }
