@@ -3,15 +3,15 @@ package me.darkeyedragon.randomtp.teleport;
 import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.SpigotImpl;
+import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
 import me.darkeyedragon.randomtp.common.eco.EcoHandler;
-import me.darkeyedragon.randomtp.config.BukkitConfigHandler;
 import me.darkeyedragon.randomtp.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.util.MessageUtil;
-import me.darkeyedragon.randomtp.util.location.LocationUtil;
 import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
 import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
+import me.darkeyedragon.randomtp.util.WorldUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -26,26 +26,32 @@ public class Teleport {
     private final SpigotImpl impl;
     private final RandomTeleport plugin;
     private final TeleportProperty property;
-    private final BukkitConfigHandler bukkitConfigHandler;
+    private final RandomConfigHandler configHandler;
     private final Player player;
-    private EcoHandler ecoHandler;
+    private final EcoHandler ecoHandler;
+    private final long cooldown;
 
+    /**
+     * @param impl the Spigot implementation class.
+     * @param property the {@link TeleportProperty} used to get the teleport data from.
+     */
     public Teleport(SpigotImpl impl, TeleportProperty property) {
         this.impl = impl;
         this.plugin = impl.getInstance();
         this.property = property;
-        this.bukkitConfigHandler = property.getConfigHandler();
+        this.configHandler = property.getConfigHandler();
         this.player = property.getPlayer();
+        this.cooldown = configHandler.getSectionTeleport().getCooldown();
+        this.ecoHandler = plugin.getEcoHandler();
     }
 
     public void random() {
         final long delay;
-        double price = bukkitConfigHandler.getSectionEconomy().getPrice();
+        double price = configHandler.getSectionEconomy().getPrice();
         if (property.isUseEco()) {
-            ecoHandler = plugin.getEcoHandler();
             if (ecoHandler != null) {
                 if (!ecoHandler.hasEnough(player.getUniqueId(), price)) {
-                    MessageUtil.sendMessage(plugin, player, bukkitConfigHandler.getSectionMessage().getSubSectionEconomy().getInsufficientFunds());
+                    MessageUtil.sendMessage(plugin, player, configHandler.getSectionMessage().getSubSectionEconomy().getInsufficientFunds());
                     return;
                 }
             } else {
@@ -57,29 +63,29 @@ public class Teleport {
         if (property.isIgnoreTeleportDelay()) {
             delay = 0;
         } else {
-            delay = bukkitConfigHandler.getSectionTeleport().getDelay();
+            delay = configHandler.getSectionTeleport().getDelay();
         }
         // Check if the player still has a cooldown active.
-        if (property.getCooldown() > 0 && plugin.getCooldowns().containsKey(player.getUniqueId()) && !property.isBypassCooldown()) {
+        if (cooldown > 0 && plugin.getCooldowns().containsKey(player.getUniqueId()) && !property.isBypassCooldown()) {
             long lastTp = plugin.getCooldowns().get(player.getUniqueId());
-            long remaining = lastTp + property.getCooldown() - System.currentTimeMillis();
+            long remaining = lastTp + cooldown - System.currentTimeMillis();
             boolean ableToTp = remaining < 0;
             if (!ableToTp) {
-                MessageUtil.sendMessage(plugin, player, bukkitConfigHandler.getSectionMessage().getCountdown(remaining));
+                MessageUtil.sendMessage(plugin, player, configHandler.getSectionMessage().getCountdown(remaining));
                 return;
             }
         }
-        if (delay == 0) {
-            teleport();
-        } else {
-            MessageUtil.sendMessage(plugin, player, bukkitConfigHandler.getSectionMessage().getInitTeleportDelay(delay));
+        //Initiate the delay timer if the delay is higher than 0
+        if (delay > 0) {
+            MessageUtil.sendMessage(plugin, player, configHandler.getSectionMessage().getInitTeleportDelay(delay));
             AtomicBoolean complete = new AtomicBoolean(false);
             int taskId = Bukkit.getScheduler().runTaskLater(impl, () -> {
                 complete.set(true);
                 teleport();
             }, delay).getTaskId();
             Location originalLoc = player.getLocation().clone();
-            if (bukkitConfigHandler.getSectionTeleport().isCancelOnMove()) {
+            if (configHandler.getSectionTeleport().isCancelOnMove()) {
+                //Cancel the teleport task if the player moves
                 Bukkit.getScheduler().runTaskTimer(impl, bukkitTask -> {
                     Location currentLoc = player.getLocation();
                     if (complete.get()) {
@@ -87,10 +93,12 @@ public class Teleport {
                     } else if ((originalLoc.getX() != currentLoc.getX() || originalLoc.getY() != currentLoc.getY() || originalLoc.getZ() != currentLoc.getZ())) {
                         Bukkit.getScheduler().cancelTask(taskId);
                         bukkitTask.cancel();
-                        MessageUtil.sendMessage(plugin, player, bukkitConfigHandler.getSectionMessage().getTeleportCanceled());
+                        MessageUtil.sendMessage(plugin, player, configHandler.getSectionMessage().getTeleportCanceled());
                     }
                 }, 0, 5L);
             }
+        } else {
+            teleport();
         }
     }
 
@@ -100,7 +108,7 @@ public class Teleport {
             tracker.getBukkitTask(player).cancel();
             tracker.remove(player);
         }
-        plugin.getDeathTracker().add(player, bukkitConfigHandler.getSectionTeleport().getDeathTimer());
+        plugin.getDeathTracker().add(player, configHandler.getSectionTeleport().getDeathTimer());
     }
 
     private void drawWarpParticles(Player player) {
@@ -111,34 +119,36 @@ public class Teleport {
     private void teleport() {
         RandomLocation randomLocation = plugin.getWorldQueue().popLocation(property.getWorld());
         if (randomLocation == null) {
-            MessageUtil.sendMessage(plugin, property.getCommandSender(), bukkitConfigHandler.getSectionMessage().getDepletedQueue());
+            MessageUtil.sendMessage(plugin, property.getCommandSender(), configHandler.getSectionMessage().getDepletedQueue());
             return;
         }
-        Location location = LocationUtil.toLocation(randomLocation);
+        Location location = WorldUtil.toLocation(randomLocation);
         PaperLib.getChunkAtAsync(location).thenAccept(chunk -> {
             LocationSearcher baseLocationSearcher = LocationSearcherFactory.getLocationSearcher(property.getWorld(), plugin);
             if (!baseLocationSearcher.isSafe(randomLocation)) {
                 random();
                 return;
             }
-            Block block = chunk.getWorld().getBlockAt(LocationUtil.toLocation(randomLocation));
+            Block block = chunk.getWorld().getBlockAt(WorldUtil.toLocation(randomLocation));
             Location loc = block.getLocation().add(0.5, 1.5, 0.5);
             plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
             drawWarpParticles(player);
             PaperLib.teleportAsync(player, loc);
-            if (bukkitConfigHandler.getSectionTeleport().getDeathTimer() > 0) {
+            //If deathtimer is enabled add it to the collection
+            if (configHandler.getSectionTeleport().getDeathTimer() > 0) {
                 addToDeathTimer(player);
             }
             if (property.isUseEco() && plugin.getEcoHandler() != null) {
-                ecoHandler.makePayment(player.getUniqueId(), bukkitConfigHandler.getSectionEconomy().getPrice());
-                MessageUtil.sendMessage(plugin, player, bukkitConfigHandler.getSectionMessage().getSubSectionEconomy().getPayment());
+                ecoHandler.makePayment(player.getUniqueId(), configHandler.getSectionEconomy().getPrice());
+                MessageUtil.sendMessage(plugin, player, configHandler.getSectionMessage().getSubSectionEconomy().getPayment());
             }
             drawWarpParticles(player);
-            MessageUtil.sendMessage(plugin, player, bukkitConfigHandler.getSectionMessage().getTeleport(randomLocation));
+            MessageUtil.sendMessage(plugin, player, configHandler.getSectionMessage().getTeleport(randomLocation));
+            //Generate a new location after the init delay
             Bukkit.getScheduler().runTaskLater(plugin.getPlugin(), () -> {
                 WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(property.getWorld());
                 plugin.getWorldQueue().get(property.getWorld()).generate(worldConfigSection, 1);
-            }, bukkitConfigHandler.getSectionQueue().getInitDelay());
+            }, configHandler.getSectionQueue().getInitDelay());
         });
     }
 }

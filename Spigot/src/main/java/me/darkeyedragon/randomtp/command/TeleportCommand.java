@@ -28,7 +28,6 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -132,7 +131,7 @@ public class TeleportCommand extends BaseCommand {
         final boolean useEco = bukkitConfigHandler.getSectionEconomy().useEco();
         final boolean bypassEco = player.hasPermission("rtp.eco.bypass");
         final boolean logic = useEco && !bypassEco;
-        TeleportProperty teleportProperty = new TeleportProperty(sender, player, world, sender.hasPermission("rtp.teleport.bypass"), sender.hasPermission("rtp.teleportdelay.bypass"), logic, bukkitConfigHandler, bukkitConfigHandler.getSectionTeleport().getCooldown());
+        TeleportProperty teleportProperty = new TeleportProperty(sender, player, world, sender.hasPermission("rtp.teleport.bypass"), sender.hasPermission("rtp.teleportdelay.bypass"), logic, bukkitConfigHandler);
         Teleport teleport = new Teleport(plugin, teleportProperty);
         teleport.random();
     }

@@ -3,7 +3,7 @@ package me.darkeyedragon.randomtp.validator;
 import com.palmergames.bukkit.towny.TownyAPI;
 import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
-import me.darkeyedragon.randomtp.util.location.LocationUtil;
+import me.darkeyedragon.randomtp.util.WorldUtil;
 import org.bukkit.Location;
 
 public class TownyValidator implements PluginLocationValidator {
@@ -23,7 +23,7 @@ public class TownyValidator implements PluginLocationValidator {
 
     @Override
     public boolean isValid(RandomLocation location) {
-        Location loc = LocationUtil.toLocation(location);
+        Location loc = WorldUtil.toLocation(location);
         return instance.isWilderness(loc);
     }
 

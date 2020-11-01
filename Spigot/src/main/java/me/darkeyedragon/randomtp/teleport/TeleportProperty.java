@@ -1,9 +1,11 @@
 package me.darkeyedragon.randomtp.teleport;
 
+import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
-import me.darkeyedragon.randomtp.config.BukkitConfigHandler;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class TeleportProperty {
 
@@ -13,18 +15,25 @@ public class TeleportProperty {
     private final boolean bypassCooldown;
     private final boolean ignoreTeleportDelay;
     private final boolean useEco;
-    private final BukkitConfigHandler bukkitConfigHandler;
-    private final long cooldown;
+    private final RandomConfigHandler configHandler;
 
-    public TeleportProperty(CommandSender commandSender, Player player, RandomWorld world, boolean bypassCooldown, boolean ignoreTeleportDelay, boolean useEco, BukkitConfigHandler bukkitConfigHandler, long cooldown) {
+    /**
+     * @param commandSender       the {@link CommandSender} that executes the command.
+     * @param player              the target to teleport. Can be null.
+     * @param world               the {@link RandomWorld}.
+     * @param bypassCooldown      whether the cooldown should be ignored when teleporting the {@link Player}.
+     * @param ignoreTeleportDelay whether to ignore the teleport delay when teleporting the {@link Player}.
+     * @param useEco              whether the {@link Player} should pay for the teleport.
+     * @param configHandler       the {@link RandomConfigHandler}.
+     */
+    public TeleportProperty(@NotNull CommandSender commandSender, @Nullable Player player, @NotNull RandomWorld world, boolean bypassCooldown, boolean ignoreTeleportDelay, boolean useEco, @NotNull RandomConfigHandler configHandler) {
         this.commandSender = commandSender;
         this.player = player;
         this.world = world;
         this.bypassCooldown = bypassCooldown;
         this.ignoreTeleportDelay = ignoreTeleportDelay;
         this.useEco = useEco;
-        this.bukkitConfigHandler = bukkitConfigHandler;
-        this.cooldown = cooldown;
+        this.configHandler = configHandler;
     }
 
     public CommandSender getCommandSender() {
@@ -51,11 +60,8 @@ public class TeleportProperty {
         return useEco;
     }
 
-    public BukkitConfigHandler getConfigHandler() {
-        return bukkitConfigHandler;
+    public RandomConfigHandler getConfigHandler() {
+        return configHandler;
     }
 
-    public long getCooldown() {
-        return cooldown;
-    }
 }
