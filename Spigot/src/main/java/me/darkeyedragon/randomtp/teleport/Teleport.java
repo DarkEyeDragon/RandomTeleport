@@ -9,9 +9,9 @@ import me.darkeyedragon.randomtp.common.eco.EcoHandler;
 import me.darkeyedragon.randomtp.config.BukkitConfigHandler;
 import me.darkeyedragon.randomtp.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.util.MessageUtil;
-import me.darkeyedragon.randomtp.util.location.LocationUtil;
 import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
 import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
+import me.darkeyedragon.randomtp.util.WorldUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -114,14 +114,14 @@ public class Teleport {
             MessageUtil.sendMessage(plugin, property.getCommandSender(), bukkitConfigHandler.getSectionMessage().getDepletedQueue());
             return;
         }
-        Location location = LocationUtil.toLocation(randomLocation);
+        Location location = WorldUtil.toLocation(randomLocation);
         PaperLib.getChunkAtAsync(location).thenAccept(chunk -> {
             LocationSearcher baseLocationSearcher = LocationSearcherFactory.getLocationSearcher(property.getWorld(), plugin);
             if (!baseLocationSearcher.isSafe(randomLocation)) {
                 random();
                 return;
             }
-            Block block = chunk.getWorld().getBlockAt(LocationUtil.toLocation(randomLocation));
+            Block block = chunk.getWorld().getBlockAt(WorldUtil.toLocation(randomLocation));
             Location loc = block.getLocation().add(0.5, 1.5, 0.5);
             plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
             drawWarpParticles(player);

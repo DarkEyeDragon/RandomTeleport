@@ -36,7 +36,6 @@ import java.util.*;
 
 public final class RandomTeleport extends RandomTeleportPluginImpl {
 
-
     private final SpigotImpl plugin;
 
     private HashMap<UUID, Long> cooldowns;
@@ -47,23 +46,15 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
     private LocationFactory locationFactory;
     private DeathTracker deathTracker;
     private BukkitAudiences bukkitAudience;
+
     //Economy
     private Economy econ;
     private static EcoHandler ecoHandler;
 
-    public RandomTeleport(SpigotImpl plugin) {
-        this.plugin = plugin;
-    }
     PluginLogger logger;
 
-
-    @Override
-    public PluginLogger getLogger() {
-        return logger;
-    }
-
-    public EcoHandler getEcoHandler() {
-        return ecoHandler;
+    public RandomTeleport(SpigotImpl plugin) {
+        this.plugin = plugin;
     }
 
     public void subscribe(LocationQueue locationQueue, RandomWorld world) {
@@ -96,43 +87,6 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         econ = rsp.getProvider();
         ecoHandler = new BukkitEcoHandler(econ);
         return true;
-    }
-
-    public HashMap<UUID, Long> getCooldowns() {
-        return cooldowns;
-    }
-
-    public Set<PluginLocationValidator> getValidatorSet() {
-        return validatorList;
-    }
-
-    public BukkitConfigHandler getConfigHandler() {
-        return bukkitConfigHandler;
-    }
-
-    public WorldQueue getWorldQueue() {
-        return worldQueue;
-    }
-
-    public LocationQueue getQueue(RandomWorld world) {
-        return worldQueue.get(world);
-    }
-
-    public PaperCommandManager getCommandManager() {
-        return manager;
-    }
-
-    public LocationFactory getLocationFactory() {
-        return locationFactory;
-    }
-
-    @Override
-    public RandomTeleportPluginImpl getInstance() {
-        return this;
-    }
-
-    public DeathTracker getDeathTracker() {
-        return deathTracker;
     }
 
     @Override
@@ -220,5 +174,51 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
 
     public Economy getEcon() {
         return econ;
+    }
+
+    @Override
+    public PluginLogger getLogger() {
+        return logger;
+    }
+
+    public EcoHandler getEcoHandler() {
+        return ecoHandler;
+    }
+
+    public HashMap<UUID, Long> getCooldowns() {
+        return cooldowns;
+    }
+
+    public Set<PluginLocationValidator> getValidatorSet() {
+        return validatorList;
+    }
+
+    public BukkitConfigHandler getConfigHandler() {
+        return bukkitConfigHandler;
+    }
+
+    public WorldQueue getWorldQueue() {
+        return worldQueue;
+    }
+
+    public LocationQueue getQueue(RandomWorld world) {
+        return worldQueue.get(world);
+    }
+
+    public PaperCommandManager getCommandManager() {
+        return manager;
+    }
+
+    public LocationFactory getLocationFactory() {
+        return locationFactory;
+    }
+
+    @Override
+    public RandomTeleportPluginImpl getInstance() {
+        return this;
+    }
+
+    public DeathTracker getDeathTracker() {
+        return deathTracker;
     }
 }

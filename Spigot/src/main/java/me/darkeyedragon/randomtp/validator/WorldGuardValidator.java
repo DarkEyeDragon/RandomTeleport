@@ -6,7 +6,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
-import me.darkeyedragon.randomtp.util.location.LocationUtil;
+import me.darkeyedragon.randomtp.util.WorldUtil;
 import org.bukkit.Location;
 
 public class WorldGuardValidator implements PluginLocationValidator {
@@ -25,7 +25,7 @@ public class WorldGuardValidator implements PluginLocationValidator {
 
     @Override
     public boolean isValid(RandomLocation location) {
-        Location loc = LocationUtil.toLocation(location);
+        Location loc = WorldUtil.toLocation(location);
         RegionManager regions = instance.getPlatform().getRegionContainer().get(BukkitAdapter.adapt(loc.getWorld()));
         if (regions == null) return true;
         else {

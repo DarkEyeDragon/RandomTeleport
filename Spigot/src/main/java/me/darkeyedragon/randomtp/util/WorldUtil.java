@@ -6,14 +6,12 @@ import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.RandomWorldBorder;
 import me.darkeyedragon.randomtp.api.world.block.BlockFace;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
+import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.world.SpigotChunk;
 import me.darkeyedragon.randomtp.world.SpigotWorld;
 import me.darkeyedragon.randomtp.world.SpigotWorldBorder;
 import me.darkeyedragon.randomtp.world.block.SpigotBlock;
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.World;
-import org.bukkit.WorldBorder;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 
 import java.util.HashMap;
@@ -48,5 +46,13 @@ public class WorldUtil {
 
     public static RandomEnvironment toRandomEnvironment(World.Environment environment) {
         return RandomEnvironment.valueOf(environment.name());
+    }
+
+    public static RandomLocation toRandomLocation(Location location){
+        return new RandomLocation(WorldUtil.toRandomWorld(location.getWorld()), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    }
+
+    public static Location toLocation(RandomLocation location){
+        return new Location(WorldUtil.toWorld(location.getWorld()), location.getX(), location.getY(), location.getZ());
     }
 }

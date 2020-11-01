@@ -5,7 +5,7 @@ import com.massivecraft.factions.FLocation;
 import com.massivecraft.factions.Faction;
 import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
-import me.darkeyedragon.randomtp.util.location.LocationUtil;
+import me.darkeyedragon.randomtp.util.WorldUtil;
 import org.bukkit.Location;
 
 /**
@@ -28,7 +28,7 @@ public class FactionsUuidValidator implements PluginLocationValidator {
 
     @Override
     public boolean isValid(RandomLocation location) {
-        Location loc = LocationUtil.toLocation(location);
+        Location loc = WorldUtil.toLocation(location);
         FLocation fLocation = new FLocation(loc);
         Faction faction = instance.getFactionAt(fLocation);
         return faction.isWilderness() || faction.isWarZone();
