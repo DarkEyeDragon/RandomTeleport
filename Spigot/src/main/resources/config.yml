@@ -26,7 +26,7 @@ queue:
   init_delay: 60
 worlds:
   world:
-    #Use the worldborder (if set) for offset. This is the vanilla worldborder.
+    #Use the worldborder for offset. This is the vanilla worldborder.
     use_worldborder: true
     #Whether or not the user needs the rtp.world.<worldname> permission
     needs_world_permission: false

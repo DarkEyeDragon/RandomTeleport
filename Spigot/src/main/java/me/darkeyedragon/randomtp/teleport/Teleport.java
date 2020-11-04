@@ -7,6 +7,7 @@ import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
 import me.darkeyedragon.randomtp.common.eco.EcoHandler;
+import me.darkeyedragon.randomtp.event.RandomPreTeleportEvent;
 import me.darkeyedragon.randomtp.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.stat.BStats;
 import me.darkeyedragon.randomtp.util.MessageUtil;
@@ -47,6 +48,11 @@ public class Teleport {
     }
 
     public void random() {
+        RandomPreTeleportEvent event = new RandomPreTeleportEvent(player, property);
+        Bukkit.getServer().getPluginManager().callEvent(event);
+        if(event.isCancelled()){
+            return;
+        }
         final long delay;
         double price = configHandler.getSectionEconomy().getPrice();
         if (property.isUseEco()) {
