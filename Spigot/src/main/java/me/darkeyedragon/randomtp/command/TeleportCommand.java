@@ -132,7 +132,7 @@ public class TeleportCommand extends BaseCommand {
         final boolean bypassEco = player.hasPermission("rtp.eco.bypass");
         final boolean logic = useEco && !bypassEco;
         TeleportProperty teleportProperty = new TeleportProperty(sender, player, world, sender.hasPermission("rtp.teleport.bypass"), sender.hasPermission("rtp.teleportdelay.bypass"), logic, bukkitConfigHandler);
-        Teleport teleport = new Teleport(plugin, teleportProperty);
+        Teleport teleport = new Teleport(plugin, teleportProperty, bukkitConfigHandler.getSectionTeleport().getParticle());
         teleport.random();
     }
 

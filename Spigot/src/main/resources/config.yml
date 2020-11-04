@@ -44,6 +44,11 @@ teleport:
   #If players die within this time after RTP'ing they wont lose anything.
   #Set to 0 to disable. Default "10s"
   death_timer: "10s"
+  #The particle to display when the player is teleporting. NONE for no particles. A full list can be found on
+  #https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
+  #You also need to provide the amount of particles.
+  #Default: TOTEM:20
+  particle: TOTEM:20
 #Plugins to take into consideration when teleporting. A player will not be teleported in those regions
 #Currently supports Factions (FactionsUUID), WorldGuard, GriefPrevention, RedProtect, Towny
 #If you want more plugins to be supported: https://github.com/DarkEyeDragon/RandomTeleport/issues
