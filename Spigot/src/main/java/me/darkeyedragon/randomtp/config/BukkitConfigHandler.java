@@ -1,20 +1,21 @@
 package me.darkeyedragon.randomtp.config;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
-import me.darkeyedragon.randomtp.common.config.Blacklist;
 import me.darkeyedragon.randomtp.api.config.Dimension;
 import me.darkeyedragon.randomtp.api.config.DimensionData;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.config.section.*;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
+import me.darkeyedragon.randomtp.api.teleport.TeleportParticle;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.Offset;
-import me.darkeyedragon.randomtp.config.section.*;
+import me.darkeyedragon.randomtp.common.config.Blacklist;
 import me.darkeyedragon.randomtp.common.util.TimeUtil;
+import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
+import me.darkeyedragon.randomtp.config.section.*;
 import me.darkeyedragon.randomtp.util.WorldUtil;
 import me.darkeyedragon.randomtp.world.SpigotBiome;
 import me.darkeyedragon.randomtp.world.SpigotBlockType;
-import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
@@ -96,7 +97,8 @@ public class BukkitConfigHandler implements RandomConfigHandler {
                 .cooldown(getCooldown())
                 .delay(getTeleportDelay())
                 .cancelOnMove(isCanceledOnMove())
-                .deathTimer(getTeleportDeathTimer());
+                .deathTimer(getTeleportDeathTimer())
+                .particle(getParticle());
     }
 
     public void populateConfigDebug() {
@@ -351,6 +353,23 @@ public class BukkitConfigHandler implements RandomConfigHandler {
             }
         }
         return dimensionData;
+    }
+
+    private TeleportParticle<Particle> getParticle() {
+        ConfigurationSection section = plugin.getConfig().getConfigurationSection("teleport");
+        String particleString = section.getString("particle");
+        if(particleString == null || particleString.equalsIgnoreCase("none")) {
+            return new TeleportParticle<>(null, 0);
+        }
+        String[] split = particleString.split(":");
+        try{
+            Particle particle = Particle.valueOf(split[0].toUpperCase());
+            int amount = Integer.parseInt(split[1]);
+            return new TeleportParticle<>(particle, amount);
+        }catch (IllegalArgumentException exception){
+            exception.printStackTrace();
+        }
+        return new TeleportParticle<>(null, 0);
     }
 
     public ConfigBlacklist getConfigBlacklist() {

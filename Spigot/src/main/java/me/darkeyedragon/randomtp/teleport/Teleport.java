@@ -4,14 +4,16 @@ import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.SpigotImpl;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
+import me.darkeyedragon.randomtp.api.teleport.TeleportParticle;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
 import me.darkeyedragon.randomtp.common.eco.EcoHandler;
+import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
+import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
+import me.darkeyedragon.randomtp.event.RandomPreTeleportEvent;
 import me.darkeyedragon.randomtp.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.stat.BStats;
 import me.darkeyedragon.randomtp.util.MessageUtil;
-import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
-import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
 import me.darkeyedragon.randomtp.util.WorldUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -20,6 +22,7 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Teleport {
@@ -29,6 +32,7 @@ public class Teleport {
     private final TeleportProperty property;
     private final RandomConfigHandler configHandler;
     private final Player player;
+    private final TeleportParticle<Particle> particle;
     private final EcoHandler ecoHandler;
     private final long cooldown;
 
@@ -36,17 +40,23 @@ public class Teleport {
      * @param impl the Spigot implementation class.
      * @param property the {@link TeleportProperty} used to get the teleport data from.
      */
-    public Teleport(SpigotImpl impl, TeleportProperty property) {
+    public Teleport(SpigotImpl impl, TeleportProperty property, TeleportParticle<Particle> particle) {
         this.impl = impl;
         this.plugin = impl.getInstance();
         this.property = property;
         this.configHandler = property.getConfigHandler();
         this.player = property.getPlayer();
+        this.particle = particle;
         this.cooldown = configHandler.getSectionTeleport().getCooldown();
         this.ecoHandler = plugin.getEcoHandler();
     }
 
     public void random() {
+        RandomPreTeleportEvent event = new RandomPreTeleportEvent(player, property);
+        Bukkit.getServer().getPluginManager().callEvent(event);
+        if(event.isCancelled()){
+            return;
+        }
         final long delay;
         double price = configHandler.getSectionEconomy().getPrice();
         if (property.isUseEco()) {
@@ -112,9 +122,10 @@ public class Teleport {
         plugin.getDeathTracker().add(player, configHandler.getSectionTeleport().getDeathTimer());
     }
 
-    private void drawWarpParticles(Player player) {
+    private void drawWarpParticles(Player player, TeleportParticle<Particle> particle) {
         Location spawnLoc = player.getEyeLocation().add(player.getLocation().getDirection());
-        player.getWorld().spawnParticle(Particle.CLOUD, spawnLoc, 20);
+        Optional<Particle> optionalParticle = Optional.ofNullable(particle.getParticle());
+        optionalParticle.ifPresent(presentParticle -> player.getWorld().spawnParticle(presentParticle, spawnLoc, particle.getAmount()));
     }
 
     private void teleport() {
@@ -133,7 +144,7 @@ public class Teleport {
             Block block = chunk.getWorld().getBlockAt(WorldUtil.toLocation(randomLocation));
             Location loc = block.getLocation().add(0.5, 1.5, 0.5);
             plugin.getCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
-            drawWarpParticles(player);
+            drawWarpParticles(player, particle);
             PaperLib.teleportAsync(player, loc);
             //If deathtimer is enabled add it to the collection
             if (configHandler.getSectionTeleport().getDeathTimer() > 0) {
@@ -143,7 +154,7 @@ public class Teleport {
                 ecoHandler.makePayment(player.getUniqueId(), configHandler.getSectionEconomy().getPrice());
                 MessageUtil.sendMessage(plugin, player, configHandler.getSectionMessage().getSubSectionEconomy().getPayment());
             }
-            drawWarpParticles(player);
+            drawWarpParticles(player, particle);
             MessageUtil.sendMessage(plugin, player, configHandler.getSectionMessage().getTeleport(randomLocation));
             BStats.addTeleportStat();
             //Generate a new location after the init delay

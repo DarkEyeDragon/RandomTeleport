@@ -1,6 +1,7 @@
 package me.darkeyedragon.randomtp.sponge.config.section;
 
 import me.darkeyedragon.randomtp.api.config.section.SectionTeleport;
+import me.darkeyedragon.randomtp.api.teleport.TeleportParticle;
 import me.darkeyedragon.randomtp.common.util.TimeUtil;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
@@ -35,5 +36,11 @@ public class ConfigTeleport implements SectionTeleport {
     @Override
     public long getDeathTimer() {
         return TimeUtil.stringToLong(death_timer);
+    }
+
+    @Override
+    //TODO implement
+    public TeleportParticle getParticle() {
+        return null;
     }
 }
