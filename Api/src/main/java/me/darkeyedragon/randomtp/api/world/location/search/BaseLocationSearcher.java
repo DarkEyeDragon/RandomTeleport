@@ -1,6 +1,6 @@
 package me.darkeyedragon.randomtp.api.world.location.search;
 
-import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
+import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
 import me.darkeyedragon.randomtp.api.config.Dimension;
 import me.darkeyedragon.randomtp.api.config.DimensionData;
 import me.darkeyedragon.randomtp.api.config.RandomBlacklist;
@@ -20,14 +20,14 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class BaseLocationSearcher implements LocationSearcher {
 
-    protected final Set<PluginLocationValidator> validatorSet;
+    protected final Set<RandomLocationValidator> validatorSet;
     private final Dimension dimension;
     private final RandomBlacklist blacklist;
 
     protected final byte CHUNK_SIZE = 16; //The size (in blocks) of a chunk in all directions
     protected final byte CHUNK_SHIFT = 4; //The amount of bits needed to translate between locations and chunks
 
-    public BaseLocationSearcher(Set<PluginLocationValidator> validatorSet, RandomBlacklist blacklist, Dimension dimension) {
+    public BaseLocationSearcher(Set<RandomLocationValidator> validatorSet, RandomBlacklist blacklist, Dimension dimension) {
         this.blacklist = blacklist;
         this.dimension = dimension;
         this.validatorSet = validatorSet;
@@ -110,7 +110,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
 
     @Override
     public boolean isSafeForPlugins(RandomLocation location) {
-        for (PluginLocationValidator validator : validatorSet) {
+        for (RandomLocationValidator validator : validatorSet) {
             if (!validator.isValid(location)) {
                 return false;
             }

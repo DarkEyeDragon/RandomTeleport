@@ -4,12 +4,12 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
+import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.util.WorldUtil;
 import org.bukkit.Location;
 
-public class WorldGuardValidator implements PluginLocationValidator {
+public class WorldGuardValidator implements RandomLocationValidator {
     private final String name;
     private WorldGuard instance;
     private boolean isLoaded;

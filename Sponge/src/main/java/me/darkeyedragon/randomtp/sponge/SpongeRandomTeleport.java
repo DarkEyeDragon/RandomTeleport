@@ -1,7 +1,7 @@
 package me.darkeyedragon.randomtp.sponge;
 
 import com.google.inject.Inject;
-import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
+import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 import me.darkeyedragon.randomtp.common.eco.EcoHandler;
@@ -60,7 +60,7 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
     }
 
     @Override
-    public Set<PluginLocationValidator> getValidatorSet() {
+    public Set<RandomLocationValidator> getValidatorSet() {
         return null;
     }
 

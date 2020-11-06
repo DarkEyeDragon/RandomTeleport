@@ -2,8 +2,7 @@ package me.darkeyedragon.randomtp;
 
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
-import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
-import me.darkeyedragon.randomtp.common.logging.PluginLogger;
+import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.QueueListener;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
@@ -11,9 +10,12 @@ import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.command.TeleportCommand;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
-import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
-import me.darkeyedragon.randomtp.config.BukkitConfigHandler;
+import me.darkeyedragon.randomtp.common.addon.AddonManager;
 import me.darkeyedragon.randomtp.common.eco.EcoHandler;
+import me.darkeyedragon.randomtp.common.logging.PluginLogger;
+import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
+import me.darkeyedragon.randomtp.common.world.location.LocationFactory;
+import me.darkeyedragon.randomtp.config.BukkitConfigHandler;
 import me.darkeyedragon.randomtp.eco.BukkitEcoHandler;
 import me.darkeyedragon.randomtp.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.failsafe.listener.PlayerDeathListener;
@@ -21,7 +23,6 @@ import me.darkeyedragon.randomtp.listener.PluginLoadListener;
 import me.darkeyedragon.randomtp.listener.WorldLoadListener;
 import me.darkeyedragon.randomtp.log.BukkitLogger;
 import me.darkeyedragon.randomtp.validator.Validator;
-import me.darkeyedragon.randomtp.common.world.location.LocationFactory;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -40,7 +41,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
 
     private HashMap<UUID, Long> cooldowns;
     private PaperCommandManager manager;
-    private Set<PluginLocationValidator> validatorList;
+    private Set<RandomLocationValidator> validatorList;
     private WorldQueue worldQueue;
     private BukkitConfigHandler bukkitConfigHandler;
     private LocationFactory locationFactory;
@@ -52,6 +53,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
     private static EcoHandler ecoHandler;
 
     PluginLogger logger;
+    private AddonManager addonManager;
 
     public RandomTeleport(SpigotImpl plugin) {
         this.plugin = plugin;
@@ -92,6 +94,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
     @Override
     public void init() {
         // Plugin startup logic
+        addonManager = new AddonManager(this);
         logger = new BukkitLogger();
         plugin.saveDefaultConfig();
         bukkitAudience = BukkitAudiences.create(plugin);
@@ -145,7 +148,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         plugin.getLogger().info(ChatColor.AQUA + "======== [Loading validators] ========");
         bukkitConfigHandler.getSectionPlugin().getPlugins().forEach(s -> {
             if (plugin.getServer().getPluginManager().getPlugin(s) != null) {
-                PluginLocationValidator validator = Validator.getValidator(s);
+                RandomLocationValidator validator = Validator.getValidator(s);
                 if (validator != null) {
                     validator.load();
                     if (validator.isLoaded()) {
@@ -162,6 +165,11 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         plugin.getServer().getPluginManager().registerEvents(new PluginLoadListener(this), plugin);
         plugin.getLogger().info(ChatColor.AQUA + "======================================");
         super.init();
+    }
+
+    @Override
+    public AddonManager getAddonManager() {
+        return addonManager;
     }
 
     public SpigotImpl getPlugin() {
@@ -189,7 +197,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         return cooldowns;
     }
 
-    public Set<PluginLocationValidator> getValidatorSet() {
+    public Set<RandomLocationValidator> getValidatorSet() {
         return validatorList;
     }
 

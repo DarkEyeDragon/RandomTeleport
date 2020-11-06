@@ -1,12 +1,12 @@
 package me.darkeyedragon.randomtp.validator;
 
 import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect;
-import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
+import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.util.WorldUtil;
 import org.bukkit.Location;
 
-public class RedProtectValidator implements PluginLocationValidator {
+public class RedProtectValidator implements RandomLocationValidator {
 
     private final String name;
     private RedProtect instance;

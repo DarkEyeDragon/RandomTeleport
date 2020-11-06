@@ -1,6 +1,6 @@
 package me.darkeyedragon.randomtp.validator;
 
-import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
+import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
 
 public enum Validator {
     FACTIONS(new FactionsUuidValidator("Factions")),
@@ -9,13 +9,13 @@ public enum Validator {
     TOWNY(new TownyValidator("Towny")),
     RED_PROTECT(new RedProtectValidator("RedProtect"));
 
-    final PluginLocationValidator validator;
+    final RandomLocationValidator validator;
 
-    Validator(PluginLocationValidator validator) {
+    Validator(RandomLocationValidator validator) {
         this.validator = validator;
     }
 
-    public static PluginLocationValidator getValidator(String name) {
+    public static RandomLocationValidator getValidator(String name) {
         for (Validator validator : Validator.values()) {
             if (validator.validator.getName().equalsIgnoreCase(name)) {
                 return validator.validator;
