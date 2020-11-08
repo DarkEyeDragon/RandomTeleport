@@ -1,17 +1,9 @@
 package me.darkeyedragon.randomtp.validator;
 
-import com.massivecraft.factions.Board;
-import com.massivecraft.factions.FLocation;
-import com.massivecraft.factions.Faction;
-import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
-import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
-import me.darkeyedragon.randomtp.util.WorldUtil;
-import org.bukkit.Location;
-
 /**
  * Faction validator for https://www.spigotmc.org/resources/factionsuuid.1035
  */
-public class FactionsUuidValidator implements RandomLocationValidator {
+/*public class FactionsUuidValidator implements RandomLocationValidator {
 
     private final String name;
     private Board instance;
@@ -50,4 +42,4 @@ public class FactionsUuidValidator implements RandomLocationValidator {
         this.isLoaded = loaded;
     }
 
-}
+}*/

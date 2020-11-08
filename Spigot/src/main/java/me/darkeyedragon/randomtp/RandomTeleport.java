@@ -22,7 +22,6 @@ import me.darkeyedragon.randomtp.failsafe.listener.PlayerDeathListener;
 import me.darkeyedragon.randomtp.listener.PluginLoadListener;
 import me.darkeyedragon.randomtp.listener.WorldLoadListener;
 import me.darkeyedragon.randomtp.log.BukkitLogger;
-import me.darkeyedragon.randomtp.validator.Validator;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -33,6 +32,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
+import java.io.File;
 import java.util.*;
 
 public final class RandomTeleport extends RandomTeleportPluginImpl {
@@ -47,7 +47,6 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
     private LocationFactory locationFactory;
     private DeathTracker deathTracker;
     private BukkitAudiences bukkitAudience;
-
     //Economy
     private Economy econ;
     private static EcoHandler ecoHandler;
@@ -146,7 +145,9 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         plugin.getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), plugin);
         validatorList = new HashSet<>();
         plugin.getLogger().info(ChatColor.AQUA + "======== [Loading validators] ========");
-        bukkitConfigHandler.getSectionPlugin().getPlugins().forEach(s -> {
+        //TODO Convert to addon system
+        addonManager.instantiateAllLocal();
+        /*bukkitConfigHandler.getSectionPlugin().getPlugins().forEach(s -> {
             if (plugin.getServer().getPluginManager().getPlugin(s) != null) {
                 RandomLocationValidator validator = Validator.getValidator(s);
                 if (validator != null) {
@@ -161,7 +162,8 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
             } else {
                 plugin.getLogger().warning(ChatColor.RED + s + " -- Not Found.");
             }
-        });
+        });*/
+
         plugin.getServer().getPluginManager().registerEvents(new PluginLoadListener(this), plugin);
         plugin.getLogger().info(ChatColor.AQUA + "======================================");
         super.init();
@@ -224,6 +226,11 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
     @Override
     public RandomTeleportPluginImpl getInstance() {
         return this;
+    }
+
+    @Override
+    public File getDataFolder() {
+        return plugin.getDataFolder();
     }
 
     public DeathTracker getDeathTracker() {

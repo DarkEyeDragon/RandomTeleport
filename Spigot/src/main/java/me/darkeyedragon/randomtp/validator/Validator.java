@@ -1,8 +1,6 @@
 package me.darkeyedragon.randomtp.validator;
 
-import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
-
-public enum Validator {
+/*public enum Validator {
     FACTIONS(new FactionsUuidValidator("Factions")),
     WORLD_GUARD(new WorldGuardValidator("WorldGuard")),
     GRIEF_PREVENTION(new GriefPreventionValidator("GriefPrevention")),
@@ -27,4 +25,4 @@ public enum Validator {
     public String getName() {
         return validator.getName();
     }
-}
+}*/

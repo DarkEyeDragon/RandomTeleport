@@ -6,10 +6,5 @@ public interface RandomLocationValidator {
 
     String getIdentifier();
 
-    boolean isRegistered(RandomLocation location);
-
-    boolean unregister();
-
-    void register();
-
+    boolean isValid(RandomLocation location);
 }

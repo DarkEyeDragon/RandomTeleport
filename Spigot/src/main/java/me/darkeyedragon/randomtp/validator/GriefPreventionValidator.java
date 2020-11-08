@@ -19,8 +19,8 @@ public class GriefPreventionValidator implements RandomLocationValidator {
     }
 
     @Override
-    public String getName() {
-        return name;
+    public String getIdentifier() {
+        return "GriefPrevention";
     }
 
     @Override
@@ -30,7 +30,7 @@ public class GriefPreventionValidator implements RandomLocationValidator {
         return claim == null;
     }
 
-    @Override
+    /*@Override
     public boolean isLoaded() {
         return isLoaded;
     }
@@ -44,6 +44,6 @@ public class GriefPreventionValidator implements RandomLocationValidator {
     @Override
     public void setLoaded(boolean loaded) {
         this.isLoaded = loaded;
-    }
+    }*/
 
 }

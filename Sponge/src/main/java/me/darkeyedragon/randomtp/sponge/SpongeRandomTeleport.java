@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
+import me.darkeyedragon.randomtp.common.addon.AddonManager;
 import me.darkeyedragon.randomtp.common.eco.EcoHandler;
 import me.darkeyedragon.randomtp.common.logging.PluginLogger;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
@@ -19,6 +20,7 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.economy.EconomyService;
 
+import java.io.File;
 import java.util.Optional;
 import java.util.Set;
 
@@ -93,5 +95,16 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
     @Override
     public RandomTeleportPluginImpl getInstance() {
         return this;
+    }
+
+    @Override
+    public File getDataFolder() {
+        return null;
+    }
+
+    @Override
+    public AddonManager getAddonManager() {
+        //TODO Implement
+        return null;
     }
 }

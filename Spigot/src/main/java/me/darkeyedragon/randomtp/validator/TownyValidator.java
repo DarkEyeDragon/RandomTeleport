@@ -1,12 +1,6 @@
 package me.darkeyedragon.randomtp.validator;
 
-import com.palmergames.bukkit.towny.TownyAPI;
-import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
-import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
-import me.darkeyedragon.randomtp.util.WorldUtil;
-import org.bukkit.Location;
-
-public class TownyValidator implements RandomLocationValidator {
+/*public class TownyValidator implements RandomLocationValidator {
 
     private final String name;
     private TownyAPI instance;
@@ -43,4 +37,4 @@ public class TownyValidator implements RandomLocationValidator {
         this.isLoaded = loaded;
     }
 
-}
+}*/
