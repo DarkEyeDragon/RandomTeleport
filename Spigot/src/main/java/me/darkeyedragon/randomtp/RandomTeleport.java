@@ -93,8 +93,8 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
     @Override
     public void init() {
         // Plugin startup logic
-        addonManager = new AddonManager(this);
-        logger = new BukkitLogger();
+        logger = new BukkitLogger(this);
+        addonManager = new AddonManager(this, logger);
         plugin.saveDefaultConfig();
         bukkitAudience = BukkitAudiences.create(plugin);
         manager = new PaperCommandManager(plugin);

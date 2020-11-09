@@ -1,14 +1,14 @@
 package me.darkeyedragon.randomtp.validator;
 
-import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.common.addon.RandomAddon;
 import me.darkeyedragon.randomtp.util.WorldUtil;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
 
-public class GriefPreventionValidator implements RandomLocationValidator {
+public class GriefPreventionValidator extends RandomAddon {
 
     private final String name;
     private Plugin instance;

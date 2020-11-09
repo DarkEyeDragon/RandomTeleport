@@ -4,7 +4,6 @@ import me.darkeyedragon.randomtp.api.config.Dimension;
 import me.darkeyedragon.randomtp.api.world.location.search.BaseLocationSearcher;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
-import org.bukkit.Location;
 
 public class EndLocationSearcher extends BaseLocationSearcher {
 
@@ -12,7 +11,7 @@ public class EndLocationSearcher extends BaseLocationSearcher {
     protected final int MAX_DISTANCE = 150;
 
     /**
-     * A simple utility class to help with {@link Location}
+     * The End location searcher
      *
      * @param plugin The plugin instance
      */
