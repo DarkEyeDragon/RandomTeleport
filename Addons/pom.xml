@@ -11,6 +11,7 @@
 
     <modules>
         <module>TownyValidator</module>
+        <module>GriefPreventionValidator</module>
     </modules>
 
 
