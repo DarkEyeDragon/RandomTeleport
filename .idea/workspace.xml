@@ -73,10 +73,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6f434003-bb3d-4b82-9d3c-424ea124dbda" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Addons/GriefPreventionValidator/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Addons/GriefPreventionValidator/src/main/java/me/darkeyedragon/randomtp/addon/GriefPreventionValidator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Addons/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Addons/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Addons/GriefPreventionValidator/src/main/java/me/darkeyedragon/randomtp/addon/GriefPreventionValidator.java" beforeDir="false" afterPath="$PROJECT_DIR$/Addons/GriefPreventionValidator/src/main/java/me/darkeyedragon/randomtp/addon/GriefPreventionValidator.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -302,7 +299,7 @@
       <workItem from="1604241267080" duration="37406000" />
       <workItem from="1604673271933" duration="30000" />
       <workItem from="1604673382324" duration="48945000" />
-      <workItem from="1605046998918" duration="929000" />
+      <workItem from="1605046998918" duration="1500000" />
     </task>
     <task id="LOCAL-00001" summary="Add sponge module and clean up gitignore">
       <created>1602253365470</created>
@@ -493,7 +490,14 @@
       <option name="project" value="LOCAL" />
       <updated>1604958863310</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="Add GriefPreventionValidator">
+      <created>1605047955348</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1605047955348</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -522,7 +526,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Add logger" />
     <MESSAGE value="Relocate files and add Offset" />
     <MESSAGE value="Add command" />
     <MESSAGE value="Clean up some code" />
@@ -547,7 +550,8 @@
     <MESSAGE value="Start implementation of addons" />
     <MESSAGE value="Implement addon system basics" />
     <MESSAGE value="Finalize basic addon implementation.&#10;Added workspace.xml to keep configurations" />
-    <option name="LAST_COMMIT_MESSAGE" value="Finalize basic addon implementation.&#10;Added workspace.xml to keep configurations" />
+    <MESSAGE value="Add GriefPreventionValidator" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add GriefPreventionValidator" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="WindowStateProjectService">
@@ -590,10 +594,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="863" y="191" width="743" height="658" key="#xdebugger.XInspectDialog/-1920.0.1920.1040/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1604939839200" />
-    <state x="472" y="38" width="816" height="939" key="CommitChangelistDialog2" timestamp="1604958862602">
+    <state x="472" y="15" width="816" height="939" key="CommitChangelistDialog2" timestamp="1605047954729">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="472" y="38" key="CommitChangelistDialog2/-1920.0.1920.1040/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1604958862602" />
+    <state x="472" y="15" key="CommitChangelistDialog2/-1920.0.1920.1040/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1605047954729" />
     <state x="472" y="101" width="816" height="939" key="CommitChangelistDialog2/0.0.1920.1040/-1920.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1604010493911" />
     <state x="758" y="397" key="DetectedRootsChooserDialog" timestamp="1602925282035">
       <screen x="0" y="0" width="1920" height="1040" />

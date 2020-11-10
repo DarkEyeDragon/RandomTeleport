@@ -8,7 +8,7 @@ import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import org.bukkit.Location;
 
 /**
- * Griefprevention location validator
+ * GriefPrevention location validator
  *
  */
 public class GriefPreventionValidator extends RandomAddon
