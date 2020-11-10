@@ -1,7 +1,6 @@
 package me.darkeyedragon.randomtp.sponge;
 
 import com.google.inject.Inject;
-import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 import me.darkeyedragon.randomtp.common.addon.AddonManager;
@@ -22,7 +21,6 @@ import org.spongepowered.api.service.economy.EconomyService;
 
 import java.io.File;
 import java.util.Optional;
-import java.util.Set;
 
 @Plugin(
         id = "sponge",
@@ -61,10 +59,6 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
         return ecoHandler;
     }
 
-    @Override
-    public Set<RandomLocationValidator> getValidatorSet() {
-        return null;
-    }
 
     @Override
     public boolean setupEconomy() {
