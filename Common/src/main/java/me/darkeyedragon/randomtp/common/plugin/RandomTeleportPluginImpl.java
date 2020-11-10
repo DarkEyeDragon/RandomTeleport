@@ -51,4 +51,5 @@ public abstract class RandomTeleportPluginImpl implements RandomTeleportPlugin<R
             });
         }
     }
+
 }

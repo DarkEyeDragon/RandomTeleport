@@ -14,23 +14,23 @@ import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 
 import java.util.EnumSet;
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class BaseLocationSearcher implements LocationSearcher {
 
-    protected final Set<RandomLocationValidator> validatorSet;
+    protected final Map<String, ? extends RandomLocationValidator> validatorMap;
     private final Dimension dimension;
     private final RandomBlacklist blacklist;
 
     protected final byte CHUNK_SIZE = 16; //The size (in blocks) of a chunk in all directions
     protected final byte CHUNK_SHIFT = 4; //The amount of bits needed to translate between locations and chunks
 
-    public BaseLocationSearcher(Set<RandomLocationValidator> validatorSet, RandomBlacklist blacklist, Dimension dimension) {
+    public BaseLocationSearcher(Map<String, ? extends RandomLocationValidator> validatorMap, RandomBlacklist blacklist, Dimension dimension) {
         this.blacklist = blacklist;
         this.dimension = dimension;
-        this.validatorSet = validatorSet;
+        this.validatorMap = validatorMap;
     }
 
     /* This is the final method that will be called from the other end, to get a location */
@@ -110,7 +110,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
 
     @Override
     public boolean isSafeForPlugins(RandomLocation location) {
-        for (RandomLocationValidator validator : validatorSet) {
+        for (RandomLocationValidator validator : validatorMap.values()) {
             if (!validator.isValid(location)) {
                 return false;
             }

@@ -12,7 +12,7 @@ public class OverworldLocationSearcher extends BaseLocationSearcher {
      * @param plugin the {@link RandomTeleportPlugin} instance
      */
     public OverworldLocationSearcher(RandomTeleportPlugin<RandomTeleportPluginImpl> plugin) {
-        super(plugin.getInstance().getValidatorSet(), plugin.getConfigHandler().getSectionBlacklist().getBlacklist(), Dimension.OVERWORLD);
+        super(plugin.getInstance().getAddonManager().getAddons(), plugin.getConfigHandler().getSectionBlacklist().getBlacklist(), Dimension.OVERWORLD);
 
         //TODO parse regex
         //Illegal biomes
