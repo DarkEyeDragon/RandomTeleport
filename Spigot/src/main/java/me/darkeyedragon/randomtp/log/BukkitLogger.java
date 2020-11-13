@@ -4,7 +4,6 @@ import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.common.logging.PluginLogger;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 
 public class BukkitLogger implements PluginLogger {
 
@@ -16,7 +15,7 @@ public class BukkitLogger implements PluginLogger {
 
     @Override
     public void info(String s) {
-        Bukkit.getLogger().info(s);
+        plugin.getPlugin().getLogger().info(s);
     }
 
     @Override
@@ -27,7 +26,7 @@ public class BukkitLogger implements PluginLogger {
 
     @Override
     public void warn(String s) {
-        Bukkit.getLogger().warning(s);
+        plugin.getPlugin().getLogger().warning(s);
     }
 
     @Override
@@ -37,7 +36,7 @@ public class BukkitLogger implements PluginLogger {
 
     @Override
     public void severe(String s) {
-        Bukkit.getLogger().severe(s);
+        plugin.getPlugin().getLogger().severe(s);
     }
 
     @Override
