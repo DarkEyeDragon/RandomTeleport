@@ -19,17 +19,17 @@ import me.darkeyedragon.randomtp.config.BukkitConfigHandler;
 import me.darkeyedragon.randomtp.eco.BukkitEcoHandler;
 import me.darkeyedragon.randomtp.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.failsafe.listener.PlayerDeathListener;
-import me.darkeyedragon.randomtp.listener.PluginLoadListener;
+import me.darkeyedragon.randomtp.listener.ServerLoadListener;
 import me.darkeyedragon.randomtp.listener.WorldLoadListener;
 import me.darkeyedragon.randomtp.log.BukkitLogger;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import java.io.File;
@@ -90,12 +90,11 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         return true;
     }
 
-    @Override
     public void init() {
         // Plugin startup logic
+        loadListeners();
         logger = new BukkitLogger(this);
         addonManager = new AddonManager(this, logger);
-        plugin.saveDefaultConfig();
         bukkitAudience = BukkitAudiences.create(plugin);
         manager = new PaperCommandManager(plugin);
         bukkitConfigHandler = new BukkitConfigHandler(this);
@@ -141,32 +140,14 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
             plugin.getLogger().warning("Vault not found. Currency based options are disabled.");
         }
         manager.registerCommand(new TeleportCommand((SpigotImpl) plugin));
-        plugin.getServer().getPluginManager().registerEvents(new WorldLoadListener(this), plugin);
-        plugin.getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), plugin);
         validatorList = new HashSet<>();
-        plugin.getLogger().info(ChatColor.AQUA + "======== [Loading validators] ========");
-        //TODO Convert to addon system
-        addonManager.instantiateAllLocal();
-        /*bukkitConfigHandler.getSectionPlugin().getPlugins().forEach(s -> {
-            if (plugin.getServer().getPluginManager().getPlugin(s) != null) {
-                RandomLocationValidator validator = Validator.getValidator(s);
-                if (validator != null) {
-                    validator.load();
-                    if (validator.isLoaded()) {
-                        plugin.getLogger().info(ChatColor.GREEN + s + " -- Successfully loaded");
-                    } else {
-                        plugin.getLogger().warning(ChatColor.RED + s + " is not loaded yet. Trying to fix by loading later...");
-                    }
-                    validatorList.add(validator);
-                }
-            } else {
-                plugin.getLogger().warning(ChatColor.RED + s + " -- Not Found.");
-            }
-        });*/
+    }
 
-        plugin.getServer().getPluginManager().registerEvents(new PluginLoadListener(this), plugin);
-        plugin.getLogger().info(ChatColor.AQUA + "======================================");
-        super.init();
+    private void loadListeners(){
+        PluginManager pluginManager = plugin.getServer().getPluginManager();
+        pluginManager.registerEvents(new WorldLoadListener(this), plugin);
+        pluginManager.registerEvents(new PlayerDeathListener(this), plugin);
+        pluginManager.registerEvents(new ServerLoadListener(this), plugin);
     }
 
     @Override
@@ -235,5 +216,17 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
 
     public DeathTracker getDeathTracker() {
         return deathTracker;
+    }
+
+    public PaperCommandManager getManager() {
+        return manager;
+    }
+
+    public Set<RandomLocationValidator> getValidatorList() {
+        return validatorList;
+    }
+
+    public BukkitConfigHandler getBukkitConfigHandler() {
+        return bukkitConfigHandler;
     }
 }
