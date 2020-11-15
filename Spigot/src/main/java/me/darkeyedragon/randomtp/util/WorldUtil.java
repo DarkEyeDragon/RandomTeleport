@@ -14,9 +14,6 @@ import me.darkeyedragon.randomtp.world.block.SpigotBlock;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class WorldUtil {
 
 
@@ -40,7 +37,7 @@ public class WorldUtil {
         return new SpigotWorldBorder(worldBorder);
     }
 
-    public static RandomChunk toRandomChunk(Chunk chunk) {
+    public static RandomChunk toRandomChunk(ChunkSnapshot chunk) {
         return new SpigotChunk(chunk);
     }
 
