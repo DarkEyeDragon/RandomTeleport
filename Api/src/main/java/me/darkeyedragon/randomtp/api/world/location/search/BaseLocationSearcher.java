@@ -27,27 +27,35 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
 
     protected final byte CHUNK_SIZE = 16; //The size (in blocks) of a chunk in all directions
     protected final byte CHUNK_SHIFT = 4; //The amount of bits needed to translate between locations and chunks
-    protected int count = 0;
+    protected int count = 1;
     protected int max = 50;
+
     public BaseLocationSearcher(Set<PluginLocationValidator> validatorSet, RandomBlacklist blacklist, Dimension dimension) {
         this.blacklist = blacklist;
         this.dimension = dimension;
         this.validatorSet = validatorSet;
     }
 
-    /* This is the final method that will be called from the other end, to get a location */
+    /**
+     * This method will search recursively until it reached 50 tries, then fail silently.
+     * @param sectionWorldDetail
+     * @return a {@link CompletableFuture<RandomLocation>} holding the location. Null if no location is found.
+     */
     @Override
-    public CompletableFuture<RandomLocation> getRandom(SectionWorldDetail sectionWorldDetail) throws IllegalArgumentException {
+    public CompletableFuture<RandomLocation> getRandom(SectionWorldDetail sectionWorldDetail) {
         return pickRandomLocation(sectionWorldDetail).thenCompose((loc) -> {
-            if (loc == null && count < 50) {
-                count++;
-                return getRandom(sectionWorldDetail);
+            if (loc == null) {
+                if (count < max) {
+                    count++;
+                    return getRandom(sectionWorldDetail);
+                }
+                //TODO handle failed searches properly.
+                return null;
             } else {
+                loc.setTries(count);
+                count = 0;
                 return CompletableFuture.completedFuture(loc);
             }
-        }).exceptionally(throwable -> {
-            throwable.printStackTrace();
-            return null;
         });
     }
 

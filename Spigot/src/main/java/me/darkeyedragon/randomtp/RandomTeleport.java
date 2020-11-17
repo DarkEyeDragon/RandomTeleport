@@ -3,7 +3,6 @@ package me.darkeyedragon.randomtp;
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
 import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
-import me.darkeyedragon.randomtp.common.logging.PluginLogger;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.QueueListener;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
@@ -11,9 +10,11 @@ import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.command.TeleportCommand;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
-import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
-import me.darkeyedragon.randomtp.config.BukkitConfigHandler;
 import me.darkeyedragon.randomtp.common.eco.EcoHandler;
+import me.darkeyedragon.randomtp.common.logging.PluginLogger;
+import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
+import me.darkeyedragon.randomtp.common.world.location.LocationFactory;
+import me.darkeyedragon.randomtp.config.BukkitConfigHandler;
 import me.darkeyedragon.randomtp.eco.BukkitEcoHandler;
 import me.darkeyedragon.randomtp.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.failsafe.listener.PlayerDeathListener;
@@ -21,7 +22,6 @@ import me.darkeyedragon.randomtp.listener.PluginLoadListener;
 import me.darkeyedragon.randomtp.listener.WorldLoadListener;
 import me.darkeyedragon.randomtp.log.BukkitLogger;
 import me.darkeyedragon.randomtp.validator.Validator;
-import me.darkeyedragon.randomtp.common.world.location.LocationFactory;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -63,7 +63,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
             locationQueue.subscribe(new QueueListener<RandomLocation>() {
                 @Override
                 public void onAdd(RandomLocation element) {
-                    plugin.getLogger().info("Safe location added for " + world.getName() + " (" + locationQueue.size() + "/" + size + ")");
+                    plugin.getLogger().info("Safe location added for " + world.getName() + " (" + locationQueue.size() + "/" + size + ") in " + element.getTries() + " tries");
                 }
 
                 @Override

@@ -32,13 +32,14 @@ public class SpigotChunkSnapshot implements RandomChunkSnapshot {
 
     /**
      * Gets the highest non-air coordinate at the given coordinates
+     * Due to a bug in snapshots we're required to offset with -1.
      *
      * @param x X-coordinate of the blocks (0-15)
      * @param z Z-coordinate of the blocks (0-15)
      * @return Y-coordinate of the highest non-air block
      */
     public int getHighestBlockYAt(int x, int z) {
-        return chunk.getHighestBlockYAt(x, z)-1;
+        return Math.max(chunk.getHighestBlockYAt(x, z)-1, 0);
     }
 
     @Override

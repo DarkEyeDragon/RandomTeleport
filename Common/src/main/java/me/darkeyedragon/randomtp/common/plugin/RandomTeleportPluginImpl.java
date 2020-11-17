@@ -4,8 +4,8 @@ import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.QueueListener;
-import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
+import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
 
 public abstract class RandomTeleportPluginImpl implements RandomTeleportPlugin<RandomTeleportPluginImpl>{

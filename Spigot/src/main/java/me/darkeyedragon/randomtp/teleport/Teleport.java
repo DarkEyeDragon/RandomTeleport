@@ -160,7 +160,11 @@ public class Teleport {
             //Generate a new location after the init delay
             Bukkit.getScheduler().runTaskLater(plugin.getPlugin(), () -> {
                 WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(property.getWorld());
-                plugin.getWorldQueue().get(property.getWorld()).generate(worldConfigSection, 1);
+                try {
+                    plugin.getWorldQueue().get(property.getWorld()).generate(worldConfigSection, 1);
+                } catch (IllegalArgumentException ex){
+                    plugin.getLogger().warn(ex.getMessage());
+                }
             }, configHandler.getSectionQueue().getInitDelay());
         });
     }
