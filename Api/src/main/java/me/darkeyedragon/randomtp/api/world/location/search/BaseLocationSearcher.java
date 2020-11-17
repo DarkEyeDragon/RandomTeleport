@@ -5,8 +5,9 @@ import me.darkeyedragon.randomtp.api.config.Dimension;
 import me.darkeyedragon.randomtp.api.config.DimensionData;
 import me.darkeyedragon.randomtp.api.config.RandomBlacklist;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
+import me.darkeyedragon.randomtp.api.world.RandomBiome;
 import me.darkeyedragon.randomtp.api.world.RandomBlockType;
-import me.darkeyedragon.randomtp.api.world.RandomChunk;
+import me.darkeyedragon.randomtp.api.world.RandomChunkSnapshot;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.block.BlockFace;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
@@ -26,7 +27,8 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
 
     protected final byte CHUNK_SIZE = 16; //The size (in blocks) of a chunk in all directions
     protected final byte CHUNK_SHIFT = 4; //The amount of bits needed to translate between locations and chunks
-
+    protected int count = 0;
+    protected int max = 50;
     public BaseLocationSearcher(Set<PluginLocationValidator> validatorSet, RandomBlacklist blacklist, Dimension dimension) {
         this.blacklist = blacklist;
         this.dimension = dimension;
@@ -35,38 +37,45 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
 
     /* This is the final method that will be called from the other end, to get a location */
     @Override
-    public CompletableFuture<RandomLocation> getRandom(SectionWorldDetail sectionWorldDetail) {
-        CompletableFuture<RandomLocation> location = pickRandomLocation(sectionWorldDetail);
-        return location.thenCompose((loc) -> {
-            if (loc == null) {
+    public CompletableFuture<RandomLocation> getRandom(SectionWorldDetail sectionWorldDetail) throws IllegalArgumentException {
+        return pickRandomLocation(sectionWorldDetail).thenCompose((loc) -> {
+            if (loc == null && count < 50) {
+                count++;
                 return getRandom(sectionWorldDetail);
             } else {
                 return CompletableFuture.completedFuture(loc);
             }
+        }).exceptionally(throwable -> {
+            throwable.printStackTrace();
+            return null;
         });
     }
 
     /*Pick a random location based on chunks*/
     private CompletableFuture<RandomLocation> pickRandomLocation(SectionWorldDetail sectionWorldDetail) {
-        CompletableFuture<RandomChunk> chunk = getRandomChunk(sectionWorldDetail);
+        CompletableFuture<RandomChunkSnapshot> chunk = getRandomChunk(sectionWorldDetail);
         return chunk.thenApply(this::getRandomLocationFromChunk);
     }
 
     /* Will search through the chunk to find a location that is safe, returning null if none is found. */
-    public RandomLocation getRandomLocationFromChunk(RandomChunk chunk) {
+    public RandomLocation getRandomLocationFromChunk(RandomChunkSnapshot chunk) {
         for (int x = 8; x < CHUNK_SIZE; x++) {
             for (int z = 8; z < CHUNK_SIZE; z++) {
-                RandomBlock block = chunk.getWorld().getHighestBlockAt((chunk.getX() << CHUNK_SHIFT) + x, (chunk.getZ() << CHUNK_SHIFT) + z);
-                if (isSafe(block.getLocation())) {
-                    return block.getLocation();
+                //RandomBlock block = chunk.get((chunk.getX() << CHUNK_SHIFT) + x, (chunk.getZ() << CHUNK_SHIFT) + z);
+                int xChunk = (chunk.getX() << CHUNK_SHIFT) + x;
+                int zChunk = (chunk.getZ() << CHUNK_SHIFT) + z;
+                int y = chunk.getHighestBlockYAt(x, z);
+                RandomLocation randomLocation = new RandomLocation(chunk.getWorld(), xChunk, y, zChunk);
+                if (isSafe(randomLocation)) {
+                    return randomLocation;
                 }
             }
         }
         return null;
     }
 
-    CompletableFuture<RandomChunk> getRandomChunk(SectionWorldDetail sectionWorldDetail) {
-        CompletableFuture<RandomChunk> chunkFuture = getRandomChunkAsync(sectionWorldDetail);
+    CompletableFuture<RandomChunkSnapshot> getRandomChunk(SectionWorldDetail sectionWorldDetail) {
+        CompletableFuture<RandomChunkSnapshot> chunkFuture = getRandomChunkAsync(sectionWorldDetail);
         return chunkFuture.thenCompose((chunk) -> {
             boolean isSafe = isSafeChunk(chunk);
             if (!isSafe) {
@@ -75,7 +84,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         });
     }
 
-    CompletableFuture<RandomChunk> getRandomChunkAsync(SectionWorldDetail sectionWorldDetail) {
+    CompletableFuture<RandomChunkSnapshot> getRandomChunkAsync(SectionWorldDetail sectionWorldDetail) {
         ThreadLocalRandom rnd = ThreadLocalRandom.current();
         Offset offset = sectionWorldDetail.getOffset();
         int chunkRadius = offset.getRadius() >> CHUNK_SHIFT;
@@ -100,7 +109,6 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         DimensionData dimensionData = blacklist.getDimensionData(dimension);
         //Check if it passes the dimension blacklist
         if (dimensionData.getBlockTypes().contains(blockType)) return false;
-        //TODO FIX
         if (block.isPassable()) return false;
         if (block.isLiquid()) return false;
         if (!isSafeAbove(loc)) return false;
@@ -128,11 +136,14 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         return (blockAbove.isPassable() && blockAboveAbove.isPassable() && !blockAbove.isLiquid());
     }
 
-    public boolean isSafeChunk(RandomChunk chunk) {
+    public boolean isSafeChunk(RandomChunkSnapshot chunk) {
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {
-                RandomBlock block = chunk.getWorld().getHighestBlockAt((chunk.getX() << CHUNK_SHIFT) + x, (chunk.getZ() << CHUNK_SHIFT) + z);
-                if (isValidGlobalBiome(block) && blacklist.getDimensionData(dimension).getBiomes().contains(block.getBiome())) {
+                int xChunk = chunk.getX() + x;
+                int zChunk = chunk.getZ() + z;
+                int y = chunk.getHighestBlockYAt(x, z);
+                RandomBiome randomBiome = chunk.getBiome(x, y, z);
+                if (isBlacklistedBiome(randomBiome)) {
                     return false;
                 }
             }
@@ -168,9 +179,10 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         return !dimensionData.getBlockTypes().contains(randomBlock.getBlockType());
     }
 
-    protected boolean isValidGlobalBiome(RandomBlock block) {
-        DimensionData dimensionData = blacklist.getDimensionData(Dimension.GLOBAL);
-        return !dimensionData.getBiomes().contains(block.getBiome());
+    protected boolean isBlacklistedBiome(RandomBiome randomBiome) {
+        DimensionData globalData = blacklist.getDimensionData(Dimension.GLOBAL);
+        DimensionData dimensionData = blacklist.getDimensionData(dimension);
+        return globalData.getBiomes().contains(randomBiome) || dimensionData.getBiomes().contains(randomBiome);
     }
 
 }

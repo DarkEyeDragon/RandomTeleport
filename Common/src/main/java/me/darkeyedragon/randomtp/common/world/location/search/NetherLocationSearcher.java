@@ -1,7 +1,7 @@
 package me.darkeyedragon.randomtp.common.world.location.search;
 
 import me.darkeyedragon.randomtp.api.config.Dimension;
-import me.darkeyedragon.randomtp.api.world.RandomChunk;
+import me.darkeyedragon.randomtp.api.world.RandomChunkSnapshot;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.search.BaseLocationSearcher;
@@ -23,7 +23,7 @@ public class NetherLocationSearcher extends BaseLocationSearcher {
 
     /* Will search through the chunk to find a location that is safe, returning null if none is found. */
     @Override
-    public RandomLocation getRandomLocationFromChunk(RandomChunk chunk) {
+    public RandomLocation getRandomLocationFromChunk(RandomChunkSnapshot chunk) {
         for (int x = 8; x < CHUNK_SIZE; x++) {
             for (int z = 8; z < CHUNK_SIZE; z++) {
                 for (int y = 0; y < MAX_HEIGHT; y++) {

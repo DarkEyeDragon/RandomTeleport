@@ -21,7 +21,7 @@ public class EndLocationSearcher extends BaseLocationSearcher {
     }
 
     /*@Override
-    public boolean isSafeChunk(RandomChunk chunk) {
+    public boolean isSafeChunk(RandomChunkSnapshot chunk) {
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {
                 RandomBlock block = chunk.getWorld().getHighestBlockAt((chunk.getX() << CHUNK_SHIFT) + x, (chunk.getZ() << CHUNK_SHIFT) + z);

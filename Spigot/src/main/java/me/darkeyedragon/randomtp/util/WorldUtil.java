@@ -1,17 +1,16 @@
 package me.darkeyedragon.randomtp.util;
 
-import me.darkeyedragon.randomtp.api.world.RandomChunk;
-import me.darkeyedragon.randomtp.api.world.RandomEnvironment;
-import me.darkeyedragon.randomtp.api.world.RandomWorld;
-import me.darkeyedragon.randomtp.api.world.RandomWorldBorder;
+import me.darkeyedragon.randomtp.api.world.*;
 import me.darkeyedragon.randomtp.api.world.block.BlockFace;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
-import me.darkeyedragon.randomtp.world.SpigotChunk;
+import me.darkeyedragon.randomtp.world.SpigotBiome;
+import me.darkeyedragon.randomtp.world.SpigotChunkSnapshot;
 import me.darkeyedragon.randomtp.world.SpigotWorld;
 import me.darkeyedragon.randomtp.world.SpigotWorldBorder;
 import me.darkeyedragon.randomtp.world.block.SpigotBlock;
 import org.bukkit.*;
+import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 
 public class WorldUtil {
@@ -37,12 +36,16 @@ public class WorldUtil {
         return new SpigotWorldBorder(worldBorder);
     }
 
-    public static RandomChunk toRandomChunk(ChunkSnapshot chunk) {
-        return new SpigotChunk(chunk);
+    public static RandomChunkSnapshot toRandomChunk(ChunkSnapshot chunk) {
+        return new SpigotChunkSnapshot(chunk);
     }
 
     public static RandomEnvironment toRandomEnvironment(World.Environment environment) {
         return RandomEnvironment.valueOf(environment.name());
+    }
+
+    public static RandomBiome toRandomBiome(Biome biome){
+        return new SpigotBiome(biome);
     }
 
     public static RandomLocation toRandomLocation(Location location){

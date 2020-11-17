@@ -12,7 +12,7 @@ public interface RandomWorld {
 
     RandomBlock getHighestBlockAt(int x, int z);
 
-    CompletableFuture<RandomChunk> getChunkAtAsync(RandomWorld world, int x, int z);
+    CompletableFuture<RandomChunkSnapshot> getChunkAtAsync(RandomWorld world, int x, int z);
 
     RandomBlock getBlockAt(RandomLocation location);
 
