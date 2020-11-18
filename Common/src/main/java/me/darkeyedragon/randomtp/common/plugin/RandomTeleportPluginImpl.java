@@ -8,9 +8,9 @@ import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
 
-public abstract class RandomTeleportPluginImpl implements RandomTeleportPlugin<RandomTeleportPluginImpl>{
+public abstract class RandomTeleportPluginImpl implements RandomTeleportPlugin<RandomTeleportPluginImpl> {
 
-    public void init(){
+    public void init() {
         populateWorldQueue();
     }
 
@@ -19,8 +19,6 @@ public abstract class RandomTeleportPluginImpl implements RandomTeleportPlugin<R
         getLogger().info("Populating WorldQueue");
         long startTime = System.currentTimeMillis();
         for (RandomWorld world : configHandler.getSectionWorld().getWorlds()) {
-            //TODO Figure out how to deal with this
-            //WorldUtil.WORLD_MAP.put(Bukkit.getWorld(world.getUUID()), world);
             //Add a new world to the world queue and generate random locations
             LocationQueue locationQueue = new LocationQueue(configHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(world, this));
             //Subscribe to the locationqueue to be notified of changes
