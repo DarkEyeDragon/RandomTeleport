@@ -153,7 +153,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
             RandomBlock relativeBlock = block.getRelative(blockFace);
             if (relativeBlock.isEmpty()) return false;
             if (!relativeBlock.getBlockType().getType().isSolid()) return false;
-            if (blacklist.getDimensionData(dimension).getBlockTypes().contains(relativeBlock.getBlockType())) ;
+            if (blacklist.getDimensionData(dimension).getBlockTypes().contains(relativeBlock.getBlockType())) return false;
         }
         return true;
     }
