@@ -60,7 +60,13 @@ public class AddonManager implements RandomAddonManager {
                     .map(this::createAddonInstance)
                     .filter(Objects::nonNull)
                     .filter(this::areRequiredPluginsPresent)
-                    .filter(this::areRequiredVersionsPresent)
+                    .filter(randomAddon -> {
+                        if (!areRequiredVersionsPresent(randomAddon)) {
+                            logger.info(MiniMessage.get().parse("<" + NamedTextColor.GRAY + ">" + "[<" + NamedTextColor.RED + ">-<" + NamedTextColor.GRAY + ">] <" + NamedTextColor.RED + ">" + randomAddon.getIdentifier() + " version mismatch."));
+                            return false;
+                        }
+                        return true;
+                    })
                     .peek(randomAddon -> logger.info(MiniMessage.get().parse("<" + NamedTextColor.GRAY + ">" + "[<" + NamedTextColor.GREEN + ">+<" + NamedTextColor.GRAY + ">] <" + NamedTextColor.LIGHT_PURPLE + ">" + randomAddon.getIdentifier() + " has been loaded")))
                     .collect(Collectors.toMap(RandomLocationValidator::getIdentifier, randomAddon -> randomAddon));
         }
@@ -91,9 +97,13 @@ public class AddonManager implements RandomAddonManager {
             ComparableVersion addonPluginVersion = new ComparableVersion(addonPlugin.getVersion());
             if (requiredPlugin.getMaxVersion() != null) {
                 ComparableVersion reqMaxPluginVersion = new ComparableVersion(requiredPlugin.getMaxVersion());
-                if (reqMaxPluginVersion.compareTo(addonPluginVersion) > 0) return false;
+                if (reqMaxPluginVersion.compareTo(addonPluginVersion) > 0) {
+                    return false;
+                }
             }
-            if (reqMinPluginVersion.compareTo(addonPluginVersion) < 0) return false;
+            if (reqMinPluginVersion.compareTo(addonPluginVersion) < 0) {
+                return false;
+            }
         }
         return true;
     }
