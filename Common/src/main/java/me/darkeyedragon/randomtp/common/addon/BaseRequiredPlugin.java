@@ -20,6 +20,12 @@ public class BaseRequiredPlugin implements RequiredPlugin {
         this.name = name;
     }
 
+    public BaseRequiredPlugin(String name) {
+        this.minVersion = null;
+        this.maxVersion = null;
+        this.name = name;
+    }
+
     @Override
     public String getMinVersion() {
         return minVersion;
