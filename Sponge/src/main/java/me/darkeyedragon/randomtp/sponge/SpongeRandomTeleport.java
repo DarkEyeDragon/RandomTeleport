@@ -1,6 +1,7 @@
 package me.darkeyedragon.randomtp.sponge;
 
 import com.google.inject.Inject;
+import me.darkeyedragon.randomtp.api.addon.AddonPlugin;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 import me.darkeyedragon.randomtp.common.addon.AddonManager;
@@ -42,11 +43,17 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
 
     @Listener
     public void onServerStart(GameStartedServerEvent event) {
-        super.init();
+        //super.init();
         configHandler = new SpongeConfigHandler();
         worldQueue = new WorldQueue();
         pluginLogger = new SpongeLogger(logger);
         locationFactory = new LocationFactory(configHandler);
+    }
+
+    @Override
+    public AddonPlugin getPlugin(String name) {
+        //TODO implement
+        return null;
     }
 
     @Override
@@ -94,6 +101,12 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
     @Override
     public File getDataFolder() {
         return null;
+    }
+
+    @Override
+    public boolean isPluginLoaded(String name) {
+        //TODO implement
+        return false;
     }
 
     @Override

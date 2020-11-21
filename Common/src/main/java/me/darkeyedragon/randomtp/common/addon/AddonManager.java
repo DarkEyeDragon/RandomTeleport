@@ -4,13 +4,16 @@ import com.google.common.collect.ImmutableMap;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
+import me.darkeyedragon.randomtp.api.addon.AddonPlugin;
 import me.darkeyedragon.randomtp.api.addon.RandomAddonManager;
 import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
+import me.darkeyedragon.randomtp.api.addon.RequiredPlugin;
 import me.darkeyedragon.randomtp.common.classloader.AddonClassLoader;
 import me.darkeyedragon.randomtp.common.logging.PluginLogger;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.File;
@@ -56,6 +59,8 @@ public class AddonManager implements RandomAddonManager {
                     .stream()
                     .map(this::createAddonInstance)
                     .filter(Objects::nonNull)
+                    .filter(this::areRequiredPluginsPresent)
+                    .filter(this::areRequiredVersionsPresent)
                     .peek(randomAddon -> logger.info(MiniMessage.get().parse("<" + NamedTextColor.GRAY + ">" + "[<" + NamedTextColor.GREEN + ">+<" + NamedTextColor.GRAY + ">] <" + NamedTextColor.LIGHT_PURPLE + ">" + randomAddon.getIdentifier() + " has been loaded")))
                     .collect(Collectors.toMap(RandomLocationValidator::getIdentifier, randomAddon -> randomAddon));
         }
@@ -70,6 +75,28 @@ public class AddonManager implements RandomAddonManager {
         }
     }
 
+    private boolean areRequiredPluginsPresent(RandomAddon randomAddon) {
+        for (RequiredPlugin requiredPlugin : randomAddon.getRequiredPlugins()) {
+            if (!instance.isPluginLoaded(requiredPlugin.getName())) return false;
+        }
+        return true;
+    }
+
+    private boolean areRequiredVersionsPresent(RandomAddon randomAddon) {
+        for (RequiredPlugin requiredPlugin : randomAddon.getRequiredPlugins()) {
+            AddonPlugin addonPlugin = instance.getPlugin(requiredPlugin.getName());
+            //If no version is present, assume it works for every version.
+            if (requiredPlugin.getMinVersion() == null) continue;
+            ComparableVersion reqMinPluginVersion = new ComparableVersion(requiredPlugin.getMinVersion());
+            ComparableVersion addonPluginVersion = new ComparableVersion(addonPlugin.getVersion());
+            if (requiredPlugin.getMaxVersion() != null) {
+                ComparableVersion reqMaxPluginVersion = new ComparableVersion(requiredPlugin.getMaxVersion());
+                if (reqMaxPluginVersion.compareTo(addonPluginVersion) > 0) return false;
+            }
+            if (reqMinPluginVersion.compareTo(addonPluginVersion) < 0) return false;
+        }
+        return true;
+    }
 
     private URL[] getJarURIs() {
         return Arrays.stream(folder.listFiles())
@@ -77,6 +104,7 @@ public class AddonManager implements RandomAddonManager {
                     try {
                         return file.toURI().toURL();
                     } catch (MalformedURLException e) {
+                        e.printStackTrace();
                         return null;
                     }
                 })

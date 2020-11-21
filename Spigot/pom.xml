@@ -61,6 +61,22 @@
                             <pattern>org.bstats</pattern>
                             <shadedPattern>me.darkeyedragon.randomtp.shaded.bstats</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>io.github.classgraph</pattern>
+                            <shadedPattern>me.darkeyedragon.randomtp.shaded.classgraph</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>nonapi.io.github.classgraph</pattern>
+                            <shadedPattern>me.darkeyedragon.randomtp.shaded.nonapi</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.google.common</pattern>
+                            <shadedPattern>me.darkeyedragon.randomtp.shaded.google</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.apache</pattern>
+                            <shadedPattern>me.darkeyedragon.randomtp.shaded.apache</shadedPattern>
+                        </relocation>
                     </relocations>
                     <filters>
                         <filter>
@@ -69,6 +85,12 @@
                                 <exclude>org/checkerframework/**
                                 </exclude> <!-- From kyori adventure, no need to shade annotations -->
                             </excludes>
+                        </filter>
+                        <filter>
+                            <artifact>me.darkeyedragon.randomtp:Common</artifact>
+                            <includes>
+                                <include>**</include>
+                            </includes>
                         </filter>
                     </filters>
                 </configuration>

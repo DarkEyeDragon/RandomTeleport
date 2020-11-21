@@ -30,5 +30,10 @@
             <version>21.0</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
+            <version>3.6.3</version>
+        </dependency>
     </dependencies>
 </project>

@@ -2,6 +2,8 @@ package me.darkeyedragon.randomtp;
 
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
+import me.darkeyedragon.randomtp.addon.SpigotAddonPlugin;
+import me.darkeyedragon.randomtp.api.addon.AddonPlugin;
 import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.QueueListener;
@@ -53,6 +55,8 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
 
     PluginLogger logger;
     private AddonManager addonManager;
+
+    private PluginManager pluginManager;
 
     public RandomTeleport(SpigotImpl plugin) {
         this.plugin = plugin;
@@ -141,6 +145,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         }
         manager.registerCommand(new TeleportCommand((SpigotImpl) plugin));
         validatorList = new HashSet<>();
+        pluginManager = Bukkit.getPluginManager();
     }
 
     private void loadListeners(){
@@ -165,6 +170,11 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
 
     public Economy getEcon() {
         return econ;
+    }
+
+    @Override
+    public AddonPlugin getPlugin(String name) {
+        return SpigotAddonPlugin.create(name);
     }
 
     @Override
@@ -212,6 +222,11 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
     @Override
     public File getDataFolder() {
         return plugin.getDataFolder();
+    }
+
+    @Override
+    public boolean isPluginLoaded(String name) {
+        return pluginManager.isPluginEnabled(name);
     }
 
     public DeathTracker getDeathTracker() {

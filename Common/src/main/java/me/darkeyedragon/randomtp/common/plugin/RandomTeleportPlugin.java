@@ -1,5 +1,6 @@
 package me.darkeyedragon.randomtp.common.plugin;
 
+import me.darkeyedragon.randomtp.api.addon.AddonPlugin;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 import me.darkeyedragon.randomtp.common.eco.EcoHandler;
@@ -10,6 +11,7 @@ import java.io.File;
 
 public interface RandomTeleportPlugin<T> {
 
+    AddonPlugin getPlugin(String name);
 
     PluginLogger getLogger();
 
@@ -29,5 +31,7 @@ public interface RandomTeleportPlugin<T> {
     T getInstance();
 
     File getDataFolder();
+
+    boolean isPluginLoaded(String name);
 
 }
