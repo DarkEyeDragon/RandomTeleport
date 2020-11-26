@@ -59,10 +59,16 @@ public class AddonManager implements RandomAddonManager {
                     .stream()
                     .map(this::createAddonInstance)
                     .filter(Objects::nonNull)
-                    .filter(this::areRequiredPluginsPresent)
+                    .filter(randomAddon -> {
+                        if(!areRequiredPluginsPresent(randomAddon)){
+                            logger.info(MiniMessage.get().parse("<gray>" + "[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " missing required plugins."));
+                            return false;
+                        }
+                        return true;
+                    })
                     .filter(randomAddon -> {
                         if (!areRequiredVersionsPresent(randomAddon)) {
-                            logger.info(MiniMessage.get().parse("<" + NamedTextColor.GRAY + ">" + "[<" + NamedTextColor.RED + ">-<" + NamedTextColor.GRAY + ">] <" + NamedTextColor.RED + ">" + randomAddon.getIdentifier() + " version mismatch."));
+                            logger.info(MiniMessage.get().parse("<gray>" + "[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " version mismatch."));
                             return false;
                         }
                         return true;
