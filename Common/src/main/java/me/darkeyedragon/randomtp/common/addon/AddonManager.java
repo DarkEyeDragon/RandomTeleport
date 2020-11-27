@@ -8,10 +8,11 @@ import me.darkeyedragon.randomtp.api.addon.AddonPlugin;
 import me.darkeyedragon.randomtp.api.addon.RandomAddonManager;
 import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
 import me.darkeyedragon.randomtp.api.addon.RequiredPlugin;
+import me.darkeyedragon.randomtp.common.addon.response.AddonResponse;
+import me.darkeyedragon.randomtp.common.addon.response.AddonResponseType;
 import me.darkeyedragon.randomtp.common.classloader.AddonClassLoader;
 import me.darkeyedragon.randomtp.common.logging.PluginLogger;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.jetbrains.annotations.Unmodifiable;
@@ -59,21 +60,34 @@ public class AddonManager implements RandomAddonManager {
                     .stream()
                     .map(this::createAddonInstance)
                     .filter(Objects::nonNull)
-                    .filter(randomAddon -> {
-                        if(!areRequiredPluginsPresent(randomAddon)){
-                            logger.info(MiniMessage.get().parse("<gray>" + "[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " missing required plugins."));
-                            return false;
+                    .map(this::areRequiredPluginsPresent)
+                    .filter(addonResponse -> {
+                        RandomAddon randomAddon = addonResponse.getAddon();
+                        if (addonResponse.getResponseType() == AddonResponseType.SUCCESS) return true;
+                        logger.info(MiniMessage.get().parse("<gray>" + "[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " missing required plugins."));
+                        for (RequiredPlugin plugin : addonResponse.getAddon().getRequiredPlugins()) {
+                            if (!plugin.isLoaded()) {
+                                logger.info(MiniMessage.get().parse("    └─ " + plugin.getName() + " is not loaded."));
+                            }
                         }
-                        return true;
+                        return false;
                     })
-                    .filter(randomAddon -> {
-                        if (!areRequiredVersionsPresent(randomAddon)) {
-                            logger.info(MiniMessage.get().parse("<gray>" + "[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " version mismatch."));
-                            return false;
+                    .map(AddonResponse::getAddon)
+                    .map(this::areRequiredVersionsPresent)
+                    .filter(addonResponse -> {
+                        RandomAddon randomAddon = addonResponse.getAddon();
+                        if (addonResponse.getResponseType() == AddonResponseType.SUCCESS) return true;
+                        logger.info(MiniMessage.get().parse("<gray>" + "[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " version mismatch."));
+                        for (RequiredPlugin plugin : addonResponse.getAddon().getRequiredPlugins()) {
+                            logger.info("yeet");
+                            if (!plugin.isLoaded()) {
+                                logger.info(MiniMessage.get().parse("    └─ " + plugin.getName() + " with version " + plugin.getMinVersion() + " is not loaded."));
+                            }
                         }
-                        return true;
+                        return false;
                     })
-                    .peek(randomAddon -> logger.info(MiniMessage.get().parse("<" + NamedTextColor.GRAY + ">" + "[<" + NamedTextColor.GREEN + ">+<" + NamedTextColor.GRAY + ">] <" + NamedTextColor.LIGHT_PURPLE + ">" + randomAddon.getIdentifier() + " has been loaded")))
+                    .map(AddonResponse::getAddon)
+                    .peek(randomAddon -> logger.info(MiniMessage.get().parse("<gray>" + "[<green>+<gray>] <light_purple>" + randomAddon.getIdentifier() + " has been loaded.")))
                     .collect(Collectors.toMap(RandomLocationValidator::getIdentifier, randomAddon -> randomAddon));
         }
     }
@@ -87,31 +101,50 @@ public class AddonManager implements RandomAddonManager {
         }
     }
 
-    private boolean areRequiredPluginsPresent(RandomAddon randomAddon) {
+    private AddonResponse areRequiredPluginsPresent(RandomAddon randomAddon) {
+        AddonResponse addonResponse = new AddonResponse(randomAddon);
         for (RequiredPlugin requiredPlugin : randomAddon.getRequiredPlugins()) {
-            if (!instance.isPluginLoaded(requiredPlugin.getName())) return false;
+            if (!instance.isPluginLoaded(requiredPlugin.getName())) {
+                addonResponse.setResponseType(AddonResponseType.MISSING_DEPENDENCY);
+                requiredPlugin.setLoaded(false);
+            } else {
+                addonResponse.setResponseType(AddonResponseType.SUCCESS);
+                requiredPlugin.setLoaded(true);
+            }
         }
-        return true;
+        return addonResponse;
     }
 
-    private boolean areRequiredVersionsPresent(RandomAddon randomAddon) {
+    private AddonResponse areRequiredVersionsPresent(RandomAddon randomAddon) {
+        AddonResponse addonResponse = new AddonResponse(randomAddon);
         for (RequiredPlugin requiredPlugin : randomAddon.getRequiredPlugins()) {
             AddonPlugin addonPlugin = instance.getPlugin(requiredPlugin.getName());
             //If no version is present, assume it works for every version.
-            if (requiredPlugin.getMinVersion() == null) continue;
+            if (requiredPlugin.getMinVersion() == null) {
+                addonResponse.setResponseType(AddonResponseType.SUCCESS);
+                continue;
+            }
             ComparableVersion reqMinPluginVersion = new ComparableVersion(requiredPlugin.getMinVersion());
             ComparableVersion addonPluginVersion = new ComparableVersion(addonPlugin.getVersion());
             if (requiredPlugin.getMaxVersion() != null) {
                 ComparableVersion reqMaxPluginVersion = new ComparableVersion(requiredPlugin.getMaxVersion());
                 if (reqMaxPluginVersion.compareTo(addonPluginVersion) > 0) {
-                    return false;
+                    addonResponse.setResponseType(AddonResponseType.INVALID_MIN_VERSION);
+                    requiredPlugin.setLoaded(false);
+                } else {
+                    addonResponse.setResponseType(AddonResponseType.SUCCESS);
+                    requiredPlugin.setLoaded(true);
                 }
             }
             if (reqMinPluginVersion.compareTo(addonPluginVersion) < 0) {
-                return false;
+                addonResponse.setResponseType(AddonResponseType.INVALID_MAX_VERSION);
+                requiredPlugin.setLoaded(false);
+            } else {
+                addonResponse.setResponseType(AddonResponseType.SUCCESS);
+                requiredPlugin.setLoaded(true);
             }
         }
-        return true;
+        return addonResponse;
     }
 
     private URL[] getJarURIs() {

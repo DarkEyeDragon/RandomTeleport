@@ -7,6 +7,7 @@ public class BaseRequiredPlugin implements RequiredPlugin {
     private final String minVersion;
     private final String name;
     private final String maxVersion;
+    private boolean loaded;
 
     public BaseRequiredPlugin(String name, String minVersion, String maxVersion) {
         this.minVersion = minVersion;
@@ -34,6 +35,16 @@ public class BaseRequiredPlugin implements RequiredPlugin {
     @Override
     public String getMaxVersion() {
         return maxVersion;
+    }
+
+    @Override
+    public boolean isLoaded() {
+        return loaded;
+    }
+
+    @Override
+    public void setLoaded(boolean loaded) {
+        this.loaded = loaded;
     }
 
     public String getName() {
