@@ -56,43 +56,47 @@ public class AddonManager implements RandomAddonManager {
                 .acceptPackages("*.addon*")
                 .scan()) {
             ClassInfoList addonClasses = scanResult.getSubclasses(ABSTRACT_CLASS);
-            addons = addonClasses.loadClasses(RandomAddon.class)
-                    .stream()
-                    .map(this::createAddonInstance)
-                    .filter(Objects::nonNull)
-                    .map(this::areRequiredPluginsPresent)
-                    .filter(addonResponse -> {
-                        RandomAddon randomAddon = addonResponse.getAddon();
-                        if (addonResponse.getResponseType() == AddonResponseType.SUCCESS) return true;
-                        logger.info(MiniMessage.get().parse("<gray>" + "[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " missing required plugins."));
-                        for (RequiredPlugin plugin : addonResponse.getAddon().getRequiredPlugins()) {
-                            if (!plugin.isLoaded()) {
-                                logger.info(MiniMessage.get().parse("    └─ " + plugin.getName() + " is not loaded."));
-                            }
-                        }
-                        return false;
-                    })
-                    .map(AddonResponse::getAddon)
-                    .map(this::areRequiredVersionsPresent)
-                    .filter(addonResponse -> {
-                        RandomAddon randomAddon = addonResponse.getAddon();
-                        if (addonResponse.getResponseType() == AddonResponseType.SUCCESS) return true;
-                        logger.info(MiniMessage.get().parse("<gray>" + "[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " version mismatch."));
-                        for (RequiredPlugin plugin : addonResponse.getAddon().getRequiredPlugins()) {
-                            logger.info("yeet");
-                            if (!plugin.isLoaded()) {
-                                logger.info(MiniMessage.get().parse("    └─ " + plugin.getName() + " with version " + plugin.getMinVersion() + " is not loaded."));
-                            }
-                        }
-                        return false;
-                    })
-                    .map(AddonResponse::getAddon)
-                    .peek(randomAddon -> logger.info(MiniMessage.get().parse("<gray>" + "[<green>+<gray>] <light_purple>" + randomAddon.getIdentifier() + " has been loaded.")))
-                    .collect(Collectors.toMap(RandomLocationValidator::getIdentifier, randomAddon -> randomAddon));
+            addons = loadAddons(addonClasses);
         }
     }
 
-    private RandomAddon createAddonInstance(Class<? extends RandomAddon> clazz) {
+    private Map<String, RandomAddon> loadAddons(ClassInfoList addonClasses) {
+        return addonClasses.loadClasses(RandomAddon.class)
+                .stream()
+                .map(this::createAddonInstance)
+                .filter(Objects::nonNull)
+                .map(this::areRequiredPluginsPresent)
+                .filter(addonResponse -> {
+                    RandomAddon randomAddon = addonResponse.getAddon();
+                    if (addonResponse.getResponseType() == AddonResponseType.SUCCESS) return true;
+                    logger.info(MiniMessage.get().parse("<gray>" + "[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " missing required plugins."));
+                    for (RequiredPlugin plugin : addonResponse.getAddon().getRequiredPlugins()) {
+                        if (!plugin.isLoaded()) {
+                            logger.info(MiniMessage.get().parse("    └─ " + plugin.getName() + " is not loaded."));
+                        }
+                    }
+                    return false;
+                })
+                .map(AddonResponse::getAddon)
+                .map(this::areRequiredVersionsPresent)
+                .filter(addonResponse -> {
+                    RandomAddon randomAddon = addonResponse.getAddon();
+                    if (addonResponse.getResponseType() == AddonResponseType.SUCCESS) return true;
+                    logger.info(MiniMessage.get().parse("<gray>" + "[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " version mismatch."));
+                    for (RequiredPlugin plugin : addonResponse.getAddon().getRequiredPlugins()) {
+                        logger.info("yeet");
+                        if (!plugin.isLoaded()) {
+                            logger.info(MiniMessage.get().parse("    └─ " + plugin.getName() + " with version " + plugin.getMinVersion() + " is not loaded."));
+                        }
+                    }
+                    return false;
+                })
+                .map(AddonResponse::getAddon)
+                .peek(randomAddon -> logger.info(MiniMessage.get().parse("<gray>" + "[<green>+<gray>] <light_purple>" + randomAddon.getIdentifier() + " has been loaded.")))
+                .collect(Collectors.toMap(RandomLocationValidator::getIdentifier, randomAddon -> randomAddon));
+    }
+
+    protected final RandomAddon createAddonInstance(Class<? extends RandomAddon> clazz) {
         try {
             return clazz.getConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
@@ -101,7 +105,7 @@ public class AddonManager implements RandomAddonManager {
         }
     }
 
-    private AddonResponse areRequiredPluginsPresent(RandomAddon randomAddon) {
+    protected final AddonResponse areRequiredPluginsPresent(RandomAddon randomAddon) {
         AddonResponse addonResponse = new AddonResponse(randomAddon);
         for (RequiredPlugin requiredPlugin : randomAddon.getRequiredPlugins()) {
             if (!instance.isPluginLoaded(requiredPlugin.getName())) {
@@ -115,7 +119,7 @@ public class AddonManager implements RandomAddonManager {
         return addonResponse;
     }
 
-    private AddonResponse areRequiredVersionsPresent(RandomAddon randomAddon) {
+    protected final AddonResponse areRequiredVersionsPresent(RandomAddon randomAddon) {
         AddonResponse addonResponse = new AddonResponse(randomAddon);
         for (RequiredPlugin requiredPlugin : randomAddon.getRequiredPlugins()) {
             AddonPlugin addonPlugin = instance.getPlugin(requiredPlugin.getName());
