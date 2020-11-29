@@ -21,10 +21,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AddonManager implements RandomAddonManager {
@@ -107,6 +104,10 @@ public class AddonManager implements RandomAddonManager {
 
     protected final AddonResponse areRequiredPluginsPresent(RandomAddon randomAddon) {
         AddonResponse addonResponse = new AddonResponse(randomAddon);
+        List<RequiredPlugin> requiredPlugins = randomAddon.getRequiredPlugins();
+        if (requiredPlugins.isEmpty()) {
+            addonResponse.setResponseType(AddonResponseType.SUCCESS);
+        }
         for (RequiredPlugin requiredPlugin : randomAddon.getRequiredPlugins()) {
             if (!instance.isPluginLoaded(requiredPlugin.getName())) {
                 addonResponse.setResponseType(AddonResponseType.MISSING_DEPENDENCY);
@@ -121,31 +122,37 @@ public class AddonManager implements RandomAddonManager {
 
     protected final AddonResponse areRequiredVersionsPresent(RandomAddon randomAddon) {
         AddonResponse addonResponse = new AddonResponse(randomAddon);
-        for (RequiredPlugin requiredPlugin : randomAddon.getRequiredPlugins()) {
+        List<RequiredPlugin> requiredPlugins = randomAddon.getRequiredPlugins();
+        if (requiredPlugins.isEmpty()) {
+            addonResponse.setResponseType(AddonResponseType.SUCCESS);
+        }
+        for (RequiredPlugin requiredPlugin : requiredPlugins) {
             AddonPlugin addonPlugin = instance.getPlugin(requiredPlugin.getName());
             //If no version is present, assume it works for every version.
-            if (requiredPlugin.getMinVersion() == null) {
+            if (requiredPlugin.getMinVersion() == null && requiredPlugin.getMaxVersion() == null) {
                 addonResponse.setResponseType(AddonResponseType.SUCCESS);
                 continue;
             }
-            ComparableVersion reqMinPluginVersion = new ComparableVersion(requiredPlugin.getMinVersion());
             ComparableVersion addonPluginVersion = new ComparableVersion(addonPlugin.getVersion());
             if (requiredPlugin.getMaxVersion() != null) {
                 ComparableVersion reqMaxPluginVersion = new ComparableVersion(requiredPlugin.getMaxVersion());
-                if (reqMaxPluginVersion.compareTo(addonPluginVersion) > 0) {
-                    addonResponse.setResponseType(AddonResponseType.INVALID_MIN_VERSION);
+                if (reqMaxPluginVersion.compareTo(addonPluginVersion) < 0) {
+                    addonResponse.setResponseType(AddonResponseType.INVALID_MAX_VERSION);
                     requiredPlugin.setLoaded(false);
                 } else {
                     addonResponse.setResponseType(AddonResponseType.SUCCESS);
                     requiredPlugin.setLoaded(true);
                 }
             }
-            if (reqMinPluginVersion.compareTo(addonPluginVersion) < 0) {
-                addonResponse.setResponseType(AddonResponseType.INVALID_MAX_VERSION);
-                requiredPlugin.setLoaded(false);
-            } else {
-                addonResponse.setResponseType(AddonResponseType.SUCCESS);
-                requiredPlugin.setLoaded(true);
+            if (requiredPlugin.getMinVersion() != null) {
+                ComparableVersion reqMinPluginVersion = new ComparableVersion(requiredPlugin.getMinVersion());
+                if (reqMinPluginVersion.compareTo(addonPluginVersion) > 0) {
+                    addonResponse.setResponseType(AddonResponseType.INVALID_MIN_VERSION);
+                    requiredPlugin.setLoaded(false);
+                } else {
+                    addonResponse.setResponseType(AddonResponseType.SUCCESS);
+                    requiredPlugin.setLoaded(true);
+                }
             }
         }
         return addonResponse;
