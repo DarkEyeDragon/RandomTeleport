@@ -67,7 +67,7 @@ public class TeleportCommand extends BaseCommand {
 
     @Default
     @CommandPermission("rtp.teleport.self")
-    @CommandCompletion("@players|@worlds")
+    @CommandCompletion("@players|@filteredWorlds")
     public void onTeleport(CommandSender sender, @Optional PlayerWorldContext target, @Optional @CommandPermission("rtp.teleport.world") World world) {
         Player player = null;
         List<Player> targets = new ArrayList<>();
