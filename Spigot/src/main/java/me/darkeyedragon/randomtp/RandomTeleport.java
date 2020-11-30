@@ -2,8 +2,9 @@ package me.darkeyedragon.randomtp;
 
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
-import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
-import me.darkeyedragon.randomtp.common.logging.PluginLogger;
+import me.darkeyedragon.randomtp.addon.SpigotAddonPlugin;
+import me.darkeyedragon.randomtp.api.addon.AddonPlugin;
+import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.QueueListener;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
@@ -190,7 +191,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         return cooldowns;
     }
 
-    public Set<PluginLocationValidator> getValidatorSet() {
+    public Set<RandomLocationValidator> getValidatorSet() {
         return validatorList;
     }
 
