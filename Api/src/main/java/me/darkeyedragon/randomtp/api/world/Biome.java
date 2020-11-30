@@ -1,6 +1,6 @@
 package me.darkeyedragon.randomtp.api.world;
 
-public enum Biome {
+/*public enum Biome {
     OCEAN,
     PLAINS,
     DESERT,
@@ -80,4 +80,4 @@ public enum Biome {
     CRIMSON_FOREST,
     WARPED_FOREST,
     BASALT_DELTAS;
-}
+}*/

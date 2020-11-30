@@ -1,7 +1,7 @@
 package me.darkeyedragon.randomtp.world;
 
 import io.papermc.lib.PaperLib;
-import me.darkeyedragon.randomtp.api.world.RandomChunk;
+import me.darkeyedragon.randomtp.api.world.RandomChunkSnapshot;
 import me.darkeyedragon.randomtp.api.world.RandomEnvironment;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.RandomWorldBorder;
@@ -33,12 +33,12 @@ public class SpigotWorld implements RandomWorld {
     }
 
     @Override
-    public CompletableFuture<RandomChunk> getChunkAtAsync(RandomWorld world, int x, int z) {
+    public CompletableFuture<RandomChunkSnapshot> getChunkAtAsync(RandomWorld world, int x, int z) {
         World regWorld = WorldUtil.toWorld(world);
         if (PaperLib.isPaper()) {
-            return regWorld.getChunkAtAsyncUrgently(x, z).thenApply(SpigotChunk::new);
+            return regWorld.getChunkAtAsync(x, z).thenApply(chunk -> new SpigotChunkSnapshot(chunk.getChunkSnapshot(true, true, false)));
         }
-        return PaperLib.getChunkAtAsync(regWorld, x, z).thenApply(SpigotChunk::new);
+        return PaperLib.getChunkAtAsync(regWorld, x, z).thenApply(chunk -> new SpigotChunkSnapshot(chunk.getChunkSnapshot(true, true, false)));
     }
 
     @Override

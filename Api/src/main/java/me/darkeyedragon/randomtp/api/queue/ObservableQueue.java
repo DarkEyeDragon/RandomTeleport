@@ -22,17 +22,22 @@ public class ObservableQueue<T> extends ArrayBlockingQueue<T> {
         super(capacity, fair, c);
     }
 
-    public void subscribe(QueueListener<T> listener){
+    public void subscribe(QueueListener<T> listener) {
         listeners.add(listener);
     }
+
     @Override
-    public boolean offer(T element){
-        boolean changed = super.offer(element);
-        listeners.forEach(listener -> listener.onAdd(element));
-        return changed;
+    public boolean offer(T element) {
+        if (element != null) {
+            boolean changed = super.offer(element);
+            listeners.forEach(listener -> listener.onAdd(element));
+            return changed;
+        }
+        return false;
     }
+
     @Override
-    public T poll(){
+    public T poll() {
         T element = super.poll();
         listeners.forEach(listener -> listener.onRemove(element));
         return element;

@@ -2,9 +2,8 @@ package me.darkeyedragon.randomtp;
 
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
-import me.darkeyedragon.randomtp.addon.SpigotAddonPlugin;
-import me.darkeyedragon.randomtp.api.addon.AddonPlugin;
-import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
+import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
+import me.darkeyedragon.randomtp.common.logging.PluginLogger;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.QueueListener;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
@@ -49,6 +48,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
     private LocationFactory locationFactory;
     private DeathTracker deathTracker;
     private BukkitAudiences bukkitAudience;
+
     //Economy
     private Economy econ;
     private static EcoHandler ecoHandler;
@@ -68,7 +68,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
             locationQueue.subscribe(new QueueListener<RandomLocation>() {
                 @Override
                 public void onAdd(RandomLocation element) {
-                    plugin.getLogger().info("Safe location added for " + world.getName() + " (" + locationQueue.size() + "/" + size + ")");
+                    plugin.getLogger().info("Safe location added for " + world.getName() + " (" + locationQueue.size() + "/" + size + ") in " + element.getTries() + " tries");
                 }
 
                 @Override
@@ -190,7 +190,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         return cooldowns;
     }
 
-    public Set<RandomLocationValidator> getValidatorSet() {
+    public Set<PluginLocationValidator> getValidatorSet() {
         return validatorList;
     }
 
