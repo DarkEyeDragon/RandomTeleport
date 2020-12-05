@@ -154,7 +154,7 @@ public class TeleportCommand extends BaseCommand {
         MessageUtil.sendMessage(instance, sender, ChatColor.GREEN + "Clearing queue...");
         worldQueue.clear();
         MessageUtil.sendMessage(instance, sender, ChatColor.GREEN + "Repopulating queue, this can take a while.");
-        instance.init();
+        instance.populateWorldQueue();
         MessageUtil.sendMessage(instance, sender, ChatColor.GREEN + "Reloaded config");
     }
 
