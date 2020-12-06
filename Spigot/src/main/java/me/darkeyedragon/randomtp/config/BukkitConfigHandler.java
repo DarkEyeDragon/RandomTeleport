@@ -75,7 +75,8 @@ public class BukkitConfigHandler implements RandomConfigHandler {
                 .depletedQueue(getDepletedQueueMessage())
                 .countdown(getCountdownRemainingMessage())
                 .noWorldPermission(getNoWorldPermissionMessage())
-                .emptyQueue(getEmptyQueueMessage());
+                .emptyQueue(getEmptyQueueMessage())
+                .invalidDefaultWorld(getInvalidDefaultWorld());
         configMessage.getEconomy()
                 .insufficientFunds(getInsufficientFundsMessage())
                 .payment(getPaymentMessage());
@@ -98,7 +99,9 @@ public class BukkitConfigHandler implements RandomConfigHandler {
                 .delay(getTeleportDelay())
                 .cancelOnMove(isCanceledOnMove())
                 .deathTimer(getTeleportDeathTimer())
-                .particle(getParticle());
+                .particle(getParticle())
+                .useDefaultWorld(getUseDefault())
+                .defaultWorld(getDefaultWorld());
     }
 
     public void populateConfigDebug() {
@@ -358,18 +361,33 @@ public class BukkitConfigHandler implements RandomConfigHandler {
     private TeleportParticle<Particle> getParticle() {
         ConfigurationSection section = plugin.getConfig().getConfigurationSection("teleport");
         String particleString = section.getString("particle");
-        if(particleString == null || particleString.equalsIgnoreCase("none")) {
+        if (particleString == null || particleString.equalsIgnoreCase("none")) {
             return new TeleportParticle<>(null, 0);
         }
         String[] split = particleString.split(":");
-        try{
+        try {
             Particle particle = Particle.valueOf(split[0].toUpperCase());
             int amount = Integer.parseInt(split[1]);
             return new TeleportParticle<>(particle, amount);
-        }catch (IllegalArgumentException exception){
+        } catch (IllegalArgumentException exception) {
             exception.printStackTrace();
         }
         return new TeleportParticle<>(null, 0);
+    }
+
+    private boolean getUseDefault() {
+        ConfigurationSection section = plugin.getConfig().getConfigurationSection("teleport");
+        return section.getBoolean("use_default_world", false);
+    }
+
+    private String getDefaultWorld() {
+        ConfigurationSection section = plugin.getConfig().getConfigurationSection("teleport");
+        return section.getString("default_world", "world");
+    }
+
+    private String getInvalidDefaultWorld() {
+        ConfigurationSection section = plugin.getConfig().getConfigurationSection("message");
+        return section.getString("invalid_default_world");
     }
 
     public ConfigBlacklist getConfigBlacklist() {

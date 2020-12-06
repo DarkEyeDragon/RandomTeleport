@@ -8,4 +8,6 @@ public interface SectionTeleport {
     boolean isCancelOnMove();
     long getDeathTimer();
     TeleportParticle getParticle();
+    boolean getUseDefaultWorld();
+    String getDefaultWorld();
 }

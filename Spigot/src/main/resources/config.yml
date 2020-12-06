@@ -12,6 +12,7 @@ message:
   #valid placeholders: %world
   no_world_permission: "&cI'm sorry, you cannot rtp in %world"
   empty_queue: "&cThere are no locations available for this world! Try again in a bit or ask an admin to reload the config."
+  invalid_default_world: "&cThe default world is not set or is invalid. Cannot teleport you. Contact an admin to fix this issue."
   economy:
     insufficient_funds: "&cYou do not have enough money to rtp!"
     payment: "&aYou just paid &b%price &ato rtp!"
@@ -49,6 +50,8 @@ teleport:
   #You also need to provide the amount of particles.
   #Default: TOTEM:20
   particle: TOTEM:20
+  use_default_world: false
+  default_world: "world"
 #Plugins to take into consideration when teleporting. A player will not be teleported in those regions
 #Currently supports Factions (FactionsUUID), WorldGuard, GriefPrevention, RedProtect, Towny
 #If you want more plugins to be supported: https://github.com/DarkEyeDragon/RandomTeleport/issues
