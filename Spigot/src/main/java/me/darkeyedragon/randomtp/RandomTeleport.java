@@ -125,15 +125,15 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
                 context.addPlayer(player);
                 return context;
             } else {
-                if(!arg1.isEmpty()){
+                if (!arg1.isEmpty()) {
                     List<Entity> entityList = Bukkit.selectEntities(c.getSender(), arg1);
                     for (Entity entity : entityList) {
-                        if(entity instanceof Player){
-                            context.addPlayer((Player)entity);
+                        if (entity instanceof Player) {
+                            context.addPlayer((Player) entity);
                         }
                     }
                     return context;
-                }else{
+                } else {
                     throw new InvalidCommandArgument(true);
                 }
             }
@@ -149,7 +149,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         pluginManager = Bukkit.getPluginManager();
     }
 
-    private void loadListeners(){
+    private void loadListeners() {
         PluginManager pluginManager = plugin.getServer().getPluginManager();
         pluginManager.registerEvents(new WorldLoadListener(this), plugin);
         pluginManager.registerEvents(new PlayerDeathListener(this), plugin);

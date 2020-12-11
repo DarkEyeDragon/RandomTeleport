@@ -81,7 +81,7 @@ public class TeleportCommand extends BaseCommand {
                 player = (Player) sender;
                 if (configTeleport.getUseDefaultWorld()) {
                     World bukkitWorld = Bukkit.getWorld(configTeleport.getDefaultWorld());
-                    if(bukkitWorld == null){
+                    if (bukkitWorld == null) {
                         MessageUtil.sendMessage(instance, player, configMessage.getInvalidDefaultWorld(configTeleport.getDefaultWorld()));
                         return;
                     }
@@ -106,7 +106,12 @@ public class TeleportCommand extends BaseCommand {
             if (target.getPlayers().size() > 0) {
                 if (sender.hasPermission("rtp.teleport.other")) {
                     targets = target.getPlayers();
-                    newWorld = WorldUtil.toRandomWorld(world);
+                    //If no world is provided check if the default world is enabled
+                    if (configTeleport.getUseDefaultWorld()) {
+                        newWorld = WorldUtil.toRandomWorld(Bukkit.getWorld(configTeleport.getDefaultWorld()));
+                    } else {
+                        newWorld = WorldUtil.toRandomWorld(world);
+                    }
                     if (!configWorld.contains(newWorld)) {
                         MessageUtil.sendMessage(instance, sender, configMessage.getNoWorldPermission(newWorld));
                         return;
