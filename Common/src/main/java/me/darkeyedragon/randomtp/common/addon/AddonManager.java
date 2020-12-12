@@ -186,11 +186,17 @@ public class AddonManager implements RandomAddonManager {
      * @param name the identifier of the addon
      * @return the {@link RandomAddon} instance or null if not found.
      */
+    @Override
     public RandomAddon unregister(String name) {
         addons.get(name).setRequiredPlugins(null);
         return addons.remove(name);
     }
 
+    /**
+     * @param name the {@link File}'s name.
+     * @return the {@link RandomAddon} instance. Null if it doesnt exist
+     */
+    @Override
     public RandomAddon register(String name) {
         String finalName = name;
         if (!name.endsWith(".jar")) {
@@ -207,14 +213,22 @@ public class AddonManager implements RandomAddonManager {
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();
+            return null;
         }
         return addons.get(name);
     }
 
+    /**
+     * @return the name of the addon folder.
+     * addons by default.
+     */
     public static String getAddonFolderName() {
         return ADDON_FOLDER_NAME;
     }
 
+    /**
+     * @return a collection of type {@link Map} with the {@link RandomAddon} identifier as key. And the {@link RandomAddon} as value.
+     */
     @Unmodifiable
     public Map<String, RandomAddon> getAddons() {
         return addons;
@@ -228,6 +242,9 @@ public class AddonManager implements RandomAddonManager {
         return folder;
     }
 
+    /**
+     * @return the full qualified name of the object.
+     */
     public static String getAbstractClass() {
         return ABSTRACT_CLASS;
     }

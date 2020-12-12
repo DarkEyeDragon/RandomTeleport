@@ -11,4 +11,6 @@ public interface RandomLocationValidator {
     boolean isValid(RandomLocation location);
 
     List<RequiredPlugin> getRequiredPlugins();
+
+    void setRequiredPlugins(List<RequiredPlugin> requiredPlugins);
 }
