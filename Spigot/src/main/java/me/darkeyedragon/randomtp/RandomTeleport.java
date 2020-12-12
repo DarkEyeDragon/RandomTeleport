@@ -2,6 +2,7 @@ package me.darkeyedragon.randomtp;
 
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
+import com.google.common.collect.ImmutableList;
 import me.darkeyedragon.randomtp.addon.SpigotAddonPlugin;
 import me.darkeyedragon.randomtp.api.addon.AddonPlugin;
 import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
@@ -113,6 +114,8 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         deathTracker = new DeathTracker(this);
         //check if the first argument is a world or player
         worldQueue = new WorldQueue();
+        manager.getCommandCompletions().registerAsyncCompletion("addonFiles", context -> ImmutableList.copyOf(addonManager.getFileNames()));
+        manager.getCommandCompletions().registerAsyncCompletion("addonNames", context -> ImmutableList.copyOf(addonManager.getAddons().keySet()));
         manager.getCommandContexts().registerContext(PlayerWorldContext.class, c -> {
             String arg1 = c.popFirstArg();
             World world = Bukkit.getWorld(arg1);
@@ -125,15 +128,15 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
                 context.addPlayer(player);
                 return context;
             } else {
-                if(!arg1.isEmpty()){
+                if (!arg1.isEmpty()) {
                     List<Entity> entityList = Bukkit.selectEntities(c.getSender(), arg1);
                     for (Entity entity : entityList) {
-                        if(entity instanceof Player){
-                            context.addPlayer((Player)entity);
+                        if (entity instanceof Player) {
+                            context.addPlayer((Player) entity);
                         }
                     }
                     return context;
-                }else{
+                } else {
                     throw new InvalidCommandArgument(true);
                 }
             }
@@ -149,7 +152,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         pluginManager = Bukkit.getPluginManager();
     }
 
-    private void loadListeners(){
+    private void loadListeners() {
         PluginManager pluginManager = plugin.getServer().getPluginManager();
         pluginManager.registerEvents(new WorldLoadListener(this), plugin);
         pluginManager.registerEvents(new PlayerDeathListener(this), plugin);

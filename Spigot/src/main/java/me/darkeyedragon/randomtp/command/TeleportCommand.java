@@ -6,6 +6,7 @@ import co.aikar.commands.annotation.*;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.SpigotImpl;
+import me.darkeyedragon.randomtp.api.addon.RequiredPlugin;
 import me.darkeyedragon.randomtp.api.config.section.SectionMessage;
 import me.darkeyedragon.randomtp.api.config.section.SectionQueue;
 import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
@@ -16,6 +17,7 @@ import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
+import me.darkeyedragon.randomtp.common.addon.RandomAddon;
 import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
 import me.darkeyedragon.randomtp.common.world.location.LocationFactory;
 import me.darkeyedragon.randomtp.config.BukkitConfigHandler;
@@ -118,11 +120,11 @@ public class TeleportCommand extends BaseCommand {
             }
         }
         final RandomWorld finalWorld = newWorld;
-        if(player == null){
+        if (player == null) {
             for (Player target1 : targets) {
                 teleport(sender, target1, finalWorld);
             }
-        }else{
+        } else {
             teleport(sender, player, finalWorld);
         }
     }
@@ -241,6 +243,48 @@ public class TeleportCommand extends BaseCommand {
         }
     }
 
+    @Subcommand("addon")
+    @CommandPermission("rtp.addon.base")
+    public class AddonClass extends BaseCommand {
+
+        @Subcommand("register")
+        @CommandCompletion("@addonFiles")
+        public void register(CommandSender sender, String name) {
+            RandomAddon addon = instance.getAddonManager().register(name);
+            if (addon != null) {
+                MessageUtil.sendMessage(instance, sender, ChatColor.GREEN + addon.getIdentifier() + " has been registered.");
+            } else {
+                MessageUtil.sendMessage(instance, sender, ChatColor.RED + " could not be registered. Is the name correct?");
+            }
+        }
+
+        @Subcommand("unregister")
+        @CommandCompletion("@addonNames")
+        public void unregister(CommandSender sender, String name) {
+            RandomAddon addon = instance.getAddonManager().unregister(name);
+            if (addon != null) {
+                MessageUtil.sendMessage(instance, sender, ChatColor.GREEN + addon.getIdentifier() + " has been unregistered.");
+            } else {
+                MessageUtil.sendMessage(instance, sender, ChatColor.RED + " could not be unregistered. Is it loaded?");
+            }
+
+        }
+
+        @Subcommand("list")
+        public void list(CommandSender sender) {
+            StringBuilder message = new StringBuilder(ChatColor.AQUA + "========= [Addons] ========").append("\n");
+            for (RandomAddon addon : instance.getAddonManager().getAddons().values()) {
+                message.append(ChatColor.GOLD).append(addon.getIdentifier()).append("\n");
+                for (RequiredPlugin requiredPlugin : addon.getRequiredPlugins()) {
+                    message.append(ChatColor.GREEN).append("  └─ ").append(requiredPlugin.getName()).append("\n");
+                }
+            }
+            message.append(ChatColor.AQUA).append("\n").append("=========================");
+            MessageUtil.sendMessage(instance, sender, message.toString());
+        }
+    }
+
+
     /*@Subcommand("createSign")
     @CommandPermission("rtp.admin.createsign")
     public void createSign(Player player, World world) {
@@ -276,4 +320,6 @@ public class TeleportCommand extends BaseCommand {
         }
         sign.update();
     }*/
+
+
 }

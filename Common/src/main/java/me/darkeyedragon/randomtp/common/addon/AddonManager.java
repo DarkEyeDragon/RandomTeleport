@@ -1,6 +1,5 @@
 package me.darkeyedragon.randomtp.common.addon;
 
-import com.google.common.collect.ImmutableMap;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
@@ -42,7 +41,7 @@ public class AddonManager implements RandomAddonManager {
     }
 
     public void instantiateAllLocal() {
-        for (URL uri : getJarURIs()) {
+        for (URL uri : getJarURLs()) {
             instantiateLocal(new AddonClassLoader(uri, instance.getClass().getClassLoader()));
         }
     }
@@ -53,10 +52,15 @@ public class AddonManager implements RandomAddonManager {
                 .acceptPackages("*.addon*")
                 .scan()) {
             ClassInfoList addonClasses = scanResult.getSubclasses(ABSTRACT_CLASS);
-            addons = loadAddons(addonClasses);
+            addons.putAll(loadAddons(addonClasses));
         }
     }
 
+    /**
+     * @param addonClasses the {@link ClassInfoList} instance. Obtained from the {@link ScanResult}.
+     * @return a collection of {@link RandomAddon} classes. This is a list since a classloader can contain multiple
+     * classes which derive from {@link RandomAddon}
+     */
     private Map<String, RandomAddon> loadAddons(ClassInfoList addonClasses) {
         return addonClasses.loadClasses(RandomAddon.class)
                 .stream()
@@ -81,7 +85,6 @@ public class AddonManager implements RandomAddonManager {
                     if (addonResponse.getResponseType() == AddonResponseType.SUCCESS) return true;
                     logger.info(MiniMessage.get().parse("<gray>" + "[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " version mismatch."));
                     for (RequiredPlugin plugin : addonResponse.getAddon().getRequiredPlugins()) {
-                        logger.info("yeet");
                         if (!plugin.isLoaded()) {
                             logger.info(MiniMessage.get().parse("    └─ " + plugin.getName() + " with version " + plugin.getMinVersion() + " is not loaded."));
                         }
@@ -93,6 +96,10 @@ public class AddonManager implements RandomAddonManager {
                 .collect(Collectors.toMap(RandomLocationValidator::getIdentifier, randomAddon -> randomAddon));
     }
 
+    /**
+     * @param clazz the {@link Class} to instantiate. Must extend {@link RandomAddon}
+     * @return the {@link } {@link RandomAddon} instance.
+     */
     protected final RandomAddon createAddonInstance(Class<? extends RandomAddon> clazz) {
         try {
             return clazz.getConstructor().newInstance();
@@ -157,8 +164,10 @@ public class AddonManager implements RandomAddonManager {
         }
         return addonResponse;
     }
-
-    private URL[] getJarURIs() {
+    public String[] getFileNames(){
+        return Arrays.stream(folder.listFiles()).filter(file -> file.getName().endsWith(".jar")).map(File::getName).toArray(String[]::new);
+    }
+    public URL[] getJarURLs() {
         return Arrays.stream(folder.listFiles())
                 .filter(file -> file.getName().endsWith(".jar")).map(file -> {
                     try {
@@ -171,9 +180,35 @@ public class AddonManager implements RandomAddonManager {
                 .filter(Objects::nonNull).toArray(URL[]::new);
     }
 
+    /**
+     * Unregister the addon. Unreferencing it should GC the classloader.
+     *
+     * @param name the identifier of the addon
+     * @return the {@link RandomAddon} instance or null if not found.
+     */
     public RandomAddon unregister(String name) {
-        throw new RuntimeException("Not implemented.");
-        //return addons.remove(name);
+        addons.get(name).setRequiredPlugins(null);
+        return addons.remove(name);
+    }
+
+    public RandomAddon register(String name) {
+        String finalName = name;
+        if (!name.endsWith(".jar")) {
+            finalName = name + ".jar";
+        }
+        File file = new File(folder, finalName);
+        try {
+            try (ScanResult scanResult = new ClassGraph()
+                    .overrideClassLoaders(new AddonClassLoader(file.toURI().toURL(), instance.getClass().getClassLoader()))
+                    .acceptPackages("*.addon*")
+                    .scan()) {
+                ClassInfoList addonClasses = scanResult.getSubclasses(ABSTRACT_CLASS);
+                addons.putAll(loadAddons(addonClasses));
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return addons.get(name);
     }
 
     public static String getAddonFolderName() {
@@ -182,7 +217,7 @@ public class AddonManager implements RandomAddonManager {
 
     @Unmodifiable
     public Map<String, RandomAddon> getAddons() {
-        return ImmutableMap.copyOf(addons);
+        return addons;
     }
 
     public RandomTeleportPluginImpl getInstance() {
