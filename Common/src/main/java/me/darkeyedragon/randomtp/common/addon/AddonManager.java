@@ -167,7 +167,7 @@ public class AddonManager implements RandomAddonManager {
     public String[] getFileNames(){
         return Arrays.stream(folder.listFiles()).filter(file -> file.getName().endsWith(".jar")).map(File::getName).toArray(String[]::new);
     }
-    public URL[] getJarURLs() {
+    protected URL[] getJarURLs() {
         return Arrays.stream(folder.listFiles())
                 .filter(file -> file.getName().endsWith(".jar")).map(file -> {
                     try {
