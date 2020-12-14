@@ -6,21 +6,21 @@ import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.QueueListener;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.common.addon.AddonManager;
 import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
 
 public abstract class RandomTeleportPluginImpl implements RandomTeleportPlugin<RandomTeleportPluginImpl> {
 
-    public void init() {
-        populateWorldQueue();
-    }
+    public abstract AddonManager getAddonManager();
 
-    private void populateWorldQueue() {
+    public final void populateWorldQueue() {
         RandomConfigHandler configHandler = getConfigHandler();
         getLogger().info("Populating WorldQueue");
         long startTime = System.currentTimeMillis();
         for (RandomWorld world : configHandler.getSectionWorld().getWorlds()) {
             //Add a new world to the world queue and generate random locations
             LocationQueue locationQueue = new LocationQueue(configHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(world, this));
+
             //Subscribe to the locationqueue to be notified of changes
             subscribe(locationQueue, world);
             SectionWorldDetail sectionWorldDetail = getLocationFactory().getWorldConfigSection(world);
@@ -46,4 +46,5 @@ public abstract class RandomTeleportPluginImpl implements RandomTeleportPlugin<R
             });
         }
     }
+
 }

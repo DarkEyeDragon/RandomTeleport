@@ -1,6 +1,6 @@
 package me.darkeyedragon.randomtp.api.world.location.search;
 
-import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
+import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
 import me.darkeyedragon.randomtp.api.config.Dimension;
 import me.darkeyedragon.randomtp.api.config.DimensionData;
 import me.darkeyedragon.randomtp.api.config.RandomBlacklist;
@@ -15,13 +15,13 @@ import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 
 import java.util.EnumSet;
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class BaseLocationSearcher implements LocationSearcher {
 
-    protected final Set<PluginLocationValidator> validatorSet;
+    protected final Map<String, ? extends RandomLocationValidator> validatorMap;
     private final Dimension dimension;
     private final RandomBlacklist blacklist;
 
@@ -30,10 +30,10 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
     protected int count = 1;
     protected int max = 50;
 
-    public BaseLocationSearcher(Set<PluginLocationValidator> validatorSet, RandomBlacklist blacklist, Dimension dimension) {
+    public BaseLocationSearcher(Map<String, ? extends RandomLocationValidator> validatorMap, RandomBlacklist blacklist, Dimension dimension) {
         this.blacklist = blacklist;
         this.dimension = dimension;
-        this.validatorSet = validatorSet;
+        this.validatorMap = validatorMap;
     }
 
     /**
@@ -126,7 +126,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
 
     @Override
     public boolean isSafeForPlugins(RandomLocation location) {
-        for (PluginLocationValidator validator : validatorSet) {
+        for (RandomLocationValidator validator : validatorMap.values()) {
             if (!validator.isValid(location)) {
                 return false;
             }
@@ -172,7 +172,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
             RandomBlock relativeBlock = block.getRelative(blockFace);
             if (relativeBlock.isEmpty()) return false;
             if (!relativeBlock.getBlockType().getType().isSolid()) return false;
-            if (blacklist.getDimensionData(dimension).getBlockTypes().contains(relativeBlock.getBlockType())) ;
+            if (blacklist.getDimensionData(dimension).getBlockTypes().contains(relativeBlock.getBlockType())) return false;
         }
         return true;
     }

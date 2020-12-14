@@ -4,16 +4,15 @@ import me.darkeyedragon.randomtp.api.config.Dimension;
 import me.darkeyedragon.randomtp.api.world.location.search.BaseLocationSearcher;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
-import org.bukkit.Location;
 
 public class OverworldLocationSearcher extends BaseLocationSearcher {
     /**
-     * A simple utility class to help with {@link Location}
+     * Overworld location implementation of {@link BaseLocationSearcher}
      *
      * @param plugin the {@link RandomTeleportPlugin} instance
      */
     public OverworldLocationSearcher(RandomTeleportPlugin<RandomTeleportPluginImpl> plugin) {
-        super(plugin.getInstance().getValidatorSet(), plugin.getConfigHandler().getSectionBlacklist().getBlacklist(), Dimension.OVERWORLD);
+        super(plugin.getInstance().getAddonManager().getAddons(), plugin.getConfigHandler().getSectionBlacklist().getBlacklist(), Dimension.OVERWORLD);
 
         //TODO parse regex
         //Illegal biomes
