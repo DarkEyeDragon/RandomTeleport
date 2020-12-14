@@ -101,6 +101,9 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         loadListeners();
         logger = new BukkitLogger(this);
         addonManager = new AddonManager(this, logger);
+        if(addonManager.createAddonDir()){
+            logger.info("No addon folder. Creating one...");
+        }
         bukkitAudience = BukkitAudiences.create(plugin);
         manager = new PaperCommandManager(plugin);
         bukkitConfigHandler = new BukkitConfigHandler(this);

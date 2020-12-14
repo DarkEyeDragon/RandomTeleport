@@ -57,6 +57,16 @@ public class AddonManager implements RandomAddonManager {
     }
 
     /**
+     * Create the addon folder if it doesn't exist
+     */
+    public boolean createAddonDir(){
+        if(!folder.exists()){
+            return folder.mkdir();
+        }
+        return false;
+    }
+
+    /**
      * @param addonClasses the {@link ClassInfoList} instance. Obtained from the {@link ScanResult}.
      * @return a collection of {@link RandomAddon} classes. This is a list since a classloader can contain multiple
      * classes which derive from {@link RandomAddon}
