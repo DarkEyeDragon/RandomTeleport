@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableList;
 import me.darkeyedragon.randomtp.addon.SpigotAddonPlugin;
 import me.darkeyedragon.randomtp.api.addon.AddonPlugin;
 import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
+import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.QueueListener;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
@@ -13,6 +14,7 @@ import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.command.TeleportCommand;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
+import me.darkeyedragon.randomtp.common.addon.AddonManager;
 import me.darkeyedragon.randomtp.common.addon.AddonManager;
 import me.darkeyedragon.randomtp.common.eco.EcoHandler;
 import me.darkeyedragon.randomtp.common.logging.PluginLogger;
@@ -29,6 +31,7 @@ import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -37,6 +40,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public final class RandomTeleport extends RandomTeleportPluginImpl {
 
@@ -151,6 +155,22 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
             plugin.getLogger().warning("Vault not found. Currency based options are disabled.");
         }
         manager.registerCommand(new TeleportCommand((SpigotImpl) plugin));
+        manager.getCommandCompletions().registerAsyncCompletion("filteredWorlds", context -> {
+            Set<RandomWorld> randomWorlds = bukkitConfigHandler.getSectionWorld().getWorlds();
+            Iterator<RandomWorld> randomWorldIterator = randomWorlds.iterator();
+            while (randomWorldIterator.hasNext()) {
+                RandomWorld randomWorld = randomWorldIterator.next();
+                SectionWorldDetail sectionWorldDetail = bukkitConfigHandler.getSectionWorld().getSectionWorldDetail(randomWorld);
+                if(sectionWorldDetail.needsWorldPermission() && !(context.getSender() instanceof ConsoleCommandSender)){
+                    if(!context.getPlayer().hasPermission("rtp.world."+randomWorld.getName())){
+                        randomWorldIterator.remove();
+                    }
+                }
+            }
+            return randomWorlds.stream().map(RandomWorld::getName).collect(Collectors.toList());
+        });
+        plugin.getServer().getPluginManager().registerEvents(new WorldLoadListener(this), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), plugin);
         validatorList = new HashSet<>();
         pluginManager = Bukkit.getPluginManager();
     }
