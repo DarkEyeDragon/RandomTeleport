@@ -41,7 +41,6 @@ public class TeleportCommand extends BaseCommand {
     private final SpigotImpl plugin;
     private WorldQueue worldQueue;
     private LocationFactory locationFactory;
-    private boolean teleportSuccess;
 
     //Economy
 
