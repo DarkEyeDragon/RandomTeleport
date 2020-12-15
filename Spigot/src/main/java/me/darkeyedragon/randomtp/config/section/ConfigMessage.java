@@ -26,6 +26,7 @@ public class ConfigMessage implements SectionMessage {
     private final Economy economy;
     private final Sign sign;
     private String emptyQueue;
+    private String invalidDefaultWorld;
 
 
     public ConfigMessage() {
@@ -70,6 +71,11 @@ public class ConfigMessage implements SectionMessage {
 
     public ConfigMessage emptyQueue(String emptyQueue) {
         this.emptyQueue = emptyQueue;
+        return this;
+    }
+
+    public ConfigMessage invalidDefaultWorld(String invalidDefaultWorld){
+        this.invalidDefaultWorld = invalidDefaultWorld;
         return this;
     }
 
@@ -172,6 +178,17 @@ public class ConfigMessage implements SectionMessage {
     @Override
     public SubSectionSign getSubSectionSign() {
         return this.sign;
+    }
+
+    @Override
+    public Component getInvalidDefaultWorld(String worldName) {
+        String message = invalidDefaultWorld;
+        if (message != null) {
+            message = ChatColor.translateAlternateColorCodes('&', message);
+            message = message.replace("%world", worldName);
+            return MiniMessage.get().parse(message);
+        }
+        return null;
     }
 
 

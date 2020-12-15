@@ -26,4 +26,6 @@ public interface SectionMessage {
     SubSectionEconomy getSubSectionEconomy();
 
     SubSectionSign getSubSectionSign();
+
+    Component getInvalidDefaultWorld(String worldName);
 }

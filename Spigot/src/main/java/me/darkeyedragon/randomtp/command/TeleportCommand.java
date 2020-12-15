@@ -9,6 +9,7 @@ import me.darkeyedragon.randomtp.SpigotImpl;
 import me.darkeyedragon.randomtp.api.addon.RequiredPlugin;
 import me.darkeyedragon.randomtp.api.config.section.SectionMessage;
 import me.darkeyedragon.randomtp.api.config.section.SectionQueue;
+import me.darkeyedragon.randomtp.api.config.section.SectionTeleport;
 import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.QueueListener;
@@ -25,6 +26,7 @@ import me.darkeyedragon.randomtp.teleport.Teleport;
 import me.darkeyedragon.randomtp.teleport.TeleportProperty;
 import me.darkeyedragon.randomtp.util.MessageUtil;
 import me.darkeyedragon.randomtp.util.WorldUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -50,6 +52,7 @@ public class TeleportCommand extends BaseCommand {
     private SectionMessage configMessage;
     private SectionQueue configQueue;
     private SectionWorld configWorld;
+    private SectionTeleport configTeleport;
 
     public TeleportCommand(SpigotImpl plugin) {
         this.instance = plugin.getInstance();
@@ -64,6 +67,7 @@ public class TeleportCommand extends BaseCommand {
         this.configWorld = bukkitConfigHandler.getSectionWorld();
         this.locationFactory = instance.getLocationFactory();
         this.worldQueue = instance.getWorldQueue();
+        this.configTeleport = bukkitConfigHandler.getSectionTeleport();
     }
 
     @Default
@@ -76,7 +80,22 @@ public class TeleportCommand extends BaseCommand {
         if (target == null) {
             if (sender instanceof Player) {
                 player = (Player) sender;
-                newWorld = WorldUtil.toRandomWorld(player.getWorld());
+                if (configTeleport.getUseDefaultWorld()) {
+                    World bukkitWorld = Bukkit.getWorld(configTeleport.getDefaultWorld());
+                    if (bukkitWorld == null) {
+                        MessageUtil.sendMessage(instance, player, configMessage.getInvalidDefaultWorld(configTeleport.getDefaultWorld()));
+                        return;
+                    }
+                    //Check if world is in the queue, if not, well then there are no locations, go figure.
+                    LocationQueue locationQueue = instance.getQueue(WorldUtil.toRandomWorld(bukkitWorld));
+                    if (locationQueue == null) {
+                        MessageUtil.sendMessage(instance, player, configMessage.getInvalidDefaultWorld(configTeleport.getDefaultWorld()));
+                        return;
+                    }
+                    newWorld = WorldUtil.toRandomWorld(bukkitWorld);
+                } else {
+                    newWorld = WorldUtil.toRandomWorld(player.getWorld());
+                }
                 if (!configWorld.contains(newWorld)) {
                     MessageUtil.sendMessage(instance, sender, configMessage.getNoWorldPermission(newWorld));
                     return;
@@ -88,7 +107,12 @@ public class TeleportCommand extends BaseCommand {
             if (target.getPlayers().size() > 0) {
                 if (sender.hasPermission("rtp.teleport.other")) {
                     targets = target.getPlayers();
-                    newWorld = WorldUtil.toRandomWorld(world);
+                    //If no world is provided check if the default world is enabled
+                    if (configTeleport.getUseDefaultWorld()) {
+                        newWorld = WorldUtil.toRandomWorld(Bukkit.getWorld(configTeleport.getDefaultWorld()));
+                    } else {
+                        newWorld = WorldUtil.toRandomWorld(world);
+                    }
                     if (!configWorld.contains(newWorld)) {
                         MessageUtil.sendMessage(instance, sender, configMessage.getNoWorldPermission(newWorld));
                         return;

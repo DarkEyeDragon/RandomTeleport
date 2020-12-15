@@ -6,12 +6,13 @@ import org.bukkit.Particle;
 
 public class ConfigTeleport implements SectionTeleport {
 
-
     private long cooldown;
     private long delay;
     private boolean cancelOnMove;
     private long deathTimer;
     private TeleportParticle<Particle> particle;
+    private boolean useDefaultWorld;
+    private String defaultWorld;
 
     public ConfigTeleport cooldown(long cooldown) {
         this.cooldown = cooldown;
@@ -38,6 +39,16 @@ public class ConfigTeleport implements SectionTeleport {
         return this;
     }
 
+    public ConfigTeleport useDefaultWorld(boolean useDefaultWorld){
+        this.useDefaultWorld = useDefaultWorld;
+        return this;
+    }
+
+    public ConfigTeleport defaultWorld(String defaultWorld){
+        this.defaultWorld = defaultWorld;
+        return this;
+    }
+
     @Override
     public long getCooldown() {
         return cooldown;
@@ -61,5 +72,15 @@ public class ConfigTeleport implements SectionTeleport {
     @Override
     public TeleportParticle<Particle> getParticle() {
         return particle;
+    }
+
+    @Override
+    public boolean getUseDefaultWorld() {
+        return useDefaultWorld;
+    }
+
+    @Override
+    public String getDefaultWorld() {
+        return defaultWorld;
     }
 }
