@@ -9,7 +9,7 @@ import java.util.List;
 public abstract class RandomAddon implements RandomLocationValidator {
 
     private List<RequiredPlugin> requiredPlugins;
-
+    private AddonManager addonManager;
     public RandomAddon() {
         requiredPlugins = new ArrayList<>();
     }
@@ -28,5 +28,13 @@ public abstract class RandomAddon implements RandomLocationValidator {
 
     public void setRequiredPlugins(List<RequiredPlugin> requiredPlugins) {
         this.requiredPlugins = requiredPlugins;
+    }
+
+    public AddonManager getAddonManager() {
+        return addonManager;
+    }
+
+    public void setAddonManager(AddonManager addonManager) {
+        this.addonManager = addonManager;
     }
 }
