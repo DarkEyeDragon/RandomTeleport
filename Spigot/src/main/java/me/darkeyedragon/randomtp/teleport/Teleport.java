@@ -11,6 +11,7 @@ import me.darkeyedragon.randomtp.common.eco.EcoHandler;
 import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
 import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
 import me.darkeyedragon.randomtp.event.RandomPreTeleportEvent;
+import me.darkeyedragon.randomtp.event.RandomTeleportCompletedEvent;
 import me.darkeyedragon.randomtp.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.stat.BStats;
 import me.darkeyedragon.randomtp.util.MessageUtil;
@@ -157,6 +158,8 @@ public class Teleport {
             drawWarpParticles(player, particle);
             MessageUtil.sendMessage(plugin, player, configHandler.getSectionMessage().getTeleport(randomLocation));
             BStats.addTeleportStat();
+            RandomTeleportCompletedEvent event = new RandomTeleportCompletedEvent(player, property);
+            Bukkit.getServer().getPluginManager().callEvent(event);
             //Generate a new location after the init delay
             Bukkit.getScheduler().runTaskLater(plugin.getPlugin(), () -> {
                 WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(property.getWorld());
