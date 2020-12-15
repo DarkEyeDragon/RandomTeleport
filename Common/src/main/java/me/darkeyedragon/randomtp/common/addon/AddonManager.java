@@ -112,7 +112,9 @@ public class AddonManager implements RandomAddonManager {
      */
     protected final RandomAddon createAddonInstance(Class<? extends RandomAddon> clazz) {
         try {
-            return clazz.getConstructor().newInstance();
+            RandomAddon randomAddon = clazz.getConstructor().newInstance();
+            randomAddon.setAddonManager(this);
+            return randomAddon;
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
             return null;
