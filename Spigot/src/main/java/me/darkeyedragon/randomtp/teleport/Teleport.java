@@ -93,7 +93,7 @@ public class Teleport {
             AtomicBoolean complete = new AtomicBoolean(false);
             int taskId = Bukkit.getScheduler().runTaskLater(impl, () -> {
                 complete.set(true);
-                teleport();
+                teleport(player);
             }, delay).getTaskId();
             Location originalLoc = player.getLocation().clone();
             if (configHandler.getSectionTeleport().isCancelOnMove()) {
@@ -110,7 +110,7 @@ public class Teleport {
                 }, 0, 5L);
             }
         } else {
-            teleport();
+            teleport(player);
         }
     }
 
@@ -129,14 +129,14 @@ public class Teleport {
         optionalParticle.ifPresent(presentParticle -> player.getWorld().spawnParticle(presentParticle, spawnLoc, particle.getAmount()));
     }
 
-    private void teleport() {
+    private void teleport(Player player) {
         RandomLocation randomLocation = plugin.getWorldQueue().popLocation(property.getWorld());
         if (randomLocation == null) {
             MessageUtil.sendMessage(plugin, property.getCommandSender(), configHandler.getSectionMessage().getDepletedQueue());
             return;
         }
         Location location = WorldUtil.toLocation(randomLocation);
-        PaperLib.getChunkAtAsync(location).thenAccept(chunk -> {
+        PaperLib.getChunkAtAsync(location.getWorld(), location.getBlockX(), location.getBlockZ(), true, true ).thenAccept(chunk -> {
             LocationSearcher baseLocationSearcher = LocationSearcherFactory.getLocationSearcher(property.getWorld(), plugin);
             if (!baseLocationSearcher.isSafe(randomLocation)) {
                 random();
