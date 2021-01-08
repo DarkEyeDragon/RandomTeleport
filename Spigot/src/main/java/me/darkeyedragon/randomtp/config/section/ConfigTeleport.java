@@ -14,39 +14,14 @@ public class ConfigTeleport implements SectionTeleport {
     private boolean useDefaultWorld;
     private String defaultWorld;
 
-    public ConfigTeleport cooldown(long cooldown) {
+    public ConfigTeleport(long cooldown, long delay, boolean cancelOnMove, long deathTimer, TeleportParticle<Particle> particle, boolean useDefaultWorld, String defaultWorld) {
         this.cooldown = cooldown;
-        return this;
-    }
-
-    public ConfigTeleport delay(long delay) {
         this.delay = delay;
-        return this;
-    }
-
-    public ConfigTeleport deathTimer(long deathTimer) {
-        this.deathTimer = deathTimer;
-        return this;
-    }
-
-    public ConfigTeleport cancelOnMove(boolean cancelOnMove) {
         this.cancelOnMove = cancelOnMove;
-        return this;
-    }
-
-    public ConfigTeleport particle(TeleportParticle<Particle> particle){
+        this.deathTimer = deathTimer;
         this.particle = particle;
-        return this;
-    }
-
-    public ConfigTeleport useDefaultWorld(boolean useDefaultWorld){
         this.useDefaultWorld = useDefaultWorld;
-        return this;
-    }
-
-    public ConfigTeleport defaultWorld(String defaultWorld){
         this.defaultWorld = defaultWorld;
-        return this;
     }
 
     @Override
@@ -55,8 +30,18 @@ public class ConfigTeleport implements SectionTeleport {
     }
 
     @Override
+    public void setCooldown(long cooldown) {
+        this.cooldown = cooldown;
+    }
+
+    @Override
     public long getDelay() {
         return delay;
+    }
+
+    @Override
+    public void setDelay(long delay) {
+        this.delay = delay;
     }
 
     @Override
@@ -65,8 +50,18 @@ public class ConfigTeleport implements SectionTeleport {
     }
 
     @Override
+    public void setCancelOnMove(boolean cancelOnMove) {
+        this.cancelOnMove = cancelOnMove;
+    }
+
+    @Override
     public long getDeathTimer() {
         return deathTimer;
+    }
+
+    @Override
+    public void setDeathTimer(long deathTimer) {
+        this.deathTimer = deathTimer;
     }
 
     @Override
@@ -75,12 +70,27 @@ public class ConfigTeleport implements SectionTeleport {
     }
 
     @Override
+    public void setParticle(TeleportParticle teleportParticle) {
+        this.particle = teleportParticle;
+    }
+
+    @Override
     public boolean getUseDefaultWorld() {
         return useDefaultWorld;
     }
 
     @Override
+    public void setUseDefaultWorld(boolean useDefaultWorld) {
+        this.useDefaultWorld = useDefaultWorld;
+    }
+
+    @Override
     public String getDefaultWorld() {
         return defaultWorld;
+    }
+
+    @Override
+    public void setDefaultWorld(String defaultWorld) {
+        this.defaultWorld = defaultWorld;
     }
 }

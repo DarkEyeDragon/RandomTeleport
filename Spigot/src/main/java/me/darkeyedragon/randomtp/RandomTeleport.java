@@ -12,7 +12,7 @@ import me.darkeyedragon.randomtp.api.queue.QueueListener;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
-import me.darkeyedragon.randomtp.command.TeleportCommand;
+import me.darkeyedragon.randomtp.command.RandomTeleportCommand;
 import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.common.addon.AddonManager;
 import me.darkeyedragon.randomtp.common.eco.EcoHandler;
@@ -29,6 +29,7 @@ import me.darkeyedragon.randomtp.log.BukkitLogger;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -122,6 +123,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         worldQueue = new WorldQueue();
         manager.getCommandCompletions().registerAsyncCompletion("addonFiles", context -> ImmutableList.copyOf(addonManager.getFileNames()));
         manager.getCommandCompletions().registerAsyncCompletion("addonNames", context -> ImmutableList.copyOf(addonManager.getAddons().keySet()));
+        manager.getCommandCompletions().registerAsyncCompletion("particles", context -> Arrays.stream(Particle.values()).map(Particle::name).collect(Collectors.toList()));
         manager.getCommandContexts().registerContext(PlayerWorldContext.class, c -> {
             String arg1 = c.popFirstArg();
             World world = Bukkit.getWorld(arg1);
@@ -153,7 +155,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         } else {
             plugin.getLogger().warning("Vault not found. Currency based options are disabled.");
         }
-        manager.registerCommand(new TeleportCommand((SpigotImpl) plugin));
+        manager.registerCommand(new RandomTeleportCommand(plugin));
         manager.getCommandCompletions().registerAsyncCompletion("filteredWorlds", context -> {
             Set<RandomWorld> randomWorlds = bukkitConfigHandler.getSectionWorld().getWorlds();
             Iterator<RandomWorld> randomWorldIterator = randomWorlds.iterator();

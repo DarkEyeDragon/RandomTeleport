@@ -94,14 +94,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
     }
 
     public void populateConfigTeleport() {
-        configTeleport = new ConfigTeleport()
-                .cooldown(getCooldown())
-                .delay(getTeleportDelay())
-                .cancelOnMove(isCanceledOnMove())
-                .deathTimer(getTeleportDeathTimer())
-                .particle(getParticle())
-                .useDefaultWorld(getUseDefault())
-                .defaultWorld(getDefaultWorld());
+        configTeleport = new ConfigTeleport(getCooldown(), getTeleportDelay(), isCanceledOnMove(), getTeleportDeathTimer(), getParticle(), getUseDefault(), getDefaultWorld());
     }
 
     public void populateConfigDebug() {
@@ -225,7 +218,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
     private long getTeleportDelay() {
         String message = plugin.getConfig().getString("teleport.delay", "0s");
         if (message != null) {
-            return TimeUtil.stringToTicks(message);
+            return TimeUtil.stringToLong(message);
         }
         throw new NumberFormatException("Not a valid number");
     }
@@ -271,7 +264,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
     private long getTeleportDeathTimer() {
         String message = plugin.getConfig().getString("teleport.death_timer", "10s");
         if (message != null) {
-            return TimeUtil.stringToTicks(message);
+            return TimeUtil.stringToLong(message);
         }
         throw new NumberFormatException("Not a valid number");
     }

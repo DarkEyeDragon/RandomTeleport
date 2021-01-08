@@ -34,24 +34,6 @@ public class TimeUtil {
         }
         return time;
     }
-    public static long stringToTicks(String message){
-        if(message == null || message.isEmpty())
-            throw new IllegalArgumentException("String can not be null or empty");
-        String suffix = message.substring(message.length() - 1);
-        String timeStr = message.replace(suffix, "");
-        long time = Integer.parseInt(timeStr);
-        switch (suffix) {
-            case "s":
-                time *= 20;
-                break;
-            case "m":
-                time *= 120;
-                break;
-            default:
-                throw new NumberFormatException("Not a valid format");
-        }
-        return time;
-    }
     public static String toFormattedString(String message, CustomTime duration){
         String messagePart = message.replaceAll("%hp", duration.getHours()+"");
         messagePart = messagePart.replaceAll("%mp", duration.getMinutes()+"");
