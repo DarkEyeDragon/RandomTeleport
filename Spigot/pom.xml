@@ -103,7 +103,7 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <finalName>${project.name}-${project.version}.${project.build}</finalName>
+                            <finalName>${project.name}-${project.version}.${build}</finalName>
                         </configuration>
                     </execution>
                 </executions>

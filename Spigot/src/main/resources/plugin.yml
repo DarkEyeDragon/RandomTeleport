@@ -1,5 +1,5 @@
 name: RandomTeleport
-version: ${project.version}.${project.build}
+version: ${project.version}.${build}
 main: me.darkeyedragon.randomtp.SpigotImpl
 api-version: 1.13
 authors: [DarkEyeDragon]
