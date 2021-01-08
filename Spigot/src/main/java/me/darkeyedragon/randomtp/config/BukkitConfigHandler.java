@@ -37,7 +37,6 @@ public class BukkitConfigHandler implements RandomConfigHandler {
     private ConfigQueue configQueue;
     private ConfigWorld configWorld;
     private ConfigTeleport configTeleport;
-    private ConfigPlugin configPlugin;
     private ConfigEconomy configEconomy;
     private ConfigDebug configDebug;
     private ConfigBlacklist configBlacklist;
@@ -52,7 +51,6 @@ public class BukkitConfigHandler implements RandomConfigHandler {
      * When invalid fiels are found, they will be defaulted to prevent errors.
      */
     public void reload() throws InvalidConfigurationException {
-        populateConfigPlugins();
         populateConfigMessage();
         populateConfigQueue();
         populateWorldConfigSection();
@@ -106,11 +104,6 @@ public class BukkitConfigHandler implements RandomConfigHandler {
                 .showQueuePopulation(getDebugShowQueuePopulation());
     }
 
-    public void populateConfigPlugins() {
-        configPlugin = new ConfigPlugin()
-                .addAll(getPlugins());
-    }
-
 
     public void populateConfigEconomy() {
         configEconomy = new ConfigEconomy()
@@ -140,11 +133,6 @@ public class BukkitConfigHandler implements RandomConfigHandler {
     @Override
     public SectionTeleport getSectionTeleport() {
         return configTeleport;
-    }
-
-    @Override
-    public SectionPlugin getSectionPlugin() {
-        return configPlugin;
     }
 
     @Override

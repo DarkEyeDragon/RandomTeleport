@@ -23,11 +23,6 @@ public class ConfigHandler implements RandomConfigHandler {
     }
 
     @Override
-    public SectionPlugin getSectionPlugin() {
-        return null;
-    }
-
-    @Override
     public SectionQueue getSectionQueue() {
         return null;
     }
