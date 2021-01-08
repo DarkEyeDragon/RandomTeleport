@@ -30,6 +30,11 @@
                     <compilerArgs>
                         <arg>-parameters</arg> <!-- for ACF -->
                     </compilerArgs>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <annotationProcessors>
+                        <annotationProcessor>me.darkeyedragon.randomtp.common.annotationprocessor.CommandAnnotationProcessor</annotationProcessor>
+                    </annotationProcessors>
                 </configuration>
             </plugin>
             <plugin>
