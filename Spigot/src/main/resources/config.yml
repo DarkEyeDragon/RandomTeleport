@@ -65,6 +65,9 @@ debug:
   #Safe location added for world(3/5)
   #Location removed from world(2/5)
   show_queue_population: true
+  #Shows debug messages in game on the execution times of the entire teleport process.
+  #Normally only enable to figure out what is causing teleport delays.
+  show_execution_times: false
 economy:
   price: 0
 #The items to blacklist. Block uses the Material enum for names, find all of them here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
