@@ -1,7 +1,6 @@
 package me.darkeyedragon.randomtp.common.world.location.search;
 
 import me.darkeyedragon.randomtp.api.config.Dimension;
-import me.darkeyedragon.randomtp.api.world.location.search.BaseLocationSearcher;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
 

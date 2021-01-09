@@ -1,4 +1,4 @@
-package me.darkeyedragon.randomtp.api.world.location.search;
+package me.darkeyedragon.randomtp.common.world.location.search;
 
 import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
 import me.darkeyedragon.randomtp.api.config.Dimension;
@@ -13,6 +13,7 @@ import me.darkeyedragon.randomtp.api.world.block.BlockFace;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
 
 import java.util.EnumSet;
 import java.util.Map;
