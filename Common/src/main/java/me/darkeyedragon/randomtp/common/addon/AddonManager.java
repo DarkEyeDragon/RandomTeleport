@@ -59,8 +59,8 @@ public class AddonManager implements RandomAddonManager {
     /**
      * Create the addon folder if it doesn't exist
      */
-    public boolean createAddonDir(){
-        if(!folder.exists()){
+    public boolean createAddonDir() {
+        if (!folder.exists()) {
             return folder.mkdir();
         }
         return false;
