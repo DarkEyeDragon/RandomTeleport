@@ -1,4 +1,4 @@
-package me.darkeyedragon.randomtp.common.logging;
+package me.darkeyedragon.randomtp.api.logging;
 
 import net.kyori.adventure.text.Component;
 

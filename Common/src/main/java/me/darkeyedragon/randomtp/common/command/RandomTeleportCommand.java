@@ -1,50 +1,44 @@
-package me.darkeyedragon.randomtp.command;
+package me.darkeyedragon.randomtp.common.command;
 
 import co.aikar.commands.BaseCommand;
+import co.aikar.commands.CommandIssuer;
 import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.annotation.*;
-import co.aikar.commands.bukkit.contexts.OnlinePlayer;
-import me.darkeyedragon.randomtp.RandomTeleport;
-import me.darkeyedragon.randomtp.SpigotImpl;
 import me.darkeyedragon.randomtp.api.addon.RequiredPlugin;
+import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.config.section.SectionMessage;
 import me.darkeyedragon.randomtp.api.config.section.SectionQueue;
 import me.darkeyedragon.randomtp.api.config.section.SectionTeleport;
 import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
+import me.darkeyedragon.randomtp.api.message.MessageHandler;
+import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.QueueListener;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 import me.darkeyedragon.randomtp.api.teleport.TeleportParticle;
+import me.darkeyedragon.randomtp.api.teleport.TeleportProperty;
+import me.darkeyedragon.randomtp.api.teleport.TeleportResponse;
+import me.darkeyedragon.randomtp.api.world.RandomPlayer;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
-import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.common.addon.RandomAddon;
+import me.darkeyedragon.randomtp.common.command.context.PlayerWorldContext;
+import me.darkeyedragon.randomtp.common.teleport.TeleportBasic;
 import me.darkeyedragon.randomtp.common.util.TimeUtil;
 import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
-import me.darkeyedragon.randomtp.config.BukkitConfigHandler;
-import me.darkeyedragon.randomtp.teleport.Teleport;
-import me.darkeyedragon.randomtp.teleport.TeleportProperty;
-import me.darkeyedragon.randomtp.util.MessageUtil;
-import me.darkeyedragon.randomtp.util.WorldUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Particle;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 @CommandAlias("rtp|randomtp|randomteleport")
 public class RandomTeleportCommand extends BaseCommand {
 
+    private final MessageHandler messageHandler;
+    private final RandomTeleportPlugin<?> plugin;
     //private BaseLocationSearcher locationHelper;
-    private BukkitConfigHandler bukkitConfigHandler;
-    private final RandomTeleport instance;
-    private final SpigotImpl plugin;
+    private RandomConfigHandler configHandler;
     private WorldQueue worldQueue;
 
     //Config sections
@@ -53,41 +47,40 @@ public class RandomTeleportCommand extends BaseCommand {
     private SectionWorld configWorld;
     private SectionTeleport configTeleport;
 
-    public RandomTeleportCommand(SpigotImpl plugin) {
-        this.instance = plugin.getInstance();
+    public RandomTeleportCommand(RandomTeleportPlugin<?> plugin) {
         this.plugin = plugin;
+        messageHandler = plugin.getMessageHandler();
         setConfigs();
     }
 
     private void setConfigs() {
-        this.bukkitConfigHandler = instance.getConfigHandler();
-        this.configMessage = bukkitConfigHandler.getSectionMessage();
-        this.configQueue = bukkitConfigHandler.getSectionQueue();
-        this.configWorld = bukkitConfigHandler.getSectionWorld();
-        this.worldQueue = instance.getWorldQueue();
-        this.configTeleport = bukkitConfigHandler.getSectionTeleport();
+        this.configHandler = plugin.getConfigHandler();
+        this.configMessage = configHandler.getSectionMessage();
+        this.configQueue = configHandler.getSectionQueue();
+        this.configWorld = configHandler.getSectionWorld();
+        this.worldQueue = plugin.getWorldHandler().getWorldQueue();
+        this.configTeleport = configHandler.getSectionTeleport();
     }
 
     @Default
     @CommandPermission("rtp.teleport.self")
     @CommandCompletion("@players|@filteredWorlds")
-    public void onTeleport(CommandSender sender, @Optional PlayerWorldContext target, @Optional @CommandPermission("rtp.teleport.world") World world) {
-        Player player = null;
-        List<Player> targets = new ArrayList<>();
+    public void onTeleport(CommandIssuer sender, @Optional PlayerWorldContext target, @Optional @CommandPermission("rtp.teleport.world") RandomWorld world) {
+        RandomPlayer player = null;
+        List<RandomPlayer> targets = new ArrayList<>();
         RandomWorld newWorld;
         if (target == null) {
             if (sender instanceof Player) {
                 player = (Player) sender;
                 if (configTeleport.getUseDefaultWorld()) {
-                    World bukkitWorld = Bukkit.getWorld(configTeleport.getDefaultWorld());
-                    if (bukkitWorld == null) {
-                        MessageUtil.sendMessage(instance, player, configMessage.getInvalidDefaultWorld(configTeleport.getDefaultWorld()));
+                    if (world == null) {
+                        messageHandler.sendMessage(sender, configMessage.getInvalidDefaultWorld(configTeleport.getDefaultWorld()));
                         return;
                     }
                     //Check if world is in the queue, if not, well then there are no locations, go figure.
-                    LocationQueue locationQueue = instance.getQueue(WorldUtil.toRandomWorld(bukkitWorld));
+                    LocationQueue locationQueue = worldQueue.get(bukkitWorld);
                     if (locationQueue == null) {
-                        MessageUtil.sendMessage(instance, player, configMessage.getInvalidDefaultWorld(configTeleport.getDefaultWorld()));
+                        messageHandler.sendMessage(sender, configMessage.getInvalidDefaultWorld(configTeleport.getDefaultWorld()));
                         return;
                     }
                     newWorld = WorldUtil.toRandomWorld(bukkitWorld);
@@ -95,7 +88,7 @@ public class RandomTeleportCommand extends BaseCommand {
                     newWorld = WorldUtil.toRandomWorld(player.getWorld());
                 }
                 if (!configWorld.contains(newWorld)) {
-                    MessageUtil.sendMessage(instance, sender, configMessage.getNoWorldPermission(newWorld));
+                    messageHandler.sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
                     return;
                 }
             } else {
@@ -112,11 +105,11 @@ public class RandomTeleportCommand extends BaseCommand {
                         newWorld = WorldUtil.toRandomWorld(world);
                     }
                     if (!configWorld.contains(newWorld)) {
-                        MessageUtil.sendMessage(instance, sender, configMessage.getNoWorldPermission(newWorld));
+                        messageHandler.sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
                         return;
                     }
                 } else {
-                    MessageUtil.sendMessage(instance, sender, ChatColor.RED + "I'm sorry, you do not have permission to perform this command!");
+                    messageHandler.sendMessage(sender, "<red>I'm sorry, you do not have permission to perform this command!");
                     return;
                 }
             } else if (target.isWorld()) {
@@ -124,12 +117,12 @@ public class RandomTeleportCommand extends BaseCommand {
                     player = (Player) sender;
                     newWorld = target.getWorld();
                     if (!configWorld.contains(newWorld)) {
-                        MessageUtil.sendMessage(instance, sender, configMessage.getNoWorldPermission(newWorld));
+                        messageHandler.sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
                         return;
                     }
                     WorldConfigSection worldConfigSection = instance.getLocationFactory().getWorldConfigSection(newWorld);
                     if (worldConfigSection == null || ((!sender.hasPermission("rtp.world." + newWorld.getName())) && worldConfigSection.needsWorldPermission())) {
-                        MessageUtil.sendMessage(instance, sender, configMessage.getNoWorldPermission(newWorld));
+                        messageHandler.sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
                         return;
                     }
 
@@ -150,44 +143,44 @@ public class RandomTeleportCommand extends BaseCommand {
         }
     }
 
-    private void teleport(CommandSender sender, Player player, RandomWorld world) {
-        final boolean useEco = bukkitConfigHandler.getSectionEconomy().useEco();
-        final boolean bypassEco = player.hasPermission("rtp.eco.bypass");
-        final boolean logic = useEco && !bypassEco;
-        TeleportProperty teleportProperty = new TeleportProperty(sender, player, world, sender.hasPermission("rtp.teleport.bypass"), sender.hasPermission("rtp.teleportdelay.bypass"), logic, bukkitConfigHandler);
-        Teleport teleport = new Teleport(plugin, teleportProperty, bukkitConfigHandler.getSectionTeleport().getParticle());
-        teleport.random();
+    private void teleport(CommandIssuer sender, RandomPlayer player, RandomWorld world) {
+        final boolean useEco = configHandler.getSectionEconomy().useEco();
+        boolean bypassDelay = player.hasPermission("rtp.teleportdelay.bypass") || sender.hasPermission("rtp.teleportdelay.bypass");
+        boolean bypasCooldown = player.hasPermission("rtp.teleport.bypass") || sender.hasPermission("rtp.teleport.bypass");
+        boolean bypassEco = useEco && (player.hasPermission("rtp.eco.bypass") || sender.hasPermission("rtp.eco.bypass"));
+        RandomLocation location = worldQueue.popLocation(world);
+        TeleportProperty teleportProperty = new BasicTel(sender, location, bypassEco, bypassDelay, bypasCooldown, configTeleport.getParticle());
+        Consumer<TeleportResponse> teleportResponse = player.teleportAsync(location);
+        teleportResponse.accept(new TeleportBasic(plugin, teleportProperty, configHandler.getSectionTeleport().getParticle()));
     }
 
     @Subcommand("reload")
     @CommandPermission("rtp.admin.reload")
-    public void onReload(CommandSender sender) {
-        sender.sendMessage(ChatColor.GREEN + "Reloading config...");
-        plugin.saveDefaultConfig();
-        plugin.reloadConfig();
+    public void onReload(CommandIssuer sender) {
+        sender.sendMessage("<green>Reloading config...");
+        plugin.getConfigHandler().saveConfig();
         try {
-            instance.getConfigHandler().reload();
+            plugin.reloadConfig();
         } catch (InvalidConfigurationException e) {
-            MessageUtil.sendMessage(instance, sender, ChatColor.RED + "Your config is not configured properly. Error:");
-            MessageUtil.sendMessage(instance, sender, ChatColor.RED + e.getMessage());
+            messageHandler.sendMessage(sender, "<red>Your config is not configured properly. Error:");
+            messageHandler.sendMessage(sender, ChatColor.RED + e.getMessage());
             e.printStackTrace();
         }
         //Set the new config object references
         setConfigs();
-        MessageUtil.sendMessage(instance, sender, ChatColor.GREEN + "Clearing queue...");
+        messageHandler.sendMessage(sender, "<green>Clearing queue...");
         worldQueue.clear();
-        MessageUtil.sendMessage(instance, sender, ChatColor.GREEN + "Repopulating queue, this can take a while.");
-        instance.populateWorldQueue();
-        MessageUtil.sendMessage(instance, sender, ChatColor.GREEN + "Reloaded config");
+        messageHandler.sendMessage(sender, "<green>Repopulating queue, this can take a while.");
+        plugin.getWorldHandler().populateWorldQueue();
+        messageHandler.sendMessage(sender, "<green>Reloaded config");
     }
 
     @Subcommand("addworld")
     @CommandPermission("rtp.admin.addworld")
     @CommandCompletion("@worlds true|false true|false <Integer> <Integer> <Integer>")
-    public void onAddWorld(CommandSender sender, World world, boolean useWorldBorder, boolean needsWorldPermission, @Optional Integer radius, @Optional Integer offsetX, @Optional Integer offsetZ) {
-        RandomWorld randomWorld = WorldUtil.toRandomWorld(world);
+    public void onAddWorld(CommandIssuer sender, RandomWorld randomWorld, boolean useWorldBorder, boolean needsWorldPermission, @Optional Integer radius, @Optional Integer offsetX, @Optional Integer offsetZ) {
         if (!useWorldBorder && (radius == null || offsetX == null || offsetZ == null)) {
-            MessageUtil.sendMessage(instance, sender, ChatColor.GOLD + "If " + ChatColor.AQUA + "useWorldBorder" + ChatColor.GOLD + " is false you need to provide the other parameters.");
+            messageHandler.sendMessage(sender, "<gold>If <aqua>useWorldBorder<gold> is false you need to provide the other parameters.");
             throw new InvalidCommandArgument(true);
         }
         if (!configWorld.contains(randomWorld)) {
@@ -197,15 +190,15 @@ public class RandomTeleportCommand extends BaseCommand {
                 if (offsetZ == null) offsetZ = 0;
             }
             configWorld.add(new WorldConfigSection(new Offset(offsetX, offsetZ, radius), randomWorld, useWorldBorder, needsWorldPermission));
-            LocationQueue locationQueue = instance.getQueue(randomWorld);
+            LocationQueue locationQueue = worldQueue.get(randomWorld);
             if (locationQueue != null) {
-                MessageUtil.sendMessage(instance, sender, ChatColor.GREEN + "Successfully added to config.");
+                messageHandler.sendMessage(sender, "<green>Successfully added to config.");
                 locationQueue.subscribe(new QueueListener<RandomLocation>() {
                     @Override
                     public void onAdd(RandomLocation element) {
-                        MessageUtil.sendMessage(instance, sender, ChatColor.GREEN + "Safe location added for " + ChatColor.GOLD + element.getWorld().getName() + ChatColor.GREEN + " (" + ChatColor.YELLOW + locationQueue.size() + ChatColor.GREEN + "/" + configQueue.getSize() + ")");
+                        messageHandler.sendMessage(sender, "<green>Safe location added for <gold>" + element.getWorld().getName() + "<green> (<yellow>" + locationQueue.size() + "<green>/<yellow>" + configQueue.getSize() + ")");
                         if (locationQueue.size() == configQueue.getSize()) {
-                            MessageUtil.sendMessage(instance, sender, ChatColor.GREEN + "Queue populated for " + ChatColor.GOLD + element.getWorld().getName());
+                            messageHandler.sendMessage(sender, "<green>Queue populated for <gold>"element.getWorld().getName());
                             locationQueue.unsubscribe(this);
                         }
                     }
@@ -216,39 +209,38 @@ public class RandomTeleportCommand extends BaseCommand {
                     }
                 });
             } else {
-                MessageUtil.sendMessage(instance, sender, ChatColor.RED + "Size section not present in the config! Add it or recreate your config.");
+                messageHandler.sendMessage(sender, "<red>Size section not present in the config! Add it or recreate your config.");
             }
         } else {
-            MessageUtil.sendMessage(instance, sender, ChatColor.RED + "That world is already added to the list!");
+            messageHandler.sendMessage(sender, "<red>That world is already added to the list!");
         }
     }
 
     @Subcommand("removeworld")
     @CommandCompletion("@worlds")
     @CommandPermission("rtp.admin.removeworld")
-    public void removeWorld(CommandSender sender, World world) {
-        RandomWorld randomWorld = WorldUtil.toRandomWorld(world);
-        if (configWorld.contains(randomWorld)) {
-            if (configWorld.remove(randomWorld)) {
-                MessageUtil.sendMessage(instance, sender, ChatColor.GREEN + "Removed world from the config and queue!");
+    public void removeWorld(CommandIssuer sender, RandomWorld world) {
+
+        if (configWorld.contains(world)) {
+            if (configWorld.remove(world)) {
+                messageHandler.sendMessage(sender, "<green>Removed world from the config and queue!");
             } else {
-                MessageUtil.sendMessage(instance, sender, ChatColor.RED + "Something went wrong with removing the world! Is it already removed?");
+                messageHandler.sendMessage(sender, "<red>Something went wrong with removing the world! Is it already removed?");
             }
         } else {
-            MessageUtil.sendMessage(instance, sender, ChatColor.RED + "That world is not not in the config!");
+            messageHandler.sendMessage(sender, "<red>That world is not not in the config!");
         }
     }
 
     @Subcommand("resetcooldown")
     @CommandCompletion("@players")
     @CommandPermission("rtp.admin.resetcooldown")
-    public void resetCooldown(CommandSender sender, OnlinePlayer target) {
+    public void resetCooldown(CommandIssuer sender, RandomPlayer target) {
         if (target != null) {
-            Player player = target.getPlayer();
             if (instance.getCooldowns().remove(player.getUniqueId()) != null) {
-                MessageUtil.sendMessage(instance, sender, ChatColor.GREEN + "Cooldown reset for " + player.getName());
+                messageHandler.sendMessage(sender, "<green>RandomCooldown reset for " + target.getName());
             } else {
-                MessageUtil.sendMessage(instance, sender, ChatColor.RED + "There was no cooldown for " + player.getName());
+                messageHandler.sendMessage(sender, "<red>There was no cooldown for " + target.getName());
             }
         }
     }
@@ -256,59 +248,15 @@ public class RandomTeleportCommand extends BaseCommand {
     @Subcommand("setprice")
     @CommandCompletion("<price>")
     @CommandPermission("rtp.admin.setprice")
-    public void setPrice(CommandSender sender, double price) {
+    public void setPrice(CommandIssuer sender, double price) {
         if (price >= 0) {
             instance.getConfigHandler().setTeleportPrice(price);
         } else {
-            MessageUtil.sendMessage(instance, sender, ChatColor.RED + "Only positive numbers are allowed.");
+            messageHandler.sendMessage(sender, "<red>Only positive numbers are allowed.");
         }
     }
 
-    @Subcommand("addon")
-    public class AddonClass extends BaseCommand {
-
-        @Subcommand("register")
-        @CommandCompletion("@addonFiles")
-        @CommandPermission("rtp.admin.addon.register")
-        public void register(CommandSender sender, String name) {
-            RandomAddon addon = instance.getAddonManager().register(name);
-            if (addon != null) {
-                MessageUtil.sendMessage(instance, sender, ChatColor.GREEN + addon.getIdentifier() + " has been registered.");
-            } else {
-                MessageUtil.sendMessage(instance, sender, ChatColor.RED + " could not be registered. Is the name correct?");
-            }
-        }
-
-        @Subcommand("unregister")
-        @CommandCompletion("@addonNames")
-        @CommandPermission("rtp.admin.addon.unregister")
-        public void unregister(CommandSender sender, String name) {
-            RandomAddon addon = instance.getAddonManager().unregister(name);
-            if (addon != null) {
-                MessageUtil.sendMessage(instance, sender, ChatColor.GREEN + addon.getIdentifier() + " has been unregistered.");
-            } else {
-                MessageUtil.sendMessage(instance, sender, ChatColor.RED + " could not be unregistered. Is it loaded?");
-            }
-
-        }
-
-        @Subcommand("list")
-        @CommandPermission("rtp.admin.addon.list")
-        public void list(CommandSender sender) {
-            StringBuilder message = new StringBuilder(ChatColor.AQUA + "========= [Addons] ========").append("\n");
-            for (RandomAddon addon : instance.getAddonManager().getAddons().values()) {
-                message.append(ChatColor.GOLD).append(addon.getIdentifier()).append("\n");
-                for (RequiredPlugin requiredPlugin : addon.getRequiredPlugins()) {
-                    message.append(ChatColor.GREEN).append("  └─ ").append(requiredPlugin.getName()).append("\n");
-                }
-            }
-            message.append(ChatColor.AQUA).append("\n").append("=========================");
-            MessageUtil.sendMessage(instance, sender, message.toString());
-        }
-    }
-
-
-    /*@Subcommand("createSign")
+    @Subcommand("createSign")
     @CommandPermission("rtp.admin.createsign")
     public void createSign(Player player, World world) {
         List<Block> lastTwoTargetBlocks = player.getLastTwoTargetBlocks(null, 100);
@@ -342,6 +290,49 @@ public class RandomTeleportCommand extends BaseCommand {
             sign.setLine(i, MiniMessage.get().serialize(components.get(i)));
         }
         sign.update();
+    }
+
+    @Subcommand("addon")
+    public class AddonClass extends BaseCommand {
+
+        @Subcommand("register")
+        @CommandCompletion("@addonFiles")
+        @CommandPermission("rtp.admin.addon.register")
+        public void register(CommandIssuer sender, String name) {
+            RandomAddon addon = plugin.getAddonManager().register(name);
+            if (addon != null) {
+                messageHandler.sendMessage(sender, "<green>" + addon.getIdentifier() + " has been registered.");
+            } else {
+                messageHandler.sendMessage(sender, "<red> could not be registered. Is the name correct?");
+            }
+        }
+
+        @Subcommand("unregister")
+        @CommandCompletion("@addonNames")
+        @CommandPermission("rtp.admin.addon.unregister")
+        public void unregister(CommandIssuer sender, String name) {
+            RandomAddon addon = instance.getAddonManager().unregister(name);
+            if (addon != null) {
+                messageHandler.sendMessage(sender, "<green>" + addon.getIdentifier() + " has been unregistered.");
+            } else {
+                messageHandler.sendMessage(sender, "<red> could not be unregistered. Is it loaded?");
+            }
+
+        }
+
+        @Subcommand("list")
+        @CommandPermission("rtp.admin.addon.list")
+        public void list(CommandIssuer sender) {
+            StringBuilder message = new StringBuilder("<aqua>========= [Addons] ========").append("\n");
+            for (RandomAddon addon : instance.getAddonManager().getAddons().values()) {
+                message.append(ChatColor.GOLD).append(addon.getIdentifier()).append("\n");
+                for (RequiredPlugin requiredPlugin : addon.getRequiredPlugins()) {
+                    message.append("<green>").append("  └─ ").append(requiredPlugin.getName()).append("\n");
+                }
+            }
+            message.append(ChatColor.AQUA).append("\n").append("=========================");
+            messageHandler.sendMessage(sender, message.toString());
+        }
     }*/
 
     @Subcommand("teleport")
@@ -349,30 +340,30 @@ public class RandomTeleportCommand extends BaseCommand {
 
         @Subcommand("setcooldown")
         @CommandPermission("rtp.admin.cooldown")
-        public void setCooldown(CommandSender sender, String time) {
+        public void setCooldown(CommandIssuer sender, String time) {
             try {
                 long cooldown = TimeUtil.stringToLong(time);
                 configTeleport.setCooldown(cooldown);
             } catch (NumberFormatException ex) {
-                sender.sendMessage(ChatColor.RED + "Unable to parse time: " + ex.getMessage());
+                sender.sendMessage("<red>Unable to parse time: " + ex.getMessage());
             }
         }
 
         @Subcommand("setdelay")
         @CommandPermission("rtp.admin.delay")
-        public void setDelay(CommandSender sender, String time) {
+        public void setDelay(CommandIssuer sender, String time) {
             try {
                 long delay = TimeUtil.stringToLong(time);
                 configTeleport.setCooldown(delay);
                 sendConfigSuccessMessage(sender);
             } catch (NumberFormatException ex) {
-                sender.sendMessage(ChatColor.RED + "Unable to parse time: " + ex.getMessage());
+                sender.sendMessage("<red>Unable to parse time: " + ex.getMessage());
             }
         }
 
         @Subcommand("setcancelonmove")
         @CommandPermission("rtp.admin.cancel_on_move")
-        public void setCancelOnMove(CommandSender sender, boolean cancelOnMove) {
+        public void setCancelOnMove(CommandIssuer sender, boolean cancelOnMove) {
             configTeleport.setCancelOnMove(cancelOnMove);
             sendConfigSuccessMessage(sender);
         }
@@ -380,7 +371,7 @@ public class RandomTeleportCommand extends BaseCommand {
         @Subcommand("setparticle")
         @CommandPermission("rtp.admin.particle")
         @CommandCompletion("@particles")
-        public void setParticle(CommandSender sender, String particleType, int amount) {
+        public void setParticle(CommandIssuer sender, String particleType, int amount) {
             TeleportParticle<Particle> particle = new TeleportParticle<>(Particle.valueOf(particleType), amount);
             configTeleport.setParticle(particle);
             sendConfigSuccessMessage(sender);
@@ -388,7 +379,7 @@ public class RandomTeleportCommand extends BaseCommand {
 
         @Subcommand("setusedefaultworld")
         @CommandPermission("rtp.admin.use_default_world")
-        public void setUseDefaultWorld(CommandSender sender, boolean useDefaultWorld) {
+        public void setUseDefaultWorld(CommandIssuer sender, boolean useDefaultWorld) {
             configTeleport.setUseDefaultWorld(useDefaultWorld);
             sendConfigSuccessMessage(sender);
         }
@@ -396,13 +387,13 @@ public class RandomTeleportCommand extends BaseCommand {
         @Subcommand("setdefaultworld")
         @CommandPermission("rtp.admin.default_world")
         @CommandCompletion("@worlds")
-        public void setDefaultWorld(CommandSender sender, String world) {
+        public void setDefaultWorld(CommandIssuer sender, String world) {
             configTeleport.setDefaultWorld(world);
             sendConfigSuccessMessage(sender);
         }
 
-        private void sendConfigSuccessMessage(CommandSender sender) {
-            sender.sendMessage(ChatColor.GREEN + "Configuration has been updated.");
+        private void sendConfigSuccessMessage(CommandIssuer sender) {
+            sender.sendMessage("<green>Configuration has been updated.");
         }
     }
 

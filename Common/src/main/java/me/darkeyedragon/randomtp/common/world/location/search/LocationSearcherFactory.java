@@ -1,8 +1,8 @@
 package me.darkeyedragon.randomtp.common.world.location.search;
 
+import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
-import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPlugin;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -80,7 +80,7 @@ public class ConfigWorld implements SectionWorld {
         LocationQueue locationQueue = new LocationQueue(sectionQueue.getSize(), LocationSearcherFactory.getLocationSearcher(world, plugin));
         plugin.subscribe(locationQueue, world);
         locationQueue.generate(worldConfigSection, sectionQueue.getSize());
-        plugin.getWorldQueue().put(world, locationQueue);
+        plugin.getWorldHandler().getWorldQueue().put(world, locationQueue);
         return locationQueue;
     }
 
@@ -92,7 +92,7 @@ public class ConfigWorld implements SectionWorld {
         section.set(world.getName(), null);
         sectionWorldDetailSet.remove(getSectionWorldDetail(world));
         plugin.getPlugin().saveConfig();
-        plugin.getWorldQueue().remove(world);
+        plugin.getWorldHandler().getWorldQueue().remove(world);
         return true;
     }
 

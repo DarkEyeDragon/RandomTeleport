@@ -10,4 +10,6 @@ public interface RandomConfigHandler {
     SectionTeleport getSectionTeleport();
     SectionWorld getSectionWorld();
     SectionBlacklist getSectionBlacklist();
+
+    void saveConfig();
 }

@@ -1,5 +1,6 @@
 package me.darkeyedragon.randomtp.api.config.section;
 
+import me.darkeyedragon.randomtp.api.teleport.RandomParticle;
 import me.darkeyedragon.randomtp.api.teleport.TeleportParticle;
 
 public interface SectionTeleport {
@@ -10,8 +11,11 @@ public interface SectionTeleport {
     boolean isCancelOnMove();
     void setCancelOnMove(boolean cancelOnMove);
     long getDeathTimer();
+
     void setDeathTimer(long deathTimer);
-    TeleportParticle getParticle();
+
+    RandomParticle<?> getParticle();
+
     void setParticle(TeleportParticle teleportParticle);
     boolean getUseDefaultWorld();
     void setUseDefaultWorld(boolean useDefaultWorld);

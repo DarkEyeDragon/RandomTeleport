@@ -73,9 +73,9 @@ public class SpigotWorld implements RandomWorld {
 
     @Override
     public boolean equals(Object obj) {
-        if(world == obj) return true;
-        if(obj instanceof RandomWorld){
-            return this.getUUID().equals(((RandomWorld)obj).getUUID());
+        if (world == obj) return true;
+        if (obj instanceof RandomWorld) {
+            return this.getUUID().equals(((RandomWorld) obj).getUUID());
         }
         return false;
     }

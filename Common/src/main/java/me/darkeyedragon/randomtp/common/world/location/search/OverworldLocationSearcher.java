@@ -1,7 +1,7 @@
 package me.darkeyedragon.randomtp.common.world.location.search;
 
 import me.darkeyedragon.randomtp.api.config.Dimension;
-import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPlugin;
+import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
 
 public class OverworldLocationSearcher extends BaseLocationSearcher {

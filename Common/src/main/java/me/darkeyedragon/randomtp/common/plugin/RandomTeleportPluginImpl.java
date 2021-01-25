@@ -2,6 +2,7 @@ package me.darkeyedragon.randomtp.common.plugin;
 
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
+import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.QueueListener;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
@@ -25,7 +26,7 @@ public abstract class RandomTeleportPluginImpl implements RandomTeleportPlugin<R
             subscribe(locationQueue, world);
             SectionWorldDetail sectionWorldDetail = getLocationFactory().getWorldConfigSection(world);
             locationQueue.generate(sectionWorldDetail);
-            getWorldQueue().put(world, locationQueue);
+            getWorldHandler().getWorldQueue().put(world, locationQueue);
         }
         getLogger().info("WorldQueue population finished in " + (System.currentTimeMillis() - startTime) + "ms");
     }

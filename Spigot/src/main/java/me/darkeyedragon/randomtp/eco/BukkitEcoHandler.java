@@ -1,6 +1,6 @@
 package me.darkeyedragon.randomtp.eco;
 
-import me.darkeyedragon.randomtp.common.eco.EcoHandler;
+import me.darkeyedragon.randomtp.api.eco.EcoHandler;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 

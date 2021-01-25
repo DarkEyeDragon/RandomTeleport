@@ -12,8 +12,9 @@ public class SpigotImpl extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        BStats bStats = new BStats();
         metrics = new Metrics(this, 8852);
-        metrics.addCustomChart(new Metrics.SingleLineChart("random_teleports", BStats::getRandomTeleportStats));
+        metrics.addCustomChart(new Metrics.SingleLineChart("random_teleports", bStats::getRandomTeleportStats));
         randomTeleport = new RandomTeleport(this);
         randomTeleport.init();
     }

@@ -1,4 +1,4 @@
-package me.darkeyedragon.randomtp.common.eco;
+package me.darkeyedragon.randomtp.api.eco;
 
 import java.util.UUID;
 

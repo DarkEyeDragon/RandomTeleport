@@ -7,10 +7,10 @@ import me.darkeyedragon.randomtp.api.addon.AddonPlugin;
 import me.darkeyedragon.randomtp.api.addon.RandomAddonManager;
 import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
 import me.darkeyedragon.randomtp.api.addon.RequiredPlugin;
+import me.darkeyedragon.randomtp.api.logging.PluginLogger;
 import me.darkeyedragon.randomtp.common.addon.response.AddonResponse;
 import me.darkeyedragon.randomtp.common.addon.response.AddonResponseType;
 import me.darkeyedragon.randomtp.common.classloader.AddonClassLoader;
-import me.darkeyedragon.randomtp.common.logging.PluginLogger;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.apache.maven.artifact.versioning.ComparableVersion;
@@ -28,7 +28,7 @@ public class AddonManager implements RandomAddonManager {
     private static final String ADDON_FOLDER_NAME = "addons";
     private static final String ABSTRACT_CLASS = "me.darkeyedragon.randomtp.common.addon.RandomAddon";
 
-    private Map<String, RandomAddon> addons;
+    private final Map<String, RandomAddon> addons;
     private final RandomTeleportPluginImpl instance;
     private final PluginLogger logger;
     private final File folder;

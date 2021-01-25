@@ -1,15 +1,13 @@
-package me.darkeyedragon.randomtp.command.context;
+package me.darkeyedragon.randomtp.common.command.context;
 
+import me.darkeyedragon.randomtp.api.world.RandomPlayer;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
-import me.darkeyedragon.randomtp.util.WorldUtil;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerWorldContext {
-    private final List<Player> players;
+    private final List<RandomPlayer> players;
     private RandomWorld world;
 
     public PlayerWorldContext() {
@@ -20,20 +18,16 @@ public class PlayerWorldContext {
         return world != null;
     }
 
-    public List<Player> getPlayers() {
+    public List<RandomPlayer> getPlayers() {
         return players;
     }
 
-    public void addPlayer(Player player) {
+    public void addPlayer(RandomPlayer player) {
         players.add(player);
     }
 
     public RandomWorld getWorld() {
         return world;
-    }
-
-    public void setWorld(World world) {
-        this.world = WorldUtil.toRandomWorld(world);
     }
 
     public void setWorld(RandomWorld world) {

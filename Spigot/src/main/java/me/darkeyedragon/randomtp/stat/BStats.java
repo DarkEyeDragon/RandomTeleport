@@ -1,13 +1,16 @@
 package me.darkeyedragon.randomtp.stat;
 
-public class BStats {
+import me.darkeyedragon.randomtp.api.metric.Metric;
+
+public class BStats implements Metric {
+
     private static int RANDOM_TELEPORTS;
 
-    public static void addTeleportStat() {
+    public void addTeleportStat() {
         RANDOM_TELEPORTS++;
     }
 
-    public static int getRandomTeleportStats() {
+    public int getRandomTeleportStats() {
         int result = RANDOM_TELEPORTS;
         RANDOM_TELEPORTS = 0;
         return result;

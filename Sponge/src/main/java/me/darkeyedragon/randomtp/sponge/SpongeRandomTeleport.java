@@ -3,10 +3,11 @@ package me.darkeyedragon.randomtp.sponge;
 import com.google.inject.Inject;
 import me.darkeyedragon.randomtp.api.addon.AddonPlugin;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
+import me.darkeyedragon.randomtp.api.eco.EcoHandler;
+import me.darkeyedragon.randomtp.api.logging.PluginLogger;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
+import me.darkeyedragon.randomtp.api.world.RandomWorldHandler;
 import me.darkeyedragon.randomtp.common.addon.AddonManager;
-import me.darkeyedragon.randomtp.common.eco.EcoHandler;
-import me.darkeyedragon.randomtp.common.logging.PluginLogger;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
 import me.darkeyedragon.randomtp.common.world.location.LocationFactory;
 import me.darkeyedragon.randomtp.sponge.config.SpongeConfigHandler;
@@ -81,6 +82,11 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
     @Override
     public RandomConfigHandler getConfigHandler() {
         return configHandler;
+    }
+
+    @Override
+    public RandomWorldHandler getWorldHandler() {
+        return world;
     }
 
     @Override
