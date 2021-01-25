@@ -2,6 +2,7 @@ package me.darkeyedragon.randomtp;
 
 import me.darkeyedragon.randomtp.stat.BStats;
 import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SingleLineChart;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class SpigotImpl extends JavaPlugin {
@@ -13,7 +14,7 @@ public class SpigotImpl extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
         metrics = new Metrics(this, 8852);
-        metrics.addCustomChart(new Metrics.SingleLineChart("random_teleports", BStats::getRandomTeleportStats));
+        metrics.addCustomChart(new SingleLineChart("random_teleports", BStats::getRandomTeleportStats));
         randomTeleport = new RandomTeleport(this);
         randomTeleport.init();
     }
