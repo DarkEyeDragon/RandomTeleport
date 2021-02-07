@@ -127,6 +127,11 @@ public class BukkitConfigHandler implements RandomConfigHandler {
     }
 
     @Override
+    public void saveConfig() {
+        plugin.saveConfig();
+    }
+
+    @Override
     public SectionTeleport getSectionTeleport() {
         return configTeleport;
     }
@@ -178,7 +183,13 @@ public class BukkitConfigHandler implements RandomConfigHandler {
             int offsetZ = section.getInt(key + ".offsetZ");
             plugin.getLogger().info(ChatColor.GREEN + key + " found! Loading...");
             RandomWorld randomWorld = WorldUtil.toRandomWorld(world);
-            sectionWorldDetailSet.add(new WorldConfigSection(new Offset(offsetX, offsetZ, radius), randomWorld, useWorldBorder, needsWorldPermission));
+            Offset offset;
+            if (useWorldBorder) {
+                offset = RandomWorld.getOffset(randomWorld);
+            } else {
+                offset = new Offset(offsetX, offsetZ, radius);
+            }
+            sectionWorldDetailSet.add(new WorldConfigSection(offset, randomWorld, useWorldBorder, needsWorldPermission));
         }
         return sectionWorldDetailSet;
     }
@@ -241,12 +252,6 @@ public class BukkitConfigHandler implements RandomConfigHandler {
 
     private String getEmptyQueueMessage() {
         return plugin.getConfig().getString("message.empty_queue", "&cThere are no locations available for this world! Try again in a bit or ask an admin to reload the config.");
-    }
-
-
-    public void setTeleportPrice(double price) {
-        plugin.getConfig().set("economy.price", price);
-        plugin.saveConfig();
     }
 
     private long getTeleportDeathTimer() {

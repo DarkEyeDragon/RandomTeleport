@@ -1,16 +1,23 @@
 package me.darkeyedragon.randomtp.common.addon;
 
 import me.darkeyedragon.randomtp.api.addon.AddonPlugin;
+import me.darkeyedragon.randomtp.api.addon.RandomAddon;
 import me.darkeyedragon.randomtp.api.addon.RequiredPlugin;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.eco.EcoHandler;
+import me.darkeyedragon.randomtp.api.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.api.logging.PluginLogger;
-import me.darkeyedragon.randomtp.api.queue.WorldQueue;
+import me.darkeyedragon.randomtp.api.message.MessageHandler;
+import me.darkeyedragon.randomtp.api.metric.Metric;
+import me.darkeyedragon.randomtp.api.scheduler.Scheduler;
+import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
+import me.darkeyedragon.randomtp.api.world.PlayerHandler;
+import me.darkeyedragon.randomtp.api.world.RandomWorldHandler;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.common.addon.response.AddonResponse;
 import me.darkeyedragon.randomtp.common.addon.response.AddonResponseType;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
-import me.darkeyedragon.randomtp.common.world.location.LocationFactory;
+import net.kyori.adventure.platform.AudienceProvider;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,12 +68,12 @@ class AddonManagerTest {
             }
 
             @Override
-            public WorldQueue getWorldQueue() {
+            public RandomWorldHandler getWorldHandler() {
                 return null;
             }
 
             @Override
-            public LocationFactory getLocationFactory() {
+            public DeathTracker getDeathTracker() {
                 return null;
             }
 
@@ -83,6 +90,41 @@ class AddonManagerTest {
             @Override
             public boolean isPluginLoaded(String name) {
                 return false;
+            }
+
+            @Override
+            public AudienceProvider getAudience() {
+                return null;
+            }
+
+            @Override
+            public MessageHandler getMessageHandler() {
+                return null;
+            }
+
+            @Override
+            public void reloadConfig() {
+
+            }
+
+            @Override
+            public PlayerHandler getPlayerHandler() {
+                return null;
+            }
+
+            @Override
+            public Metric getStats() {
+                return null;
+            }
+
+            @Override
+            public CooldownHandler getCooldownHandler() {
+                return null;
+            }
+
+            @Override
+            public Scheduler getScheduler() {
+                return null;
             }
         };
         requiredPluginNoMinMaxVersion = new RequiredPlugin() {

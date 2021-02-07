@@ -5,6 +5,7 @@ import me.darkeyedragon.randomtp.api.world.RandomBlockType;
 import me.darkeyedragon.randomtp.api.world.block.BlockFace;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.common.world.location.CommonLocation;
 import me.darkeyedragon.randomtp.world.SpigotBiome;
 import me.darkeyedragon.randomtp.world.SpigotBlockType;
 import me.darkeyedragon.randomtp.world.SpigotWorld;
@@ -20,7 +21,7 @@ public class SpigotBlock implements RandomBlock {
 
     @Override
     public RandomLocation getLocation() {
-        return new RandomLocation(new SpigotWorld(block.getWorld()), block.getX(), block.getY(), block.getZ());
+        return new CommonLocation(new SpigotWorld(block.getWorld()), block.getX(), block.getY(), block.getZ());
     }
 
     @Override

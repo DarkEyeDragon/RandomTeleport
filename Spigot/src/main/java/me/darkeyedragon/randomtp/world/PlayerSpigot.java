@@ -3,8 +3,12 @@ package me.darkeyedragon.randomtp.world;
 import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.api.teleport.RandomCooldown;
 import me.darkeyedragon.randomtp.api.teleport.TeleportProperty;
+import me.darkeyedragon.randomtp.api.teleport.TeleportResponse;
+import me.darkeyedragon.randomtp.api.teleport.TeleportType;
 import me.darkeyedragon.randomtp.api.world.RandomPlayer;
+import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.common.teleport.BasicTeleportResponse;
 import me.darkeyedragon.randomtp.util.WorldUtil;
 import org.bukkit.entity.Player;
 
@@ -31,8 +35,18 @@ public class PlayerSpigot implements RandomPlayer {
     }
 
     @Override
+    public String getName() {
+        return player.getName();
+    }
+
+    @Override
     public RandomLocation getLocation() {
         return WorldUtil.toRandomLocation(player.getLocation());
+    }
+
+    @Override
+    public RandomWorld getWorld() {
+        return WorldUtil.toRandomWorld(player.getWorld());
     }
 
     @Override
@@ -41,10 +55,16 @@ public class PlayerSpigot implements RandomPlayer {
     }
 
     @Override
-    public CompletableFuture<Boolean> teleportAsync(TeleportProperty teleportProperty) {
+    public CompletableFuture<TeleportResponse> teleportAsync(TeleportProperty teleportProperty) {
         RandomLocation randomLocation = teleportProperty.getLocation();
         //Teleport the player async if possible
-        return PaperLib.teleportAsync(player, WorldUtil.toLocation(randomLocation));
+        return PaperLib.teleportAsync(player, WorldUtil.toLocation(randomLocation)).thenApply(aBoolean -> {
+            if (aBoolean) {
+                return new BasicTeleportResponse(TeleportType.SUCCESS);
+            } else {
+                return new BasicTeleportResponse(TeleportType.FAIL);
+            }
+        });
     }
 
     @Override
@@ -55,5 +75,10 @@ public class PlayerSpigot implements RandomPlayer {
     @Override
     public void setCooldown(RandomCooldown cooldown) {
         this.cooldown = cooldown;
+    }
+
+    @Override
+    public boolean hasPermission(String permission) {
+        return player.hasPermission(permission);
     }
 }

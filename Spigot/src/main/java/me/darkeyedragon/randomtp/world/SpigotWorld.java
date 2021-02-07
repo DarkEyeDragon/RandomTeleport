@@ -1,6 +1,7 @@
 package me.darkeyedragon.randomtp.world;
 
 import io.papermc.lib.PaperLib;
+import me.darkeyedragon.randomtp.api.teleport.RandomParticle;
 import me.darkeyedragon.randomtp.api.world.RandomChunkSnapshot;
 import me.darkeyedragon.randomtp.api.world.RandomEnvironment;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
@@ -9,6 +10,7 @@ import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.util.WorldUtil;
 import me.darkeyedragon.randomtp.world.block.SpigotBlock;
+import org.bukkit.Particle;
 import org.bukkit.World;
 
 import java.util.UUID;
@@ -43,7 +45,7 @@ public class SpigotWorld implements RandomWorld {
 
     @Override
     public RandomBlock getBlockAt(RandomLocation location) {
-        return new SpigotBlock(world.getBlockAt(location.getX(), location.getY(), location.getZ()));
+        return new SpigotBlock(world.getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
     }
 
     @Override
@@ -78,5 +80,10 @@ public class SpigotWorld implements RandomWorld {
             return this.getUUID().equals(((RandomWorld) obj).getUUID());
         }
         return false;
+    }
+
+    @Override
+    public void spawnParticle(RandomParticle<?> particle, RandomLocation spawnLoc, int amount) {
+        world.spawnParticle((Particle) particle.getParticle(), WorldUtil.toLocation(spawnLoc), amount);
     }
 }

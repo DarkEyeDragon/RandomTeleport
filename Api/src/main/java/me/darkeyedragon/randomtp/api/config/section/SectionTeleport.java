@@ -1,7 +1,6 @@
 package me.darkeyedragon.randomtp.api.config.section;
 
 import me.darkeyedragon.randomtp.api.teleport.RandomParticle;
-import me.darkeyedragon.randomtp.api.teleport.TeleportParticle;
 
 public interface SectionTeleport {
     long getCooldown();
@@ -16,9 +15,11 @@ public interface SectionTeleport {
 
     RandomParticle<?> getParticle();
 
-    void setParticle(TeleportParticle teleportParticle);
+    void setParticle(RandomParticle<?> teleportParticle);
+
     boolean getUseDefaultWorld();
     void setUseDefaultWorld(boolean useDefaultWorld);
     String getDefaultWorld();
     void setDefaultWorld(String defaultWorld);
+
 }

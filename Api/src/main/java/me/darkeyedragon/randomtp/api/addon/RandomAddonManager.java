@@ -1,9 +1,12 @@
 package me.darkeyedragon.randomtp.api.addon;
 
 
+import java.util.Map;
+
 public interface RandomAddonManager {
-    RandomLocationValidator unregister(String name);
+    RandomAddon unregister(String name);
 
-    RandomLocationValidator register(String name);
+    RandomAddon register(String name);
 
+    Map<String, RandomAddon> getAddons();
 }

@@ -17,6 +17,11 @@ public class ConfigEconomy implements SectionEconomy {
         return price;
     }
 
+    @Override
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
     /**
      * If the plugin is charging money to rtp.
      * NOTE: Will return false if price is not set

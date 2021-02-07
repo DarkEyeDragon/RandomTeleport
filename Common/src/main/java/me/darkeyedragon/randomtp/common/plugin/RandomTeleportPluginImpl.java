@@ -24,7 +24,7 @@ public abstract class RandomTeleportPluginImpl implements RandomTeleportPlugin<R
 
             //Subscribe to the locationqueue to be notified of changes
             subscribe(locationQueue, world);
-            SectionWorldDetail sectionWorldDetail = getLocationFactory().getWorldConfigSection(world);
+            SectionWorldDetail sectionWorldDetail = configHandler.getSectionWorld().getSectionWorldDetail(world);
             locationQueue.generate(sectionWorldDetail);
             getWorldHandler().getWorldQueue().put(world, locationQueue);
         }

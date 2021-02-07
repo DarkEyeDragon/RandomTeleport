@@ -1,12 +1,14 @@
 package me.darkeyedragon.randomtp.api.plugin;
 
 import me.darkeyedragon.randomtp.api.addon.AddonPlugin;
+import me.darkeyedragon.randomtp.api.addon.RandomAddonManager;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.eco.EcoHandler;
 import me.darkeyedragon.randomtp.api.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.api.logging.PluginLogger;
 import me.darkeyedragon.randomtp.api.message.MessageHandler;
 import me.darkeyedragon.randomtp.api.metric.Metric;
+import me.darkeyedragon.randomtp.api.scheduler.Scheduler;
 import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
 import me.darkeyedragon.randomtp.api.world.PlayerHandler;
 import me.darkeyedragon.randomtp.api.world.RandomWorldHandler;
@@ -50,4 +52,7 @@ public interface RandomTeleportPlugin<T> {
 
     CooldownHandler getCooldownHandler();
 
+    Scheduler getScheduler();
+
+    RandomAddonManager getAddonManager();
 }

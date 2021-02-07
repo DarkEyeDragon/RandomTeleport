@@ -2,6 +2,7 @@ package me.darkeyedragon.randomtp.world;
 
 import me.darkeyedragon.randomtp.api.world.RandomWorldBorder;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.common.world.location.CommonLocation;
 import org.bukkit.Location;
 import org.bukkit.WorldBorder;
 
@@ -17,7 +18,7 @@ public class SpigotWorldBorder implements RandomWorldBorder {
     public RandomLocation getCenter() {
         SpigotWorld spigotWorld = new SpigotWorld(worldBorder.getCenter().getWorld());
         Location location = worldBorder.getCenter();
-        return new RandomLocation(spigotWorld, location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        return new CommonLocation(spigotWorld, location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
     @Override

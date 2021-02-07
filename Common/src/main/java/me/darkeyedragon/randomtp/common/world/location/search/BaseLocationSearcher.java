@@ -14,6 +14,7 @@ import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
+import me.darkeyedragon.randomtp.common.world.location.CommonLocation;
 
 import java.util.EnumSet;
 import java.util.Map;
@@ -53,7 +54,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
                 //TODO handle failed searches properly.
                 return null;
             } else {
-                loc.setTries(count);
+                //loc.setTries(count);
                 count = 0;
                 return CompletableFuture.completedFuture(loc);
             }
@@ -74,7 +75,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
                 int xChunk = (chunk.getX() << CHUNK_SHIFT) + x;
                 int zChunk = (chunk.getZ() << CHUNK_SHIFT) + z;
                 int y = chunk.getHighestBlockYAt(x, z);
-                RandomLocation randomLocation = new RandomLocation(chunk.getWorld(), xChunk, y, zChunk);
+                RandomLocation randomLocation = new CommonLocation(chunk.getWorld(), xChunk, y, zChunk);
                 if (isSafe(randomLocation)) {
                     return randomLocation;
                 }

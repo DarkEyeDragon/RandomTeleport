@@ -4,6 +4,7 @@ import me.darkeyedragon.randomtp.api.world.*;
 import me.darkeyedragon.randomtp.api.world.block.BlockFace;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.common.world.location.CommonLocation;
 import me.darkeyedragon.randomtp.world.SpigotBiome;
 import me.darkeyedragon.randomtp.world.SpigotChunkSnapshot;
 import me.darkeyedragon.randomtp.world.SpigotWorld;
@@ -49,7 +50,7 @@ public class WorldUtil {
     }
 
     public static RandomLocation toRandomLocation(Location location){
-        return new RandomLocation(WorldUtil.toRandomWorld(location.getWorld()), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        return new CommonLocation(WorldUtil.toRandomWorld(location.getWorld()), location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
     public static Location toLocation(RandomLocation location){

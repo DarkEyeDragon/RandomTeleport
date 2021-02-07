@@ -1,7 +1,8 @@
 package me.darkeyedragon.randomtp.api.world;
 
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.Particle;
+import me.darkeyedragon.randomtp.api.teleport.RandomParticle;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
+import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 
 import java.util.UUID;
@@ -33,5 +34,19 @@ public interface RandomWorld {
      */
     boolean equals(Object object);
 
-    void spawnParticle(Particle particle, RandomLocation spawnLoc, int amount);
+    /**
+     * @param world the {@link RandomWorld} you want to get the {@link RandomWorldBorder} offset of
+     * @return the {@link Offset} of the {@link RandomWorldBorder}
+     */
+    static Offset getOffset(RandomWorld world) {
+        RandomWorldBorder worldBorder = world.getWorldBorder();
+        RandomLocation center = worldBorder.getCenter();
+        Offset offset = new Offset();
+        offset.setX(center.getBlockX());
+        offset.setZ(center.getBlockZ());
+        offset.setRadius((int) Math.floor(worldBorder.getSize() / 2 - worldBorder.getWarningDistance()));
+        return offset;
+    }
+
+    void spawnParticle(RandomParticle<?> particle, RandomLocation spawnLoc, int amount);
 }

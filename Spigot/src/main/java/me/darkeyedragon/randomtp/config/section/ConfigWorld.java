@@ -7,7 +7,6 @@ import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetai
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.Offset;
-import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
 import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -75,7 +74,7 @@ public class ConfigWorld implements SectionWorld {
     }
 
     private LocationQueue generateLocations(RandomWorld world) {
-        WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(world);
+        SectionWorldDetail worldConfigSection = plugin.getConfigHandler().getSectionWorld().getSectionWorldDetail(world);
         SectionQueue sectionQueue = plugin.getConfigHandler().getSectionQueue();
         LocationQueue locationQueue = new LocationQueue(sectionQueue.getSize(), LocationSearcherFactory.getLocationSearcher(world, plugin));
         plugin.subscribe(locationQueue, world);

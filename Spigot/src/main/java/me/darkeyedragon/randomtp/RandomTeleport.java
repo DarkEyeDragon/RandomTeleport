@@ -13,18 +13,18 @@ import me.darkeyedragon.randomtp.api.logging.PluginLogger;
 import me.darkeyedragon.randomtp.api.message.MessageHandler;
 import me.darkeyedragon.randomtp.api.metric.Metric;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
-import me.darkeyedragon.randomtp.api.queue.QueueListener;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
+import me.darkeyedragon.randomtp.api.scheduler.Scheduler;
 import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
 import me.darkeyedragon.randomtp.api.teleport.TeleportHandler;
 import me.darkeyedragon.randomtp.api.world.PlayerHandler;
 import me.darkeyedragon.randomtp.api.world.RandomPlayer;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.RandomWorldHandler;
-import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.common.addon.AddonManager;
 import me.darkeyedragon.randomtp.common.command.RandomTeleportCommand;
 import me.darkeyedragon.randomtp.common.command.context.PlayerWorldContext;
+import me.darkeyedragon.randomtp.common.message.CommonMessageHandler;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
 import me.darkeyedragon.randomtp.config.BukkitConfigHandler;
 import me.darkeyedragon.randomtp.eco.BukkitEcoHandler;
@@ -33,7 +33,9 @@ import me.darkeyedragon.randomtp.failsafe.listener.PlayerDeathListener;
 import me.darkeyedragon.randomtp.listener.ServerLoadListener;
 import me.darkeyedragon.randomtp.listener.WorldLoadListener;
 import me.darkeyedragon.randomtp.log.BukkitLogger;
+import me.darkeyedragon.randomtp.scheduler.SpigotScheduler;
 import me.darkeyedragon.randomtp.teleport.SpigotCooldownHandler;
+import me.darkeyedragon.randomtp.world.PlayerSpigot;
 import me.darkeyedragon.randomtp.world.SpigotPlayerHandler;
 import me.darkeyedragon.randomtp.world.SpigotWorldHandler;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -66,7 +68,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
     private PlayerHandler playerHandler;
     private Metric metric;
     private CooldownHandler cooldownHandler;
-
+    private Scheduler scheduler;
     //Economy
     private Economy econ;
     private static EcoHandler ecoHandler;
@@ -75,27 +77,12 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
     private AddonManager addonManager;
 
     private PluginManager pluginManager;
+    private MessageHandler messageHandler;
 
     public RandomTeleport(SpigotImpl plugin) {
         this.plugin = plugin;
     }
 
-    public void subscribe(LocationQueue locationQueue, RandomWorld world) {
-        if (bukkitConfigHandler.getSectionDebug().isShowQueuePopulation()) {
-            int size = bukkitConfigHandler.getSectionQueue().getSize();
-            locationQueue.subscribe(new QueueListener<RandomLocation>() {
-                @Override
-                public void onAdd(RandomLocation element) {
-                    plugin.getLogger().info("Safe location added for " + world.getName() + " (" + locationQueue.size() + "/" + size + ") in " + element.getTries() + " tries");
-                }
-
-                @Override
-                public void onRemove(RandomLocation element) {
-                    plugin.getLogger().info("Safe location consumed for " + world.getName() + " (" + locationQueue.size() + "/" + size + ")");
-                }
-            });
-        }
-    }
 
     //Economy logic
     @Override
@@ -115,7 +102,9 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
     public void init() {
         // Plugin startup logic
         loadListeners();
+        scheduler = new SpigotScheduler(this);
         playerHandler = new SpigotPlayerHandler();
+        messageHandler = new CommonMessageHandler(this);
         logger = new BukkitLogger(this);
         addonManager = new AddonManager(this, logger);
         if(addonManager.createAddonDir()){
@@ -162,6 +151,14 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
                     throw new InvalidCommandArgument(true);
                 }
             }
+        });
+        manager.getCommandContexts().registerContext(RandomWorld.class, c -> {
+            String arg1 = c.popFirstArg();
+            return worldHandler.getWorld(arg1);
+        });
+        manager.getCommandContexts().registerContext(RandomPlayer.class, c -> {
+            String arg1 = c.popFirstArg();
+            return new PlayerSpigot(Bukkit.getPlayer(arg1));
         });
         if (setupEconomy()) {
             plugin.getLogger().info("Vault found. Hooking into it.");
@@ -271,7 +268,16 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
 
     @Override
     public MessageHandler getMessageHandler() {
-        throw new RuntimeException("Not implemented");
+        return messageHandler;
+    }
+
+    @Override
+    public void reloadConfig() {
+        try {
+            getConfigHandler().reload();
+        } catch (InvalidConfigurationException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -287,6 +293,11 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
     @Override
     public CooldownHandler getCooldownHandler() {
         return cooldownHandler;
+    }
+
+    @Override
+    public Scheduler getScheduler() {
+        return scheduler;
     }
 
     public DeathTracker getDeathTracker() {

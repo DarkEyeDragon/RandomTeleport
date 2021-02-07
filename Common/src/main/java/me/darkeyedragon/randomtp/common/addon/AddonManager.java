@@ -3,10 +3,7 @@ package me.darkeyedragon.randomtp.common.addon;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
-import me.darkeyedragon.randomtp.api.addon.AddonPlugin;
-import me.darkeyedragon.randomtp.api.addon.RandomAddonManager;
-import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
-import me.darkeyedragon.randomtp.api.addon.RequiredPlugin;
+import me.darkeyedragon.randomtp.api.addon.*;
 import me.darkeyedragon.randomtp.api.logging.PluginLogger;
 import me.darkeyedragon.randomtp.common.addon.response.AddonResponse;
 import me.darkeyedragon.randomtp.common.addon.response.AddonResponseType;
@@ -242,6 +239,7 @@ public class AddonManager implements RandomAddonManager {
      * @return a collection of type {@link Map} with the {@link RandomAddon} identifier as key. And the {@link RandomAddon} as value.
      */
     @Unmodifiable
+    @Override
     public Map<String, RandomAddon> getAddons() {
         return addons;
     }

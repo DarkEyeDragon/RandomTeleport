@@ -23,7 +23,7 @@ public class LocationFactory {
         if (sectionWorldDetail.useWorldBorder()) {
             RandomWorldBorder worldBorder = sectionWorldDetail.getWorld().getWorldBorder();
             RandomLocation center = worldBorder.getCenter();
-            offset = new Offset(center.getX(), center.getY(), (int) Math.floor(worldBorder.getSize() / 2 - worldBorder.getWarningDistance()));
+            offset = new Offset(center.getBlockX(), center.getBlockY(), (int) Math.floor(worldBorder.getSize() / 2 - worldBorder.getWarningDistance()));
         } else {
             offset = sectionWorldDetail.getOffset();
         }

@@ -9,9 +9,9 @@ public interface CooldownHandler {
 
     RandomCooldown getCooldown(UUID playerUUID);
 
-    boolean removeCooldown(RandomPlayer randomPlayer);
+    RandomCooldown removeCooldown(RandomPlayer randomPlayer);
 
-    boolean removeCooldown(UUID playerUUID);
+    RandomCooldown removeCooldown(UUID playerUUID);
 
-    boolean addCooldown(RandomCooldown randomCooldown);
+    RandomCooldown addCooldown(RandomPlayer player, RandomCooldown randomCooldown);
 }

@@ -11,7 +11,7 @@ public class LocationSearcherFactory {
 
     private static final Map<RandomWorld, LocationSearcher> locationSearcherMap = new HashMap<>();
 
-    public static LocationSearcher getLocationSearcher(RandomWorld world, RandomTeleportPlugin randomTeleport) {
+    public static LocationSearcher getLocationSearcher(RandomWorld world, RandomTeleportPlugin<?> randomTeleport) {
         switch (world.getEnvironment()) {
             case NORMAL:
                 return locationSearcherMap.computeIfAbsent(world, ls -> new OverworldLocationSearcher(randomTeleport));
