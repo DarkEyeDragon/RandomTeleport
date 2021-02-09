@@ -113,7 +113,7 @@ public class BasicTeleportHandler implements TeleportHandler {
     }
 
     private void teleport(RandomPlayer player) {
-        RandomLocation randomLocation = plugin.getWorldHandler().getWorldQueue().popLocation(property.getLocation().getWorld());
+        RandomLocation randomLocation = plugin.getWorldHandler().getWorldQueue().popLocation(property.getWorld());
         if (randomLocation == null) {
             plugin.getMessageHandler().sendMessage(property.getCommandIssuer(), configHandler.getSectionMessage().getDepletedQueue());
             return;

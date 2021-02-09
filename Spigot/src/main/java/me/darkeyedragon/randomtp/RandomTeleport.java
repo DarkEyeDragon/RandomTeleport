@@ -124,6 +124,8 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         deathTracker = new SpigotDeathTracker(this);
         //check if the first argument is a world or player
         worldQueue = new WorldQueue();
+        manager.enableUnstableAPI("help");
+        manager.enableUnstableAPI("brigadier");
         manager.getCommandCompletions().registerAsyncCompletion("addonFiles", context -> ImmutableList.copyOf(addonManager.getFileNames()));
         manager.getCommandCompletions().registerAsyncCompletion("addonNames", context -> ImmutableList.copyOf(addonManager.getAddons().keySet()));
         manager.getCommandCompletions().registerAsyncCompletion("particles", context -> Arrays.stream(Particle.values()).map(Particle::name).collect(Collectors.toList()));
@@ -134,8 +136,10 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
             PlayerWorldContext context = new PlayerWorldContext();
             if (randomWorld != null) {
                 context.setWorld(randomWorld);
+                context.addPlayer(playerHandler.getPlayer(c.getPlayer().getUniqueId()));
                 return context;
             } else if (player != null) {
+                context.setWorld(player.getWorld());
                 context.addPlayer(player);
                 return context;
             } else {

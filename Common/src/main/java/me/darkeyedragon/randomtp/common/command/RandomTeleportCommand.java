@@ -12,7 +12,6 @@ import me.darkeyedragon.randomtp.api.config.section.SectionMessage;
 import me.darkeyedragon.randomtp.api.config.section.SectionQueue;
 import me.darkeyedragon.randomtp.api.config.section.SectionTeleport;
 import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
-import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.message.MessageHandler;
 import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
@@ -27,12 +26,9 @@ import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.common.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.common.teleport.BasicTeleportHandler;
-import me.darkeyedragon.randomtp.common.teleport.BasicTeleportProperty;
+import me.darkeyedragon.randomtp.common.teleport.CommonTeleportProperty;
 import me.darkeyedragon.randomtp.common.util.TimeUtil;
 import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @CommandAlias("rtp|randomtp|randomteleport")
 public class RandomTeleportCommand extends BaseCommand {
@@ -69,81 +65,37 @@ public class RandomTeleportCommand extends BaseCommand {
     @Default
     @CommandPermission("rtp.teleport.self")
     @CommandCompletion("@players|@filteredWorlds")
+    @Description("Teleport players to a random location.")
+    @Syntax("[world/player] [world]")
     public void onTeleport(CommandIssuer sender, @Optional PlayerWorldContext target, @Optional @CommandPermission("rtp.teleport.world") RandomWorld world) {
-        List<RandomPlayer> targets = new ArrayList<>();
-        RandomWorld newWorld;
-        if (target == null) {
-            if (sender.isPlayer()) {
-                if (configTeleport.getUseDefaultWorld()) {
-                    if (world == null) {
-                        messageHandler.sendMessage(sender, configMessage.getInvalidDefaultWorld(configTeleport.getDefaultWorld()));
-                        return;
-                    }
-                    //Check if world is in the queue, if not, well then there are no locations, go figure.
-                    LocationQueue locationQueue = worldQueue.get(world);
-                    if (locationQueue == null) {
-                        messageHandler.sendMessage(sender, configMessage.getInvalidDefaultWorld(configTeleport.getDefaultWorld()));
-                        return;
-                    }
-                    newWorld = world;
-                } else {
-                    newWorld = plugin.getPlayerHandler().getPlayer(sender.getUniqueId()).getWorld();
-                }
-                if (!configWorld.contains(newWorld)) {
-                    messageHandler.sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
-                    return;
-                }
-            } else {
-                throw new InvalidCommandArgument(true);
-            }
-        } else {
-            if (target.getPlayers().size() > 0) {
-                if (sender.hasPermission("rtp.teleport.other")) {
-                    targets = target.getPlayers();
-                    //If no world is provided check if the default world is enabled
-                    if (configTeleport.getUseDefaultWorld()) {
-                        newWorld = plugin.getWorldHandler().getWorld(configTeleport.getDefaultWorld());
-                    } else {
-                        newWorld = world;
-                    }
-                    if (!configWorld.contains(newWorld)) {
-                        messageHandler.sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
-                        return;
-                    }
-                } else {
-                    messageHandler.sendMessage(sender, "<red>I'm sorry, you do not have permission to perform this command!");
-                    return;
-                }
-            } else if (target.isWorld()) {
-                if (sender.isPlayer()) {
-                    newWorld = target.getWorld();
-                    if (!configWorld.contains(newWorld)) {
-                        messageHandler.sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
-                        return;
-                    }
-                    SectionWorldDetail sectionWorldDetail = configWorld.getSectionWorldDetail(newWorld);
-                    if (sectionWorldDetail == null || ((!sender.hasPermission("rtp.world." + newWorld.getName())) && sectionWorldDetail.needsWorldPermission())) {
-                        messageHandler.sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
-                        return;
-                    }
-
-                } else {
+        RandomPlayer player;
+        if (target != null) {
+            if (world == null) {
+                if (target.getWorld() == null) {
                     throw new InvalidCommandArgument(true);
                 }
+                world = target.getWorld();
+            }
+            if (sender.isPlayer() && target.isWorld()) {
+                player = target.getPlayers().get(0);
             } else {
                 throw new InvalidCommandArgument(true);
             }
-        }
-        //TODO Add selector system
-        /*final RandomWorld finalWorld = newWorld;
-        if (player == null) {
-            for (RandomPlayer target1 : targets) {
-                teleport(sender, target1, finalWorld);
+        } else if (sender.isPlayer()) {
+            player = plugin.getPlayerHandler().getPlayer(sender.getUniqueId());
+            if (world == null && configTeleport.getUseDefaultWorld()) {
+                String worldName = plugin.getConfigHandler().getSectionTeleport().getDefaultWorld();
+                world = plugin.getWorldHandler().getWorld(worldName);
+                if (world == null) {
+                    plugin.getMessageHandler().sendMessage(sender, configMessage.getInvalidDefaultWorld(worldName));
+                }
+            } else {
+                throw new InvalidCommandArgument(true);
             }
         } else {
-            teleport(sender, player, finalWorld);
-        }*/
-        teleport(sender, target.getPlayers().get(0), newWorld);
+            throw new InvalidCommandArgument(true);
+        }
+        teleport(sender, player, world);
     }
 
     private void teleport(CommandIssuer sender, RandomPlayer player, RandomWorld world) {
@@ -152,7 +104,7 @@ public class RandomTeleportCommand extends BaseCommand {
         boolean bypasCooldown = player.hasPermission("rtp.teleport.bypass") || sender.hasPermission("rtp.teleport.bypass");
         boolean bypassEco = useEco && (player.hasPermission("rtp.eco.bypass") || sender.hasPermission("rtp.eco.bypass"));
         RandomLocation location = worldQueue.popLocation(world);
-        TeleportProperty teleportProperty = new BasicTeleportProperty(location, sender, player, bypassEco, bypassDelay, bypasCooldown, configTeleport.getParticle());
+        TeleportProperty teleportProperty = new CommonTeleportProperty(location, sender, player, bypassEco, bypassDelay, bypasCooldown, configTeleport.getParticle());
         BasicTeleportHandler teleportHandler = new BasicTeleportHandler(plugin, teleportProperty);
         teleportHandler.toRandomLocation(player);
     }
@@ -174,7 +126,8 @@ public class RandomTeleportCommand extends BaseCommand {
 
     @Subcommand("addworld")
     @CommandPermission("rtp.admin.addworld")
-    @CommandCompletion("@worlds true|false true|false <Integer> <Integer> <Integer>")
+    @Syntax("<world> <useWorldBorder> <needsWorldPermission> [radius] [offsetX] [offsetZ]")
+    @CommandCompletion("@worlds true|false true|false")
     public void onAddWorld(CommandIssuer sender, RandomWorld randomWorld, boolean useWorldBorder, boolean needsWorldPermission, @Optional Integer radius, @Optional Integer offsetX, @Optional Integer offsetZ) {
         if (!useWorldBorder && (radius == null || offsetX == null || offsetZ == null)) {
             messageHandler.sendMessage(sender, "<gold>If <aqua>useWorldBorder<gold> is false you need to provide the other parameters.");
