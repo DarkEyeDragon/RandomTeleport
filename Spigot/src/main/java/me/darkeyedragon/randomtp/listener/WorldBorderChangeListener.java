@@ -36,7 +36,7 @@ public class WorldBorderChangeListener implements Listener {
             worldQueue.remove(world);
             worldQueue.put(
                     world, new LocationQueue(
-                            plugin, configHandler.getSectionQueue().getSize(),
+                            configHandler.getSectionQueue().getSize(),
                             LocationSearcherFactory.getLocationSearcher(world, plugin)
                     )
             );
