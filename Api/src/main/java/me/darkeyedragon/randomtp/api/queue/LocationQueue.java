@@ -7,6 +7,7 @@ import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
 public class LocationQueue extends ObservableQueue<RandomLocation> {
 
     private final LocationSearcher baseLocationSearcher;
+
     public LocationQueue(int capacity, LocationSearcher baseLocationSearcher) {
         super(capacity);
         this.baseLocationSearcher = baseLocationSearcher;
@@ -15,8 +16,9 @@ public class LocationQueue extends ObservableQueue<RandomLocation> {
     public void generate(SectionWorldDetail sectionWorldDetail) {
         generate(sectionWorldDetail, super.remainingCapacity());
     }
-    public void generate(SectionWorldDetail sectionWorldDetail, int amount){
-        for(int i = 0; i < amount; i++){
+
+    public void generate(SectionWorldDetail sectionWorldDetail, int amount) {
+        for (int i = 0; i < amount; i++) {
             baseLocationSearcher.getRandom(sectionWorldDetail).thenAccept(super::offer);
         }
     }

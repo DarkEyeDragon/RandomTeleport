@@ -14,11 +14,13 @@ import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
+import me.darkeyedragon.randomtp.common.util.ChunkTraverser;
 import me.darkeyedragon.randomtp.common.world.location.CommonLocation;
 
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class BaseLocationSearcher implements LocationSearcher {
@@ -40,6 +42,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
 
     /**
      * This method will search recursively until it reached 50 tries, then fail silently.
+     *
      * @param sectionWorldDetail
      * @return a {@link CompletableFuture<RandomLocation>} holding the location. Null if no location is found.
      */
@@ -55,7 +58,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
                 return null;
             } else {
                 //loc.setTries(count);
-                count = 0;
+                count = 1;
                 return CompletableFuture.completedFuture(loc);
             }
         });
@@ -69,8 +72,8 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
 
     /* Will search through the chunk to find a location that is safe, returning null if none is found. */
     public RandomLocation getRandomLocationFromChunk(RandomChunkSnapshot chunk) {
-        for (int x = 8; x < CHUNK_SIZE; x++) {
-            for (int z = 8; z < CHUNK_SIZE; z++) {
+        for (int x = 0; x < CHUNK_SIZE; x++) {
+            for (int z = 0; z < CHUNK_SIZE; z++) {
                 //RandomBlock block = chunk.get((chunk.getX() << CHUNK_SHIFT) + x, (chunk.getZ() << CHUNK_SHIFT) + z);
                 int xChunk = (chunk.getX() << CHUNK_SHIFT) + x;
                 int zChunk = (chunk.getZ() << CHUNK_SHIFT) + z;
@@ -89,8 +92,19 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         return chunkFuture.thenCompose((chunk) -> {
             boolean isSafe = isSafeChunk(chunk);
             if (!isSafe) {
+                ChunkTraverser chunkTraverser = new ChunkTraverser(chunk);
+                while (chunkTraverser.hasNext()) {
+                    try {
+                        RandomChunkSnapshot snapshot = chunkTraverser.next().get();
+                        if (isSafeChunk(chunk)) return CompletableFuture.completedFuture(snapshot);
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
+                    }
+                }
                 return getRandomChunk(sectionWorldDetail);
-            } else return CompletableFuture.completedFuture(chunk);
+            } else {
+                return CompletableFuture.completedFuture(chunk);
+            }
         });
     }
 
@@ -174,7 +188,8 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
             RandomBlock relativeBlock = block.getRelative(blockFace);
             if (relativeBlock.isEmpty()) return false;
             if (!relativeBlock.getBlockType().getType().isSolid()) return false;
-            if (blacklist.getDimensionData(dimension).getBlockTypes().contains(relativeBlock.getBlockType())) return false;
+            if (blacklist.getDimensionData(dimension).getBlockTypes().contains(relativeBlock.getBlockType()))
+                return false;
         }
         return true;
     }
