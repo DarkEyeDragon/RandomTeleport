@@ -12,6 +12,7 @@ import me.darkeyedragon.randomtp.api.config.section.SectionMessage;
 import me.darkeyedragon.randomtp.api.config.section.SectionQueue;
 import me.darkeyedragon.randomtp.api.config.section.SectionTeleport;
 import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
+import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.message.MessageHandler;
 import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
@@ -29,6 +30,9 @@ import me.darkeyedragon.randomtp.common.teleport.BasicTeleportHandler;
 import me.darkeyedragon.randomtp.common.teleport.CommonTeleportProperty;
 import me.darkeyedragon.randomtp.common.util.TimeUtil;
 import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @CommandAlias("rtp|randomtp|randomteleport")
 public class RandomTeleportCommand extends BaseCommand {
@@ -64,38 +68,89 @@ public class RandomTeleportCommand extends BaseCommand {
 
     @Default
     @CommandPermission("rtp.teleport.self")
-    @CommandCompletion("@players @filteredWorlds")
+    @CommandCompletion("@playerWorlds")
     @Description("Teleport players to a random location.")
     @Syntax("[world/player] [world]")
     public void onTeleport(CommandIssuer sender, @Optional PlayerWorldContext target, @Optional @CommandPermission("rtp.teleport.world") RandomWorld world) {
-        RandomPlayer player;
-        if (target != null) {
-            if (world == null) {
-                if (target.getWorld() == null) {
-                    throw new InvalidCommandArgument(true);
+        RandomPlayer player = null;
+        List<RandomPlayer> targets = new ArrayList<>();
+        RandomWorld newWorld;
+        if (target == null) {
+            if (sender.isPlayer()) {
+                player = plugin.getPlayerHandler().getPlayer(sender.getUniqueId());
+                if (configTeleport.getUseDefaultWorld()) {
+                    newWorld = plugin.getWorldHandler().getWorld(world.getName());
+                    if (newWorld == null) {
+                        plugin.getMessageHandler().sendMessage(player, configMessage.getInvalidDefaultWorld(configTeleport.getDefaultWorld()));
+                        return;
+                    }
+                    //Check if world is in the queue, if not, well then there are no locations, go figure.
+                    LocationQueue locationQueue = plugin.getWorldHandler().getWorldQueue().get(world);
+                    if (locationQueue == null) {
+                        plugin.getMessageHandler().sendMessage(player, configMessage.getInvalidDefaultWorld(configTeleport.getDefaultWorld()));
+                        return;
+                    }
+                } else {
+                    newWorld = plugin.getWorldHandler().getWorld(player.getWorld().getName());
                 }
-                world = target.getWorld();
-            }
-            if (sender.isPlayer() && target.isWorld()) {
-                player = target.getPlayers().get(0);
-            } else {
-                throw new InvalidCommandArgument(true);
-            }
-        } else if (sender.isPlayer()) {
-            player = plugin.getPlayerHandler().getPlayer(sender.getUniqueId());
-            if (world == null && configTeleport.getUseDefaultWorld()) {
-                String worldName = plugin.getConfigHandler().getSectionTeleport().getDefaultWorld();
-                world = plugin.getWorldHandler().getWorld(worldName);
-                if (world == null) {
-                    plugin.getMessageHandler().sendMessage(sender, configMessage.getInvalidDefaultWorld(worldName));
+                if (!configWorld.contains(newWorld)) {
+                    plugin.getMessageHandler().sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
+                    return;
                 }
             } else {
                 throw new InvalidCommandArgument(true);
             }
         } else {
-            throw new InvalidCommandArgument(true);
+            if (target.getPlayers().size() > 0) {
+                if (sender.hasPermission("rtp.teleport.other")) {
+                    targets = target.getPlayers();
+                    //If no world is provided check if the default world is enabled
+                    if (configTeleport.getUseDefaultWorld()) {
+                        newWorld = plugin.getWorldHandler().getWorld(configTeleport.getDefaultWorld());
+                    } else {
+                        newWorld = world;
+                    }
+                    if (!configWorld.contains(newWorld)) {
+                        if (newWorld == null) {
+
+                            throw new InvalidCommandArgument(true);
+                        }
+                        plugin.getMessageHandler().sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
+                        return;
+                    }
+                } else {
+                    plugin.getMessageHandler().sendMessage(sender, "<red>I'm sorry, you do not have permission to perform this command!");
+                    return;
+                }
+            } else if (target.isWorld()) {
+                if (sender.isPlayer()) {
+                    player = plugin.getPlayerHandler().getPlayer(sender.getUniqueId());
+                    newWorld = target.getWorld();
+                    if (!configWorld.contains(newWorld)) {
+                        plugin.getMessageHandler().sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
+                        return;
+                    }
+                    SectionWorldDetail sectionWorldDetail = plugin.getConfigHandler().getSectionWorld().getSectionWorldDetail(newWorld);
+                    if (sectionWorldDetail == null || ((!sender.hasPermission("rtp.world." + newWorld.getName())) && sectionWorldDetail.needsWorldPermission())) {
+                        plugin.getMessageHandler().sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
+                        return;
+                    }
+
+                } else {
+                    throw new InvalidCommandArgument(true);
+                }
+            } else {
+                throw new InvalidCommandArgument(true);
+            }
         }
-        teleport(sender, player, world);
+        final RandomWorld finalWorld = newWorld;
+        if (player == null) {
+            for (RandomPlayer target1 : targets) {
+                teleport(sender, target1, finalWorld);
+            }
+        } else {
+            teleport(sender, player, finalWorld);
+        }
     }
 
     private void teleport(CommandIssuer sender, RandomPlayer player, RandomWorld world) {
