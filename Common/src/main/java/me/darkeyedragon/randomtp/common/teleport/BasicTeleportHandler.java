@@ -13,6 +13,8 @@ import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
 import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class BasicTeleportHandler implements TeleportHandler {
 
     private final RandomTeleportPlugin<?> plugin;
@@ -74,31 +76,33 @@ public class BasicTeleportHandler implements TeleportHandler {
         }
         //TODO figure out scheduler
         //Initiate the delay timer if the delay is higher than 0
-        /*if (delay > 0) {
+        if (delay > 0) {
             plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getInitTeleportDelay(delay));
             AtomicBoolean complete = new AtomicBoolean(false);
-            int taskId = plugin.getScheduler().runTaskLater(plugin, () -> {
+            int taskId = plugin.getScheduler().runTaskLater(() -> {
                 complete.set(true);
                 teleport(player);
             }, delay).getTaskId();
             RandomLocation originalLoc = player.getLocation().clone();
             if (configHandler.getSectionTeleport().isCancelOnMove()) {
                 //Cancel the teleport task if the player moves
-                plugin.getScheduler().runTaskTimer(plugin, bukkitTask -> {
+                plugin.getScheduler().runTaskTimer(task -> {
                     RandomLocation currentLoc = player.getLocation();
                     if (complete.get()) {
-                        bukkitTask.cancel();
+                        task.cancel();
                     } else if ((originalLoc.getX() != currentLoc.getX() || originalLoc.getY() != currentLoc.getY() || originalLoc.getZ() != currentLoc.getZ())) {
                         plugin.getScheduler().cancelTask(taskId);
-                        bukkitTask.cancel();
+                        task.cancel();
                         plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getTeleportCanceled());
                     }
                 }, 0, 5L);
             }
-        } else {*/
-        teleport(player);
-        return new BasicTeleportResponse(TeleportType.SUCCESS);
-        //}
+        } else {
+            teleport(player);
+            return new BasicTeleportResponse(TeleportType.SUCCESS);
+        }
+        //TODO proper return type
+        return null;
     }
 
     private void addToDeathTimer(RandomPlayer player) {

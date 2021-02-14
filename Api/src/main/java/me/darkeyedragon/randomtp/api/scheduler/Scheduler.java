@@ -1,9 +1,13 @@
 package me.darkeyedragon.randomtp.api.scheduler;
 
-public interface Scheduler {
-    void runTaskTimer(Runnable runnable, long delay, long interval);
+import java.util.function.Consumer;
 
-    void runTaskLater(Runnable runnable, long delay);
+public interface Scheduler {
+    Task runTaskTimer(Runnable runnable, long delay, long interval);
+
+    Task runTaskLater(Runnable runnable, long delay);
+
+    void runTaskTimer(Consumer<Task> taskConsumer, long delay, long interval);
 
     void cancelTask(int taskId);
 }

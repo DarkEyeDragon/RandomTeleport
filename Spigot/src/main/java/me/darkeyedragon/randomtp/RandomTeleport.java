@@ -8,12 +8,10 @@ import me.darkeyedragon.randomtp.api.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.api.logging.PluginLogger;
 import me.darkeyedragon.randomtp.api.message.MessageHandler;
 import me.darkeyedragon.randomtp.api.metric.Metric;
-import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 import me.darkeyedragon.randomtp.api.scheduler.Scheduler;
 import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
 import me.darkeyedragon.randomtp.api.world.PlayerHandler;
-import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.RandomWorldHandler;
 import me.darkeyedragon.randomtp.command.completion.Registrar;
 import me.darkeyedragon.randomtp.common.addon.AddonManager;
@@ -53,10 +51,8 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
     private PlayerHandler playerHandler;
     private Metric metric;
     private CooldownHandler cooldownHandler;
-    private Scheduler scheduler;
+    private static Scheduler scheduler;
 
-    //Economy
-    private Economy econ;
     private static EcoHandler ecoHandler;
 
     PluginLogger logger;
@@ -80,7 +76,8 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         if (rsp == null) {
             return false;
         }
-        econ = rsp.getProvider();
+        //Economy
+        Economy econ = rsp.getProvider();
         ecoHandler = new BukkitEcoHandler(econ);
         return true;
     }
@@ -153,10 +150,6 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         return bukkitAudience;
     }
 
-    public Economy getEcon() {
-        return econ;
-    }
-
     @Override
     public AddonPlugin getPlugin(String name) {
         return SpigotAddonPlugin.create(name);
@@ -175,18 +168,9 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         return bukkitConfigHandler;
     }
 
-    public LocationQueue getQueue(RandomWorld world) {
-        return worldQueue.get(world);
-    }
-
     public PaperCommandManager getCommandManager() {
         return commandManager;
     }
-
-    //TODO REPLACE
-    /*public LocationFactory getLocationFactory() {
-        return locationFactory;
-    }*/
 
     @Override
     public RandomTeleportPluginImpl getInstance() {
@@ -242,6 +226,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         return scheduler;
     }
 
+    @Override
     public DeathTracker getDeathTracker() {
         return deathTracker;
     }

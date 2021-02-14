@@ -7,4 +7,5 @@ public interface Task {
     int getTaskId();
 
     boolean isCancelled();
+
 }
