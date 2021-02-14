@@ -23,7 +23,7 @@ public class ServerLoadListener implements Listener {
         instance.getLogger().info(ChatColor.AQUA + "======== [Loading validators] ========");
         instance.getAddonManager().instantiateAllLocal();
         instance.getLogger().info(ChatColor.AQUA + "======================================");
-        instance.populateWorldQueue();
+        instance.getWorldHandler().populateWorldQueue();
     }
 
 }

@@ -16,7 +16,6 @@ import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetai
 import me.darkeyedragon.randomtp.api.message.MessageHandler;
 import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
-import me.darkeyedragon.randomtp.api.queue.QueueListener;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
 import me.darkeyedragon.randomtp.api.teleport.RandomParticle;
@@ -26,6 +25,7 @@ import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.common.command.context.PlayerWorldContext;
+import me.darkeyedragon.randomtp.common.queue.CommonQueueListener;
 import me.darkeyedragon.randomtp.common.teleport.BasicTeleportHandler;
 import me.darkeyedragon.randomtp.common.teleport.CommonTeleportProperty;
 import me.darkeyedragon.randomtp.common.util.TimeUtil;
@@ -198,7 +198,7 @@ public class RandomTeleportCommand extends BaseCommand {
             LocationQueue locationQueue = worldQueue.get(randomWorld);
             if (locationQueue != null) {
                 messageHandler.sendMessage(sender, "<green>Successfully added to config.");
-                locationQueue.subscribe(new QueueListener<RandomLocation>() {
+                locationQueue.subscribe(new CommonQueueListener(plugin, randomWorld, locationQueue) {
                     @Override
                     public void onAdd(RandomLocation element) {
                         messageHandler.sendMessage(sender, "<green>Safe location added for <gold>" + element.getWorld().getName() + "<green> (<yellow>" + locationQueue.size() + "<green>/<yellow>" + configQueue.getSize() + ")");
@@ -206,11 +206,6 @@ public class RandomTeleportCommand extends BaseCommand {
                             messageHandler.sendMessage(sender, "<green>Queue populated for <gold>" + element.getWorld().getName());
                             locationQueue.unsubscribe(this);
                         }
-                    }
-
-                    @Override
-                    public void onRemove(RandomLocation element) {
-                        //ignored
                     }
                 });
             } else {

@@ -117,19 +117,18 @@ public class BasicTeleportHandler implements TeleportHandler {
     }
 
     private void teleport(RandomPlayer player) {
-        RandomLocation randomLocation = plugin.getWorldHandler().getWorldQueue().popLocation(property.getWorld());
-        if (randomLocation == null) {
+        RandomLocation location = property.getLocation();
+        if (location == null) {
             plugin.getMessageHandler().sendMessage(property.getCommandIssuer(), configHandler.getSectionMessage().getDepletedQueue());
             return;
         }
-        //getChunkAtAsync(location.getWorld(), location.getX(), location.getZ(), true, true)
-        randomLocation.getWorld().getChunkAtAsync(randomLocation.getWorld(), randomLocation.getBlockX(), randomLocation.getBlockZ()).thenAccept(chunk -> {
+        location.getWorld().getChunkAtAsync(location.getWorld(), location.getBlockX(), location.getBlockZ()).thenAccept(chunk -> {
             LocationSearcher baseLocationSearcher = LocationSearcherFactory.getLocationSearcher(property.getLocation().getWorld(), plugin);
-            if (!baseLocationSearcher.isSafe(randomLocation)) {
+            if (!baseLocationSearcher.isSafe(location)) {
                 toRandomLocation(player);
                 return;
             }
-            RandomBlock block = chunk.getWorld().getBlockAt(randomLocation);
+            RandomBlock block = chunk.getWorld().getBlockAt(location);
             RandomLocation loc = block.getLocation().add(0.5, 1.5, 0.5);
             plugin.getCooldownHandler().addCooldown(player, new BasicCooldown(player.getUniqueId(), System.currentTimeMillis(), configHandler.getSectionTeleport().getCooldown()));
             drawWarpParticles(player, property.getParticle());
@@ -144,7 +143,7 @@ public class BasicTeleportHandler implements TeleportHandler {
                 plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getSubSectionEconomy().getPayment());
             }
             drawWarpParticles(player, property.getParticle());
-            plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getTeleport(randomLocation));
+            plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getTeleport(location));
             plugin.getStats().addTeleportStat();
             //TODO implement event pipeline
             /*RandomTeleportCompletedEvent event = new RandomTeleportCompletedEvent(player, property);

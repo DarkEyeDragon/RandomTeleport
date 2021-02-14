@@ -1,13 +1,10 @@
 package me.darkeyedragon.randomtp.config.section;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
-import me.darkeyedragon.randomtp.api.config.section.SectionQueue;
 import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
-import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.Offset;
-import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.Set;
@@ -56,10 +53,7 @@ public class ConfigWorld implements SectionWorld {
     }
 
     @Override
-    public LocationQueue add(SectionWorldDetail sectionWorldDetail) {
-        if (section == null) {
-            return null;
-        }
+    public void add(SectionWorldDetail sectionWorldDetail) {
         RandomWorld randomWorld = sectionWorldDetail.getWorld();
         String worldName = randomWorld.getName();
         Offset offset = sectionWorldDetail.getOffset();
@@ -70,17 +64,6 @@ public class ConfigWorld implements SectionWorld {
         section.set(worldName + ".offsetZ", offset.getZ());
         plugin.getPlugin().saveConfig();
         sectionWorldDetailSet.add(sectionWorldDetail);
-        return generateLocations(randomWorld);
-    }
-
-    private LocationQueue generateLocations(RandomWorld world) {
-        SectionWorldDetail worldConfigSection = plugin.getConfigHandler().getSectionWorld().getSectionWorldDetail(world);
-        SectionQueue sectionQueue = plugin.getConfigHandler().getSectionQueue();
-        LocationQueue locationQueue = new LocationQueue(sectionQueue.getSize(), LocationSearcherFactory.getLocationSearcher(world, plugin));
-        plugin.subscribe(locationQueue, world);
-        locationQueue.generate(worldConfigSection, sectionQueue.getSize());
-        plugin.getWorldHandler().getWorldQueue().put(world, locationQueue);
-        return locationQueue;
     }
 
     @Override
