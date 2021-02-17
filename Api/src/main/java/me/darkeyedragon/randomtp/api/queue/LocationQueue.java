@@ -4,8 +4,12 @@ import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetai
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
 
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+
 public class LocationQueue extends ObservableQueue<RandomLocation> {
 
+    protected final int MAX_CONCURRENT = 5;
     private final LocationSearcher baseLocationSearcher;
 
     public LocationQueue(int capacity, LocationSearcher baseLocationSearcher) {
@@ -17,9 +21,29 @@ public class LocationQueue extends ObservableQueue<RandomLocation> {
         generate(sectionWorldDetail, super.remainingCapacity());
     }
 
+    /**
+     * Generates locations based on the {@link SectionWorldDetail}.
+     * To prevent the thread from choking a hard limit is placed on the loop. Limiting the amount of
+     * searches that can be scheduled at once.
+     *
+     * @param sectionWorldDetail the {@link SectionWorldDetail}
+     * @param amount             the amount of required locations to be found.
+     * @author Trigary
+     */
     public void generate(SectionWorldDetail sectionWorldDetail, int amount) {
-        for (int i = 0; i < amount; i++) {
-            baseLocationSearcher.getRandom(sectionWorldDetail).thenAccept(super::offer);
+        AtomicInteger startedAmount = new AtomicInteger();
+        AtomicReference<Runnable> worker = new AtomicReference<>();
+        worker.set(() -> baseLocationSearcher.getRandom(sectionWorldDetail).thenAccept(randomLocation -> {
+            offer(randomLocation);
+            if (startedAmount.getAndIncrement() < amount) {
+                worker.get().run();
+            }
+        }));
+        int workersToStart = Math.min(amount, MAX_CONCURRENT);
+        for (int workerIndex = 0; workerIndex < workersToStart; workerIndex++) {
+            if (startedAmount.getAndIncrement() < amount) {
+                worker.get().run();
+            }
         }
     }
 }
