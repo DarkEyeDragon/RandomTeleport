@@ -8,7 +8,7 @@ import java.util.Set;
 public interface SectionWorld {
     Set<SectionWorldDetail> getSectionWorldDetailSet();
 
-    void add(SectionWorldDetail sectionWorldDetail);
+    boolean add(SectionWorldDetail sectionWorldDetail);
 
     SectionWorld setSectionDetail(SectionWorldDetail sectionWorld);
 

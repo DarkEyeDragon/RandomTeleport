@@ -30,6 +30,7 @@ import me.darkeyedragon.randomtp.common.teleport.BasicTeleportHandler;
 import me.darkeyedragon.randomtp.common.teleport.CommonTeleportProperty;
 import me.darkeyedragon.randomtp.common.util.TimeUtil;
 import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
+import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -194,7 +195,9 @@ public class RandomTeleportCommand extends BaseCommand {
                 if (offsetX == null) offsetX = 0;
                 if (offsetZ == null) offsetZ = 0;
             }
-            configWorld.add(new WorldConfigSection(new Offset(offsetX, offsetZ, radius), randomWorld, useWorldBorder, needsWorldPermission));
+            if (configWorld.add(new WorldConfigSection(new Offset(offsetX, offsetZ, radius), randomWorld, useWorldBorder, needsWorldPermission))) {
+                plugin.getWorldHandler().getWorldQueue().put(randomWorld, new LocationQueue(configQueue.getSize(), LocationSearcherFactory.getLocationSearcher(randomWorld, plugin)));
+            }
             LocationQueue locationQueue = worldQueue.get(randomWorld);
             if (locationQueue != null) {
                 messageHandler.sendMessage(sender, "<green>Successfully added to config.");

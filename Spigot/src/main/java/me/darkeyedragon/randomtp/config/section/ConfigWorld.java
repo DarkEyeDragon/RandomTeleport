@@ -53,7 +53,8 @@ public class ConfigWorld implements SectionWorld {
     }
 
     @Override
-    public void add(SectionWorldDetail sectionWorldDetail) {
+    public boolean add(SectionWorldDetail sectionWorldDetail) {
+        if (sectionWorldDetail == null) return false;
         RandomWorld randomWorld = sectionWorldDetail.getWorld();
         String worldName = randomWorld.getName();
         Offset offset = sectionWorldDetail.getOffset();
@@ -63,7 +64,7 @@ public class ConfigWorld implements SectionWorld {
         section.set(worldName + ".offsetX", offset.getX());
         section.set(worldName + ".offsetZ", offset.getZ());
         plugin.getPlugin().saveConfig();
-        sectionWorldDetailSet.add(sectionWorldDetail);
+        return sectionWorldDetailSet.add(sectionWorldDetail);
     }
 
     @Override
