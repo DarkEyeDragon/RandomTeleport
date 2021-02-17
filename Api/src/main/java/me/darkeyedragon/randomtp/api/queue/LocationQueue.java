@@ -34,6 +34,10 @@ public class LocationQueue extends ObservableQueue<RandomLocation> {
         AtomicInteger startedAmount = new AtomicInteger();
         AtomicReference<Runnable> worker = new AtomicReference<>();
         worker.set(() -> baseLocationSearcher.getRandom(sectionWorldDetail).thenAccept(randomLocation -> {
+            if (super.contains(randomLocation)) {
+                worker.get().run();
+                return;
+            }
             offer(randomLocation);
             if (startedAmount.getAndIncrement() < amount) {
                 worker.get().run();

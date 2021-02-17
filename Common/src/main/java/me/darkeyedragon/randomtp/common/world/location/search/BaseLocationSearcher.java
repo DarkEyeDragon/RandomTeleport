@@ -55,6 +55,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
                     return getRandom(sectionWorldDetail);
                 }
                 //TODO handle failed searches properly.
+
                 return null;
             } else {
                 //loc.setTries(count);
@@ -119,6 +120,10 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         RandomWorld world = sectionWorldDetail.getWorld();
         if (world == null) return CompletableFuture.completedFuture(null);
         return world.getChunkAtAsync(world, x + chunkOffsetX, z + chunkOffsetZ);
+    }
+
+    public void isDuplicate(RandomLocation loc) {
+
     }
 
     @Override

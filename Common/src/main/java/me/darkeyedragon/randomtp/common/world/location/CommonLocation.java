@@ -7,6 +7,8 @@ import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.common.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class CommonLocation implements RandomLocation {
 
     private final RandomWorld randomWorld;
@@ -112,5 +114,24 @@ public class CommonLocation implements RandomLocation {
         vector.setZ(xz * Math.cos(Math.toRadians(rotX)));
 
         return vector;
+    }
+
+    @Override
+    public final boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (this == obj) return true;
+        if (obj instanceof RandomLocation) {
+            RandomLocation otherLoc = (RandomLocation) obj;
+            return this.randomWorld.equals(otherLoc.getWorld())
+                    && this.x == otherLoc.getX()
+                    && this.y == otherLoc.getY()
+                    && this.z == otherLoc.getZ();
+        }
+        return false;
+    }
+
+    @Override
+    public final int hashCode() {
+        return Objects.hash(randomWorld, x, y, z);
     }
 }
