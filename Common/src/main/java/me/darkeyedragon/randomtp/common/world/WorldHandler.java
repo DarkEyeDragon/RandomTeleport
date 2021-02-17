@@ -32,7 +32,7 @@ public abstract class WorldHandler implements RandomWorldHandler {
         long startTime = System.currentTimeMillis();
         for (RandomWorld world : configHandler.getSectionWorld().getWorlds()) {
             //Add a new world to the world queue and generate random locations
-            LocationQueue locationQueue = new LocationQueue(configHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(world, plugin));
+            LocationQueue locationQueue = new LocationQueue(plugin, configHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(world, plugin));
 
             //Subscribe to the locationqueue to be notified of changes
             subscribe(locationQueue, world);

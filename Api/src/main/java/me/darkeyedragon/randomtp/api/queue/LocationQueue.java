@@ -1,6 +1,7 @@
 package me.darkeyedragon.randomtp.api.queue;
 
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
+import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
 
@@ -10,10 +11,12 @@ import java.util.concurrent.atomic.AtomicReference;
 public class LocationQueue extends ObservableQueue<RandomLocation> {
 
     protected final int MAX_CONCURRENT = 5;
+    private final RandomTeleportPlugin<?> plugin;
     private final LocationSearcher baseLocationSearcher;
 
-    public LocationQueue(int capacity, LocationSearcher baseLocationSearcher) {
+    public LocationQueue(RandomTeleportPlugin<?> plugin, int capacity, LocationSearcher baseLocationSearcher) {
         super(capacity);
+        this.plugin = plugin;
         this.baseLocationSearcher = baseLocationSearcher;
     }
 
@@ -42,6 +45,9 @@ public class LocationQueue extends ObservableQueue<RandomLocation> {
             if (startedAmount.getAndIncrement() < amount) {
                 worker.get().run();
             }
+        }).exceptionally(throwable -> {
+            plugin.getLogger().warn(throwable.getMessage());
+            return null;
         }));
         int workersToStart = Math.min(amount, MAX_CONCURRENT);
         for (int workerIndex = 0; workerIndex < workersToStart; workerIndex++) {

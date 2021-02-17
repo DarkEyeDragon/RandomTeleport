@@ -14,6 +14,7 @@ import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
+import me.darkeyedragon.randomtp.common.exception.NoRandomLocationFoundException;
 import me.darkeyedragon.randomtp.common.util.ChunkTraverser;
 import me.darkeyedragon.randomtp.common.world.location.CommonLocation;
 
@@ -54,11 +55,8 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
                     count++;
                     return getRandom(sectionWorldDetail);
                 }
-                //TODO handle failed searches properly.
-
-                return null;
+                throw new NoRandomLocationFoundException(count, sectionWorldDetail.getWorld());
             } else {
-                //loc.setTries(count);
                 count = 1;
                 return CompletableFuture.completedFuture(loc);
             }

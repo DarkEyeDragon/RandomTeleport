@@ -196,7 +196,7 @@ public class RandomTeleportCommand extends BaseCommand {
                 if (offsetZ == null) offsetZ = 0;
             }
             if (configWorld.add(new WorldConfigSection(new Offset(offsetX, offsetZ, radius), randomWorld, useWorldBorder, needsWorldPermission))) {
-                plugin.getWorldHandler().getWorldQueue().put(randomWorld, new LocationQueue(configQueue.getSize(), LocationSearcherFactory.getLocationSearcher(randomWorld, plugin)));
+                plugin.getWorldHandler().getWorldQueue().put(randomWorld, new LocationQueue(plugin, configQueue.getSize(), LocationSearcherFactory.getLocationSearcher(randomWorld, plugin)));
             }
             LocationQueue locationQueue = worldQueue.get(randomWorld);
             if (locationQueue != null) {
