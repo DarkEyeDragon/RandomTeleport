@@ -54,4 +54,10 @@ public class SpigotBlock implements RandomBlock {
         return new SpigotBlockType(block.getType());
     }
 
+    @Override
+    public String toString() {
+        return "SpigotBlock{" +
+                "block=" + block +
+                '}';
+    }
 }

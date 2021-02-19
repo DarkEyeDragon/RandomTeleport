@@ -129,7 +129,7 @@ public class BasicTeleportHandler implements TeleportHandler {
                 return;
             }
             RandomBlock block = chunk.getWorld().getBlockAt(location);
-            RandomLocation loc = block.getLocation().add(0.5, 1.5, 0.5);
+            property.setLocation(property.getLocation().add(0.5, 1.5, 0.5));
             plugin.getCooldownHandler().addCooldown(player, new BasicCooldown(player.getUniqueId(), System.currentTimeMillis(), configHandler.getSectionTeleport().getCooldown()));
             drawWarpParticles(player, property.getParticle());
             player.teleportAsync(property);

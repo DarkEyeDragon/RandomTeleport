@@ -84,6 +84,11 @@ public class SpigotWorld implements RandomWorld {
     }
 
     @Override
+    public boolean isChunkLoaded(int x, int z) {
+        return world.isChunkLoaded(x, z);
+    }
+
+    @Override
     public void spawnParticle(RandomParticle<?> particle, RandomLocation spawnLoc, int amount) {
         world.spawnParticle((Particle) particle.getParticle(), WorldUtil.toLocation(spawnLoc), amount);
     }

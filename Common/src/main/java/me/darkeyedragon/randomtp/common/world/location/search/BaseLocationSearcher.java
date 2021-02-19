@@ -71,8 +71,8 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
 
     /* Will search through the chunk to find a location that is safe, returning null if none is found. */
     public RandomLocation getRandomLocationFromChunk(RandomChunkSnapshot chunk) {
-        for (int x = 0; x < CHUNK_SIZE; x++) {
-            for (int z = 0; z < CHUNK_SIZE; z++) {
+        for (int x = 2; x < CHUNK_SIZE - 2; x++) {
+            for (int z = 2; z < CHUNK_SIZE - 2; z++) {
                 //RandomBlock block = chunk.get((chunk.getX() << CHUNK_SHIFT) + x, (chunk.getZ() << CHUNK_SHIFT) + z);
                 int xChunk = (chunk.getX() << CHUNK_SHIFT) + x;
                 int zChunk = (chunk.getZ() << CHUNK_SHIFT) + z;
@@ -95,7 +95,13 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
                 while (chunkTraverser.hasNext()) {
                     try {
                         RandomChunkSnapshot snapshot = chunkTraverser.next().get();
-                        if (isSafeChunk(chunk)) return CompletableFuture.completedFuture(snapshot);
+                        int x = snapshot.getX() << CHUNK_SHIFT;
+                        int z = snapshot.getZ() << CHUNK_SHIFT;
+                        int radius = sectionWorldDetail.getOffset().getRadius();
+                        boolean withinBounds = x < radius && z < radius;
+                        if (withinBounds && isSafeChunk(snapshot)) {
+                            return CompletableFuture.completedFuture(snapshot);
+                        }
                     } catch (InterruptedException | ExecutionException e) {
                         e.printStackTrace();
                     }
@@ -164,10 +170,8 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
     }
 
     public boolean isSafeChunk(RandomChunkSnapshot chunk) {
-        for (int x = 0; x < CHUNK_SIZE; x++) {
-            for (int z = 0; z < CHUNK_SIZE; z++) {
-                int xChunk = chunk.getX() + x;
-                int zChunk = chunk.getZ() + z;
+        for (int x = 2; x < CHUNK_SIZE - 2; x++) {
+            for (int z = 2; z < CHUNK_SIZE - 2; z++) {
                 int y = chunk.getHighestBlockYAt(x, z);
                 RandomBiome randomBiome = chunk.getBiome(x, y, z);
                 if (isBlacklistedBiome(randomBiome)) {
@@ -189,6 +193,12 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         blockfaces.remove(BlockFace.DOWN);
         for (BlockFace blockFace : blockfaces) {
             RandomBlock relativeBlock = block.getRelative(blockFace);
+            boolean isChunkLoaded = location.getWorld().isChunkLoaded(relativeBlock.getLocation().getBlockX() >> CHUNK_SHIFT, relativeBlock.getLocation().getBlockZ() >> CHUNK_SHIFT);
+            if (!isChunkLoaded) {
+                System.out.println("Unloaded chunk access");
+                System.out.println(relativeBlock);
+                return false;
+            }
             if (relativeBlock.isEmpty()) return false;
             if (!relativeBlock.getBlockType().getType().isSolid()) return false;
             if (blacklist.getDimensionData(dimension).getBlockTypes().contains(relativeBlock.getBlockType()))

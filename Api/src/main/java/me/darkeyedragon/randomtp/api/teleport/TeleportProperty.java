@@ -9,6 +9,8 @@ public interface TeleportProperty {
 
     RandomLocation getLocation();
 
+    void setLocation(RandomLocation location);
+
     CommandIssuer getCommandIssuer();
 
     RandomPlayer getTarget();

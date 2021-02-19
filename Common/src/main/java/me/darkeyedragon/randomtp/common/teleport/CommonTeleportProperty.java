@@ -9,7 +9,7 @@ import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 
 public class CommonTeleportProperty implements TeleportProperty {
 
-    private final RandomLocation location;
+    private RandomLocation location;
     private final CommandIssuer commandIssuer;
     private final RandomPlayer target;
     private final boolean bypassEco;
@@ -30,6 +30,11 @@ public class CommonTeleportProperty implements TeleportProperty {
     @Override
     public RandomLocation getLocation() {
         return location;
+    }
+
+    @Override
+    public void setLocation(RandomLocation location) {
+        this.location = location;
     }
 
     @Override

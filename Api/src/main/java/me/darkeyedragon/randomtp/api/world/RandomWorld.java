@@ -48,5 +48,7 @@ public interface RandomWorld {
         return offset;
     }
 
+    boolean isChunkLoaded(int x, int z);
+
     void spawnParticle(RandomParticle<?> particle, RandomLocation spawnLoc, int amount);
 }
