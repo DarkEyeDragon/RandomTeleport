@@ -45,7 +45,7 @@ public class BasicTeleportHandler implements TeleportHandler {
         }*/
         final long delay;
         double price = configHandler.getSectionEconomy().getPrice();
-        if (!property.isBypassEco()) {
+        if (!property.isBypassEco() && price > 0) {
             if (ecoHandler != null) {
                 if (!ecoHandler.hasEnough(player.getUniqueId(), price)) {
                     plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getSubSectionEconomy().getInsufficientFunds());
