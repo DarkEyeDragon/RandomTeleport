@@ -74,10 +74,10 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         for (int x = 2; x < CHUNK_SIZE - 2; x++) {
             for (int z = 2; z < CHUNK_SIZE - 2; z++) {
                 //RandomBlock block = chunk.get((chunk.getX() << CHUNK_SHIFT) + x, (chunk.getZ() << CHUNK_SHIFT) + z);
-                int xChunk = (chunk.getX() << CHUNK_SHIFT) + x;
-                int zChunk = (chunk.getZ() << CHUNK_SHIFT) + z;
+                int xLoc = (chunk.getX() << CHUNK_SHIFT) + x;
+                int zLoc = (chunk.getZ() << CHUNK_SHIFT) + z;
                 int y = chunk.getHighestBlockYAt(x, z);
-                RandomLocation randomLocation = new CommonLocation(chunk.getWorld(), xChunk, y, zChunk);
+                RandomLocation randomLocation = new CommonLocation(chunk.getWorld(), xLoc, y, zLoc);
                 if (isSafe(randomLocation)) {
                     return randomLocation;
                 }
@@ -97,8 +97,8 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
                         RandomChunkSnapshot snapshot = chunkTraverser.next().get();
                         int x = snapshot.getX() << CHUNK_SHIFT;
                         int z = snapshot.getZ() << CHUNK_SHIFT;
-                        int radius = sectionWorldDetail.getOffset().getRadius();
-                        boolean withinBounds = x < radius && z < radius;
+                        Offset offset = sectionWorldDetail.getOffset();
+                        boolean withinBounds = x < offset.getRadius() + offset.getX() && z < offset.getRadius() + offset.getZ();
                         if (withinBounds && isSafeChunk(snapshot)) {
                             return CompletableFuture.completedFuture(snapshot);
                         }
@@ -132,6 +132,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
 
     @Override
     public boolean isSafe(RandomLocation loc) {
+        //In the case the chunk isn't loaded we just assume the locatoin isn't safe.
         RandomWorld world = loc.getWorld();
         if (world == null) return false;
         RandomBlock block = loc.getBlock();
@@ -196,7 +197,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
             boolean isChunkLoaded = location.getWorld().isChunkLoaded(relativeBlock.getLocation().getBlockX() >> CHUNK_SHIFT, relativeBlock.getLocation().getBlockZ() >> CHUNK_SHIFT);
             if (!isChunkLoaded) {
                 System.out.println("Unloaded chunk access");
-                System.out.println(relativeBlock);
+                Thread.dumpStack();
                 return false;
             }
             if (relativeBlock.isEmpty()) return false;

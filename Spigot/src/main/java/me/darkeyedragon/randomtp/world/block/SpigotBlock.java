@@ -58,6 +58,7 @@ public class SpigotBlock implements RandomBlock {
     public String toString() {
         return "SpigotBlock{" +
                 "block=" + block +
+                "world=" + block.getWorld() +
                 '}';
     }
 }
