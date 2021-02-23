@@ -98,7 +98,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
                         int x = snapshot.getX() << CHUNK_SHIFT;
                         int z = snapshot.getZ() << CHUNK_SHIFT;
                         Offset offset = sectionWorldDetail.getOffset();
-                        boolean withinBounds = x < offset.getRadius() + offset.getX() && z < offset.getRadius() + offset.getZ();
+                        boolean withinBounds = (x < offset.getRadius() + offset.getX() && z < offset.getRadius() + offset.getZ()) || (x > offset.getRadius() - offset.getX() && z > offset.getRadius() - offset.getZ());
                         if (withinBounds && isSafeChunk(snapshot)) {
                             return CompletableFuture.completedFuture(snapshot);
                         }
@@ -119,8 +119,8 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         int chunkRadius = offset.getRadius() >> CHUNK_SHIFT;
         int chunkOffsetX = offset.getX() >> CHUNK_SHIFT;
         int chunkOffsetZ = offset.getZ() >> CHUNK_SHIFT;
-        int x = rnd.nextInt(-chunkRadius, chunkRadius);
-        int z = rnd.nextInt(-chunkRadius, chunkRadius);
+        int x = rnd.nextInt(-chunkRadius, chunkRadius + 1);
+        int z = rnd.nextInt(-chunkRadius, chunkRadius + 1);
         RandomWorld world = sectionWorldDetail.getWorld();
         if (world == null) return CompletableFuture.completedFuture(null);
         return world.getChunkAtAsync(world, x + chunkOffsetX, z + chunkOffsetZ);
