@@ -8,7 +8,6 @@ import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.teleport.*;
 import me.darkeyedragon.randomtp.api.world.RandomPlayer;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
-import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
 import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
@@ -128,17 +127,16 @@ public class BasicTeleportHandler implements TeleportHandler {
                 toRandomLocation(player);
                 return;
             }
-            RandomBlock block = chunk.getWorld().getBlockAt(location);
             property.setLocation(property.getLocation().add(0.5, 1.5, 0.5));
             plugin.getCooldownHandler().addCooldown(player, new BasicCooldown(player.getUniqueId(), System.currentTimeMillis(), configHandler.getSectionTeleport().getCooldown()));
             drawWarpParticles(player, property.getParticle());
             player.teleportAsync(property);
-            //PaperLib.teleportAsync(player, loc);
+
             //If deathtimer is enabled add it to the collection
             if (configHandler.getSectionTeleport().getDeathTimer() > 0) {
                 addToDeathTimer(player);
             }
-            if (!property.isBypassEco() && plugin.getEcoHandler() != null) {
+            if (configHandler.getSectionEconomy().useEco() && !property.isBypassEco() && plugin.getEcoHandler() != null) {
                 ecoHandler.makePayment(player.getUniqueId(), configHandler.getSectionEconomy().getPrice());
                 plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getSubSectionEconomy().getPayment());
             }
