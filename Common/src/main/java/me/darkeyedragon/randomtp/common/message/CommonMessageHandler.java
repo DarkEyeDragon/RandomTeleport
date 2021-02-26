@@ -31,9 +31,9 @@ public class CommonMessageHandler implements MessageHandler {
     public void sendMessage(CommandIssuer commandIssuer, Component component) {
         if (MiniMessage.get().serialize(component).isEmpty()) return;
         if (commandIssuer.isPlayer()) {
-            plugin.getAudience().console().sendMessage(component);
-        } else {
             plugin.getAudience().player(commandIssuer.getUniqueId()).sendMessage(component);
+        } else {
+            plugin.getAudience().console().sendMessage(component);
         }
     }
 
