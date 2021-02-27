@@ -13,4 +13,8 @@ public interface SectionWorldDetail {
     boolean useWorldBorder();
 
     boolean needsWorldPermission();
+
+    double getPrice();
+
+    boolean useEco();
 }

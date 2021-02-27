@@ -43,7 +43,7 @@ public class BasicTeleportHandler implements TeleportHandler {
             return;
         }*/
         final long delay;
-        double price = configHandler.getSectionEconomy().getPrice();
+        double price = property.getPrice();
         if (!property.isBypassEco() && price > 0) {
             if (ecoHandler != null) {
                 if (!ecoHandler.hasEnough(player.getUniqueId(), price)) {

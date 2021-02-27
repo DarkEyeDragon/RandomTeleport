@@ -27,7 +27,7 @@ public class LocationFactory {
         } else {
             offset = sectionWorldDetail.getOffset();
         }
-        return new WorldConfigSection(offset, sectionWorldDetail.getWorld(), sectionWorldDetail.useWorldBorder(), sectionWorldDetail.needsWorldPermission());
+        return new WorldConfigSection(offset, sectionWorldDetail.getWorld(), sectionWorldDetail.getPrice(), sectionWorldDetail.useWorldBorder(), sectionWorldDetail.needsWorldPermission());
     }
 
     public RandomConfigHandler getConfigHandler() {

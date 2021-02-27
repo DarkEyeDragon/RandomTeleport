@@ -5,11 +5,9 @@ import me.darkeyedragon.randomtp.api.config.section.SectionEconomy;
 public class ConfigEconomy implements SectionEconomy {
 
     private double price;
-    private boolean useEco;
 
     public ConfigEconomy price(double price) {
         this.price = price;
-        this.useEco = price > 0;
         return this;
     }
 
@@ -29,7 +27,7 @@ public class ConfigEconomy implements SectionEconomy {
      * @return true if price is greater than 0
      */
     public boolean useEco() {
-        return useEco;
+        return price > 0;
     }
 
 }

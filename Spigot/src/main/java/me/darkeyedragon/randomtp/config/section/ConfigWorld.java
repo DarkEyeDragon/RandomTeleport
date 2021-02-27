@@ -58,11 +58,13 @@ public class ConfigWorld implements SectionWorld {
         RandomWorld randomWorld = sectionWorldDetail.getWorld();
         String worldName = randomWorld.getName();
         Offset offset = sectionWorldDetail.getOffset();
+        double price = sectionWorldDetail.getPrice();
         section.set(worldName + ".use_worldborder", sectionWorldDetail.useWorldBorder());
         section.set(worldName + ".needs_world_permission", sectionWorldDetail.needsWorldPermission());
         section.set(worldName + ".radius", offset.getRadius());
         section.set(worldName + ".offsetX", offset.getX());
         section.set(worldName + ".offsetZ", offset.getZ());
+        section.set(worldName + ".price", price);
         plugin.getPlugin().saveConfig();
         return sectionWorldDetailSet.add(sectionWorldDetail);
     }

@@ -155,12 +155,20 @@ public class RandomTeleportCommand extends BaseCommand {
     }
 
     private void teleport(CommandIssuer sender, RandomPlayer player, RandomWorld world) {
-        final boolean useEco = configHandler.getSectionEconomy().useEco();
+        final SectionWorldDetail worldDetail = plugin.getConfigHandler().getSectionWorld().getSectionWorldDetail(world);
+        final boolean useWorldEco = worldDetail.useEco();
+        final boolean useGlobalEco = configHandler.getSectionEconomy().useEco();
+        double price = 0;
+        if (useWorldEco) {
+            price = configHandler.getSectionEconomy().getPrice();
+        } else if (useGlobalEco) {
+            price = worldDetail.getPrice();
+        }
         boolean bypassDelay = player.hasPermission("rtp.teleportdelay.bypass") || sender.hasPermission("rtp.teleportdelay.bypass");
-        boolean bypasCooldown = player.hasPermission("rtp.teleport.bypass") || sender.hasPermission("rtp.teleport.bypass");
-        boolean bypassEco = useEco && (player.hasPermission("rtp.eco.bypass") || sender.hasPermission("rtp.eco.bypass"));
+        boolean bypassCooldown = player.hasPermission("rtp.teleport.bypass") || sender.hasPermission("rtp.teleport.bypass");
+        boolean bypassEco = player.hasPermission("rtp.eco.bypass") || sender.hasPermission("rtp.eco.bypass");
         RandomLocation location = worldQueue.popLocation(world);
-        TeleportProperty teleportProperty = new CommonTeleportProperty(location, sender, player, bypassEco, bypassDelay, bypasCooldown, configTeleport.getParticle());
+        TeleportProperty teleportProperty = new CommonTeleportProperty(location, sender, player, price, bypassEco, bypassDelay, bypassCooldown, configTeleport.getParticle());
         BasicTeleportHandler teleportHandler = new BasicTeleportHandler(plugin, teleportProperty);
         teleportHandler.toRandomLocation(player);
     }
@@ -182,9 +190,9 @@ public class RandomTeleportCommand extends BaseCommand {
 
     @Subcommand("addworld")
     @CommandPermission("rtp.admin.addworld")
-    @Syntax("<world> <useWorldBorder> <needsWorldPermission> [radius] [offsetX] [offsetZ]")
+    @Syntax("<world> <useWorldBorder> <needsWorldPermission> [price] [radius] [offsetX] [offsetZ]")
     @CommandCompletion("@worlds true|false true|false")
-    public void onAddWorld(CommandIssuer sender, RandomWorld randomWorld, boolean useWorldBorder, boolean needsWorldPermission, @Optional Integer radius, @Optional Integer offsetX, @Optional Integer offsetZ) {
+    public void onAddWorld(CommandIssuer sender, RandomWorld randomWorld, boolean useWorldBorder, boolean needsWorldPermission, @Optional double price, @Optional Integer radius, @Optional Integer offsetX, @Optional Integer offsetZ) {
         if (!useWorldBorder && (radius == null || offsetX == null || offsetZ == null)) {
             messageHandler.sendMessage(sender, "<gold>If <aqua>useWorldBorder<gold> is false you need to provide the other parameters.");
             throw new InvalidCommandArgument(true);
@@ -195,7 +203,7 @@ public class RandomTeleportCommand extends BaseCommand {
                 if (offsetX == null) offsetX = 0;
                 if (offsetZ == null) offsetZ = 0;
             }
-            if (configWorld.add(new WorldConfigSection(new Offset(offsetX, offsetZ, radius), randomWorld, useWorldBorder, needsWorldPermission))) {
+            if (configWorld.add(new WorldConfigSection(new Offset(offsetX, offsetZ, radius), randomWorld, price, useWorldBorder, needsWorldPermission))) {
                 plugin.getWorldHandler().getWorldQueue().put(randomWorld, new LocationQueue(plugin, configQueue.getSize(), LocationSearcherFactory.getLocationSearcher(randomWorld, plugin)));
             }
             LocationQueue locationQueue = worldQueue.get(randomWorld);

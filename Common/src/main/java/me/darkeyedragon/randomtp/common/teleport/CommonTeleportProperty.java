@@ -16,12 +16,14 @@ public class CommonTeleportProperty implements TeleportProperty {
     private final boolean bypassTeleportDelay;
     private final boolean bypassCooldown;
     private final RandomParticle<?> particle;
+    private final double price;
 
-    public CommonTeleportProperty(RandomLocation location, CommandIssuer commandIssuer, RandomPlayer target, boolean bypassEco, boolean bypassTeleportDelay, boolean bypassCooldown, RandomParticle<?> particle) {
+    public CommonTeleportProperty(RandomLocation location, CommandIssuer commandIssuer, RandomPlayer target, double price, boolean bypassEco, boolean bypassTeleportDelay, boolean bypassCooldown, RandomParticle<?> particle) {
         this.location = location;
         this.commandIssuer = commandIssuer;
         this.target = target;
         this.bypassEco = bypassEco;
+        this.price = price;
         this.bypassTeleportDelay = bypassTeleportDelay;
         this.bypassCooldown = bypassCooldown;
         this.particle = particle;
@@ -70,5 +72,10 @@ public class CommonTeleportProperty implements TeleportProperty {
     @Override
     public RandomWorld getWorld() {
         return location.getWorld();
+    }
+
+    @Override
+    public double getPrice() {
+        return price;
     }
 }

@@ -10,12 +10,14 @@ public class WorldConfigSection implements SectionWorldDetail {
     private final RandomWorld world;
     private final boolean useWorldBorder;
     private final boolean needsWorldPermission;
+    private final double price;
 
-    public WorldConfigSection(Offset offset, RandomWorld world, boolean useWorldBorder, boolean needsWorldPermission) {
+    public WorldConfigSection(Offset offset, RandomWorld world, double price, boolean useWorldBorder, boolean needsWorldPermission) {
         this.offset = offset;
         this.world = world;
         this.useWorldBorder = useWorldBorder;
         this.needsWorldPermission = needsWorldPermission;
+        this.price = price;
     }
 
     @Override
@@ -41,5 +43,15 @@ public class WorldConfigSection implements SectionWorldDetail {
     @Override
     public boolean needsWorldPermission() {
         return needsWorldPermission;
+    }
+
+    @Override
+    public double getPrice() {
+        return price;
+    }
+
+    @Override
+    public boolean useEco() {
+        return price > 0;
     }
 }

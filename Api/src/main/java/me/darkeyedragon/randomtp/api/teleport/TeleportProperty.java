@@ -24,4 +24,6 @@ public interface TeleportProperty {
     RandomParticle<?> getParticle();
 
     RandomWorld getWorld();
+
+    double getPrice();
 }

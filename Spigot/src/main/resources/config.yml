@@ -35,6 +35,7 @@ worlds:
     radius: 21474836
     offsetX: 0
     offsetZ: 0
+    price: 0
 teleport:
   #m = minutes, s = seconds
   #default: "60m"
@@ -68,8 +69,10 @@ debug:
   #Shows debug messages in game on the execution times of the entire teleport process.
   #Normally only enable to figure out what is causing teleport delays.
   show_execution_times: false
+#Default price for worlds without a price defined.
+#0 to disable
 economy:
-  price: 0
+  default_price: 0
 #The items to blacklist. Block uses the Material enum for names, find all of them here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
 #Blocks also support Tags ($PRESSURE_PLATES = all types of pressure plates) a full list can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Tag.html
 #All Tags are prefixed with $

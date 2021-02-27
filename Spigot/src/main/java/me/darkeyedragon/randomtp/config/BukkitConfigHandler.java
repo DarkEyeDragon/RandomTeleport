@@ -181,6 +181,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
             int radius = section.getInt(key + ".radius");
             int offsetX = section.getInt(key + ".offsetX");
             int offsetZ = section.getInt(key + ".offsetZ");
+            double price = section.getDouble(key + ".price");
             plugin.getLogger().info(ChatColor.GREEN + key + " found! Loading...");
             RandomWorld randomWorld = WorldUtil.toRandomWorld(world);
             Offset offset;
@@ -189,7 +190,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
             } else {
                 offset = new Offset(offsetX, offsetZ, radius);
             }
-            sectionWorldDetailSet.add(new WorldConfigSection(offset, randomWorld, useWorldBorder, needsWorldPermission));
+            sectionWorldDetailSet.add(new WorldConfigSection(offset, randomWorld, price, useWorldBorder, needsWorldPermission));
         }
         return sectionWorldDetailSet;
     }
@@ -199,7 +200,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
     }
 
     private double getPrice() {
-        return plugin.getConfig().getDouble("economy.price", 0);
+        return plugin.getConfig().getDouble("economy.default_price", 0);
     }
 
     private String getPaymentMessage() {
