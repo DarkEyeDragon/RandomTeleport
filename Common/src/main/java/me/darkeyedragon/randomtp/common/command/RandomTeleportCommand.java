@@ -175,9 +175,9 @@ public class RandomTeleportCommand extends BaseCommand {
 
     @Subcommand("reload")
     @CommandPermission("rtp.admin.reload")
+    @Description("Reload the rtp config")
     public void onReload(CommandIssuer sender) {
-        sender.sendMessage("<green>Reloading config...");
-        plugin.getConfigHandler().saveConfig();
+        messageHandler.sendMessage(sender, "<green>Reloading config...");
         plugin.reloadConfig();
         //Set the new config object references
         setConfigs();
