@@ -1,6 +1,5 @@
 package me.darkeyedragon.randomtp.api.world;
 
-import me.darkeyedragon.randomtp.api.teleport.RandomParticle;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
@@ -50,5 +49,5 @@ public interface RandomWorld {
 
     boolean isChunkLoaded(int x, int z);
 
-    void spawnParticle(RandomParticle<?> particle, RandomLocation spawnLoc, int amount);
+    void spawnParticle(String particleId, RandomLocation spawnLoc, int amount);
 }

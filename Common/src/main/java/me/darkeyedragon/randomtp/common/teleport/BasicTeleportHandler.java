@@ -6,6 +6,7 @@ import me.darkeyedragon.randomtp.api.eco.EcoHandler;
 import me.darkeyedragon.randomtp.api.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.teleport.*;
+import me.darkeyedragon.randomtp.api.world.RandomParticle;
 import me.darkeyedragon.randomtp.api.world.RandomPlayer;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
@@ -110,9 +111,9 @@ public class BasicTeleportHandler implements TeleportHandler {
         plugin.getDeathTracker().add(player, configHandler.getSectionTeleport().getDeathTimer());
     }
 
-    private void drawWarpParticles(RandomPlayer player, RandomParticle<?> particle) {
+    private void drawWarpParticles(RandomPlayer player, RandomParticle particle) {
         RandomLocation spawnLoc = player.getEyeLocation().add(player.getLocation().getDirection());
-        player.getWorld().spawnParticle(particle, spawnLoc, particle.getAmount());
+        player.getWorld().spawnParticle(particle.getId(), spawnLoc, particle.getAmount());
     }
 
     private void teleport(RandomPlayer player) {

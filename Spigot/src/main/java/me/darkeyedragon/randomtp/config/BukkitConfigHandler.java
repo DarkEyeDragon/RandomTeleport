@@ -6,11 +6,12 @@ import me.darkeyedragon.randomtp.api.config.DimensionData;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.config.section.*;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
-import me.darkeyedragon.randomtp.api.teleport.TeleportParticle;
+import me.darkeyedragon.randomtp.api.world.RandomParticle;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.common.config.Blacklist;
 import me.darkeyedragon.randomtp.common.util.TimeUtil;
+import me.darkeyedragon.randomtp.common.world.CommonParticle;
 import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
 import me.darkeyedragon.randomtp.config.section.*;
 import me.darkeyedragon.randomtp.util.WorldUtil;
@@ -21,6 +22,7 @@ import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.List;
@@ -345,21 +347,22 @@ public class BukkitConfigHandler implements RandomConfigHandler {
         return dimensionData;
     }
 
-    private TeleportParticle<Particle> getParticle() {
+    @Nullable
+    private RandomParticle getParticle() {
         ConfigurationSection section = plugin.getConfig().getConfigurationSection("teleport");
         String particleString = section.getString("particle");
         if (particleString == null || particleString.equalsIgnoreCase("none")) {
-            return new TeleportParticle<>(null, 0);
+            return new CommonParticle(null, 0);
         }
         String[] split = particleString.split(":");
         try {
-            Particle particle = Particle.valueOf(split[0].toUpperCase());
+            String particleId = split[0].toUpperCase();
             int amount = Integer.parseInt(split[1]);
-            return new TeleportParticle<>(particle, amount);
+            return new CommonParticle(particleId, amount);
         } catch (IllegalArgumentException exception) {
             exception.printStackTrace();
         }
-        return new TeleportParticle<>(null, 0);
+        return null;
     }
 
     private boolean getUseDefault() {

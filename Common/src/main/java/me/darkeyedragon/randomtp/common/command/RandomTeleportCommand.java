@@ -18,8 +18,8 @@ import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
-import me.darkeyedragon.randomtp.api.teleport.RandomParticle;
 import me.darkeyedragon.randomtp.api.teleport.TeleportProperty;
+import me.darkeyedragon.randomtp.api.world.RandomParticle;
 import me.darkeyedragon.randomtp.api.world.RandomPlayer;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.Offset;
@@ -29,6 +29,7 @@ import me.darkeyedragon.randomtp.common.queue.CommonQueueListener;
 import me.darkeyedragon.randomtp.common.teleport.BasicTeleportHandler;
 import me.darkeyedragon.randomtp.common.teleport.CommonTeleportProperty;
 import me.darkeyedragon.randomtp.common.util.TimeUtil;
+import me.darkeyedragon.randomtp.common.world.CommonParticle;
 import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
 import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
 
@@ -346,67 +347,70 @@ public class RandomTeleportCommand extends BaseCommand {
         }
     }
 
-    @Subcommand("teleport")
-    public class TeleportSettingsCommand {
+    @Subcommand("delay")
+    @CommandPermission("rtp.admin.delay")
+    @Description("Set the cooldown before teleports")
+    @Syntax("<time>")
+    @CommandCompletion("1s|1m|1h")
+    public void setDelay(CommandIssuer sender, String time) {
+        try {
+            long delay = TimeUtil.stringToLong(time);
+            configTeleport.setCooldown(delay);
+            sendConfigSuccessMessage(sender);
+        } catch (NumberFormatException ex) {
+            sender.sendMessage("<red>Unable to parse time: " + ex.getMessage());
+        }
+    }
 
-        @Subcommand("setcooldown")
+    @Subcommand("cancelonmove")
+    @CommandPermission("rtp.admin.cancel_on_move")
+    public void setCancelOnMove(CommandIssuer sender, boolean cancelOnMove) {
+        configTeleport.setCancelOnMove(cancelOnMove);
+        sendConfigSuccessMessage(sender);
+    }
+
+    @Subcommand("setparticle")
+    @CommandPermission("rtp.admin.particle")
+    @CommandCompletion("@particles")
+    public void setParticle(CommandIssuer sender, String particleName, int amount) {
+        RandomParticle particle = new CommonParticle(particleName, amount);
+        configTeleport.setParticle(particle);
+        sendConfigSuccessMessage(sender);
+    }
+
+    @Subcommand("defaultworld")
+    @CommandPermission("rtp.admin.use_default_world")
+    public void setUseDefaultWorld(CommandIssuer sender, boolean useDefaultWorld) {
+        configTeleport.setUseDefaultWorld(useDefaultWorld);
+        sendConfigSuccessMessage(sender);
+    }
+
+    @Subcommand("setdefaultworld")
+    @CommandPermission("rtp.admin.default_world")
+    @CommandCompletion("@worlds")
+    public void setDefaultWorld(CommandIssuer sender, String world) {
+        configTeleport.setDefaultWorld(world);
+        sendConfigSuccessMessage(sender);
+    }
+
+    private void sendConfigSuccessMessage(CommandIssuer sender) {
+        sender.sendMessage("<green>Configuration has been updated.");
+    }
+
+    @Subcommand("set")
+    public class SetValues {
+        @Subcommand("cooldown")
         @CommandPermission("rtp.admin.cooldown")
+        @Description("Set the cooldown between teleports")
+        @Syntax("<time>")
+        @CommandCompletion("1s|1m|1h")
         public void setCooldown(CommandIssuer sender, String time) {
             try {
                 long cooldown = TimeUtil.stringToLong(time);
                 configTeleport.setCooldown(cooldown);
             } catch (NumberFormatException ex) {
-                sender.sendMessage("<red>Unable to parse time: " + ex.getMessage());
+                plugin.getMessageHandler().sendMessage(sender, "<red>Unable to parse time: " + ex.getMessage());
             }
-        }
-
-        @Subcommand("setdelay")
-        @CommandPermission("rtp.admin.delay")
-        public void setDelay(CommandIssuer sender, String time) {
-            try {
-                long delay = TimeUtil.stringToLong(time);
-                configTeleport.setCooldown(delay);
-                sendConfigSuccessMessage(sender);
-            } catch (NumberFormatException ex) {
-                sender.sendMessage("<red>Unable to parse time: " + ex.getMessage());
-            }
-        }
-
-        @Subcommand("setcancelonmove")
-        @CommandPermission("rtp.admin.cancel_on_move")
-        public void setCancelOnMove(CommandIssuer sender, boolean cancelOnMove) {
-            configTeleport.setCancelOnMove(cancelOnMove);
-            sendConfigSuccessMessage(sender);
-        }
-
-        @Subcommand("setparticle")
-        @CommandPermission("rtp.admin.particle")
-        @CommandCompletion("@particles")
-        public void setParticle(CommandIssuer sender, String particleType, int amount) {
-            //TODO implement
-            RandomParticle<?> particle = null;
-            configTeleport.setParticle(particle);
-            sendConfigSuccessMessage(sender);
-        }
-
-        @Subcommand("setusedefaultworld")
-        @CommandPermission("rtp.admin.use_default_world")
-        public void setUseDefaultWorld(CommandIssuer sender, boolean useDefaultWorld) {
-            configTeleport.setUseDefaultWorld(useDefaultWorld);
-            sendConfigSuccessMessage(sender);
-        }
-
-        @Subcommand("setdefaultworld")
-        @CommandPermission("rtp.admin.default_world")
-        @CommandCompletion("@worlds")
-        public void setDefaultWorld(CommandIssuer sender, String world) {
-            configTeleport.setDefaultWorld(world);
-            sendConfigSuccessMessage(sender);
-        }
-
-        private void sendConfigSuccessMessage(CommandIssuer sender) {
-            sender.sendMessage("<green>Configuration has been updated.");
         }
     }
-
 }
