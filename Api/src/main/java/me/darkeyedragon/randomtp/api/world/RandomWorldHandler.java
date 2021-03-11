@@ -12,5 +12,7 @@ public interface RandomWorldHandler {
 
     void populateWorldQueue();
 
+    void populateWorld(RandomWorld world);
+
     RandomWorld getWorld(String worldName);
 }

@@ -31,16 +31,22 @@ public abstract class WorldHandler implements RandomWorldHandler {
         plugin.getLogger().info("Populating WorldQueue");
         long startTime = System.currentTimeMillis();
         for (RandomWorld world : configHandler.getSectionWorld().getWorlds()) {
-            //Add a new world to the world queue and generate random locations
-            LocationQueue locationQueue = new LocationQueue(plugin, configHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(world, plugin));
-
-            //Subscribe to the locationqueue to be notified of changes
-            subscribe(locationQueue, world);
-            SectionWorldDetail sectionWorldDetail = configHandler.getSectionWorld().getSectionWorldDetail(world);
-            locationQueue.generate(sectionWorldDetail);
-            plugin.getWorldHandler().getWorldQueue().put(world, locationQueue);
+            populateWorld(world);
         }
         plugin.getLogger().info("WorldQueue population finished in " + (System.currentTimeMillis() - startTime) + "ms");
+    }
+
+    @Override
+    public final void populateWorld(RandomWorld world) {
+        //Add a new world to the world queue and generate random locations
+        RandomConfigHandler configHandler = plugin.getConfigHandler();
+        LocationQueue locationQueue = new LocationQueue(plugin, configHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(world, plugin));
+
+        //Subscribe to the locationqueue to be notified of changes
+        subscribe(locationQueue, world);
+        SectionWorldDetail sectionWorldDetail = configHandler.getSectionWorld().getSectionWorldDetail(world);
+        locationQueue.generate(sectionWorldDetail);
+        plugin.getWorldHandler().getWorldQueue().put(world, locationQueue);
     }
 
     public void subscribe(LocationQueue locationQueue, RandomWorld world) {
