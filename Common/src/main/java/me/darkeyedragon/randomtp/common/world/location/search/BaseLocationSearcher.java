@@ -126,13 +126,8 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         return world.getChunkAtAsync(world, x + chunkOffsetX, z + chunkOffsetZ);
     }
 
-    public void isDuplicate(RandomLocation loc) {
-
-    }
-
     @Override
     public boolean isSafe(RandomLocation loc) {
-        //In the case the chunk isn't loaded we just assume the locatoin isn't safe.
         RandomWorld world = loc.getWorld();
         if (world == null) return false;
         RandomBlock block = loc.getBlock();
