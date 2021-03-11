@@ -46,7 +46,7 @@ public class LocationQueue extends ObservableQueue<RandomLocation> {
                 worker.get().run();
             }
         }).exceptionally(throwable -> {
-            plugin.getLogger().warn(throwable.getMessage());
+            throwable.printStackTrace();
             return null;
         }));
         int workersToStart = Math.min(amount, MAX_CONCURRENT);
