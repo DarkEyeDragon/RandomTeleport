@@ -6,6 +6,8 @@ import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.world.RandomPlayer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.apache.commons.lang3.Validate;
+import org.jetbrains.annotations.NotNull;
 
 public class CommonMessageHandler implements MessageHandler {
 
@@ -40,5 +42,20 @@ public class CommonMessageHandler implements MessageHandler {
     @Override
     public void sendMessage(CommandIssuer commandIssuer, String message) {
         sendMessage(commandIssuer, MiniMessage.get().parse(message));
+    }
+
+    @NotNull
+    public static String translateAlternateColorCodes(char altColorChar, @NotNull String textToTranslate) {
+        Validate.notNull(textToTranslate, "Cannot translate null text");
+        char[] b = textToTranslate.toCharArray();
+
+        for (int i = 0; i < b.length - 1; ++i) {
+            if (b[i] == altColorChar && "0123456789AaBbCcDdEeFfKkLlMmNnOoRrXx".indexOf(b[i + 1]) > -1) {
+                b[i] = 167;
+                b[i + 1] = Character.toLowerCase(b[i + 1]);
+            }
+        }
+
+        return new String(b);
     }
 }
