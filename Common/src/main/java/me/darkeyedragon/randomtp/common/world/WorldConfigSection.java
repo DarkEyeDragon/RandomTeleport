@@ -2,17 +2,17 @@ package me.darkeyedragon.randomtp.common.world;
 
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
-import me.darkeyedragon.randomtp.api.world.location.Offset;
+import me.darkeyedragon.randomtp.api.world.location.RandomOffset;
 
 public class WorldConfigSection implements SectionWorldDetail {
 
-    private final Offset offset;
+    private final RandomOffset offset;
     private final RandomWorld world;
     private final boolean useWorldBorder;
     private final boolean needsWorldPermission;
     private final double price;
 
-    public WorldConfigSection(Offset offset, RandomWorld world, double price, boolean useWorldBorder, boolean needsWorldPermission) {
+    public WorldConfigSection(RandomOffset offset, RandomWorld world, double price, boolean useWorldBorder, boolean needsWorldPermission) {
         this.offset = offset;
         this.world = world;
         this.useWorldBorder = useWorldBorder;
@@ -26,7 +26,7 @@ public class WorldConfigSection implements SectionWorldDetail {
     }
 
     @Override
-    public Offset getOffset() {
+    public RandomOffset getOffset() {
         return offset;
     }
 

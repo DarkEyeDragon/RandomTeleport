@@ -1,6 +1,8 @@
-package me.darkeyedragon.randomtp.api.world.location;
+package me.darkeyedragon.randomtp.common.world.location;
 
-public class Offset {
+import me.darkeyedragon.randomtp.api.world.location.RandomOffset;
+
+public class Offset implements RandomOffset {
     private int x;
     private int z;
     private int radius;

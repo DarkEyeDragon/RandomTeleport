@@ -1,5 +1,6 @@
-package me.darkeyedragon.randomtp.api.config;
+package me.darkeyedragon.randomtp.common.config;
 
+import me.darkeyedragon.randomtp.api.config.RandomDimensionData;
 import me.darkeyedragon.randomtp.api.world.RandomBiome;
 import me.darkeyedragon.randomtp.api.world.RandomBlockType;
 
@@ -7,7 +8,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class DimensionData {
+public class DimensionData implements RandomDimensionData {
     private final Set<RandomBlockType> blockTypes;
     private final Set<RandomBiome> biomes;
 

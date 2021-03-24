@@ -4,8 +4,8 @@ import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.RandomWorldBorder;
-import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.api.world.location.RandomOffset;
 import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
 
 public class LocationFactory {
@@ -18,7 +18,7 @@ public class LocationFactory {
 
     public WorldConfigSection getWorldConfigSection(RandomWorld randomWorld){
         SectionWorldDetail sectionWorldDetail = configHandler.getSectionWorld().getSectionWorldDetail(randomWorld);
-        Offset offset;
+        RandomOffset offset;
         if(sectionWorldDetail == null) return null;
         if (sectionWorldDetail.useWorldBorder()) {
             RandomWorldBorder worldBorder = sectionWorldDetail.getWorld().getWorldBorder();

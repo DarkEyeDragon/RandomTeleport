@@ -1,18 +1,21 @@
 package me.darkeyedragon.randomtp.config;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
+import me.darkeyedragon.randomtp.SpigotImpl;
 import me.darkeyedragon.randomtp.api.config.Dimension;
-import me.darkeyedragon.randomtp.api.config.DimensionData;
-import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
+import me.darkeyedragon.randomtp.api.config.RandomDimensionData;
 import me.darkeyedragon.randomtp.api.config.section.*;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.world.RandomParticle;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
-import me.darkeyedragon.randomtp.api.world.location.Offset;
+import me.darkeyedragon.randomtp.api.world.location.RandomOffset;
 import me.darkeyedragon.randomtp.common.config.Blacklist;
+import me.darkeyedragon.randomtp.common.config.CommonConfigHandler;
+import me.darkeyedragon.randomtp.common.config.DimensionData;
 import me.darkeyedragon.randomtp.common.util.TimeUtil;
 import me.darkeyedragon.randomtp.common.world.CommonParticle;
 import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
+import me.darkeyedragon.randomtp.common.world.location.Offset;
 import me.darkeyedragon.randomtp.config.section.*;
 import me.darkeyedragon.randomtp.util.WorldUtil;
 import me.darkeyedragon.randomtp.world.SpigotBiome;
@@ -20,8 +23,6 @@ import me.darkeyedragon.randomtp.world.SpigotBlockType;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -31,10 +32,9 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class BukkitConfigHandler implements RandomConfigHandler {
+public class BukkitConfigHandler extends CommonConfigHandler {
 
-    private final RandomTeleport instance;
-    private final JavaPlugin plugin;
+    private final SpigotImpl plugin;
     private ConfigMessage configMessage;
     private ConfigQueue configQueue;
     private ConfigWorld configWorld;
@@ -44,7 +44,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
     private ConfigBlacklist configBlacklist;
 
     public BukkitConfigHandler(RandomTeleport instance) {
-        this.instance = instance;
+        super(instance);
         this.plugin = instance.getPlugin();
     }
 
@@ -52,7 +52,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
      * (re)loads the config.
      * When invalid fiels are found, they will be defaulted to prevent errors.
      */
-    public void reload() throws InvalidConfigurationException {
+    public boolean reload() {
         populateConfigMessage();
         populateConfigQueue();
         populateWorldConfigSection();
@@ -60,9 +60,10 @@ public class BukkitConfigHandler implements RandomConfigHandler {
         populateConfigDebug();
         populateConfigEconomy();
         populateBlacklist();
+        return true;
     }
 
-    public void populateBlacklist() throws InvalidConfigurationException {
+    public void populateBlacklist() {
         configBlacklist = new ConfigBlacklist(getBlacklist());
     }
 
@@ -90,7 +91,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
     }
 
     public void populateWorldConfigSection() {
-        configWorld = new ConfigWorld(instance, getOffsets());
+        configWorld = new ConfigWorld(plugin, getOffsets());
     }
 
     public void populateConfigTeleport() {
@@ -175,7 +176,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
         for (String key : keys) {
             World world = Bukkit.getWorld(key);
             if (world == null) {
-                instance.getInstance().getLogger().warn("World " + key + " does not exist! Skipping...");
+                randomTeleportPlugin.getLogger().warn("World " + key + " does not exist! Skipping...");
                 continue;
             }
             boolean useWorldBorder = section.getBoolean(key + ".use_worldborder");
@@ -186,7 +187,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
             double price = section.getDouble(key + ".price");
             plugin.getLogger().info(ChatColor.GREEN + key + " found! Loading...");
             RandomWorld randomWorld = WorldUtil.toRandomWorld(world);
-            Offset offset;
+            RandomOffset offset;
             if (useWorldBorder) {
                 offset = RandomWorld.getOffset(randomWorld);
             } else {
@@ -269,7 +270,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
         return plugin.getConfig().getStringList("message.sign");
     }
 
-    public Blacklist getBlacklist() throws InvalidConfigurationException {
+    public Blacklist getBlacklist() {
         Blacklist blacklist = new Blacklist();
         for (Dimension dimension : Dimension.values()) {
             blacklist.addDimensionData(dimension, getDimData(dimension));
@@ -277,10 +278,10 @@ public class BukkitConfigHandler implements RandomConfigHandler {
         return blacklist;
     }
 
-    private DimensionData getDimData(Dimension dimension) throws InvalidConfigurationException {
+    private RandomDimensionData getDimData(Dimension dimension) {
         ConfigurationSection blacklistSec = plugin.getConfig().getConfigurationSection("blacklist");
-        if (blacklistSec == null) throw new InvalidConfigurationException("blacklist section missing!");
-        DimensionData dimensionData = new DimensionData();
+        if (blacklistSec == null) return null;
+        RandomDimensionData dimensionData = new DimensionData();
 
         ConfigurationSection section;
         switch (dimension) {
@@ -300,7 +301,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
                 section = null;
                 break;
         }
-        if (section == null) throw new InvalidConfigurationException("blacklist.global section missing!");
+        if (section == null) return null;
         List<String> blockStrings = section.getStringList("block");
         Material[] materials = Material.values();
         for (String s : blockStrings) {
@@ -321,7 +322,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
                         try {
                             dimensionData.addBlockType(new SpigotBlockType(Material.valueOf(matcher.group(0))));
                         } catch (IllegalArgumentException ex) {
-                            instance.getInstance().getLogger().warn(s + " is not a valid block.");
+                            super.randomTeleportPlugin.getLogger().warn(s + " is not a valid block.");
                         }
                     }
                 }
@@ -339,7 +340,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
                     try {
                         dimensionData.addBiome(new SpigotBiome(Biome.valueOf(s.toUpperCase())));
                     } catch (IllegalArgumentException ex) {
-                        instance.getInstance().getLogger().warn(s + " is not a valid biome.");
+                        randomTeleportPlugin.getLogger().warn(s + " is not a valid biome.");
                     }
                 }
             }

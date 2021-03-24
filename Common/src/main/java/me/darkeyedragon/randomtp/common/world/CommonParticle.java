@@ -21,4 +21,9 @@ public class CommonParticle implements RandomParticle {
     public int getAmount() {
         return amount;
     }
+
+    @Override
+    public String toString() {
+        return id + ":" + amount;
+    }
 }

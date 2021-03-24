@@ -22,7 +22,6 @@ import me.darkeyedragon.randomtp.api.teleport.TeleportProperty;
 import me.darkeyedragon.randomtp.api.world.RandomParticle;
 import me.darkeyedragon.randomtp.api.world.RandomPlayer;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
-import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.common.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.common.queue.CommonQueueListener;
@@ -31,6 +30,7 @@ import me.darkeyedragon.randomtp.common.teleport.CommonTeleportProperty;
 import me.darkeyedragon.randomtp.common.util.TimeUtil;
 import me.darkeyedragon.randomtp.common.world.CommonParticle;
 import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
+import me.darkeyedragon.randomtp.common.world.location.Offset;
 import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
 
 import java.util.ArrayList;

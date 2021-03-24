@@ -1,4 +1,4 @@
-message:
+messages:
   initteleport: "&aSearching for safe location to teleport to..."
   #Used when teleport delay is larger than 0. This supports placeholders
   #valid placeholders: %hp (hours partial) %mp (minutes partial) %sp (seconds partial) %h (total hours) %m (total minutes) %s(total seconds)

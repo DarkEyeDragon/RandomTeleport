@@ -12,4 +12,6 @@ public interface RandomConfigHandler {
     SectionBlacklist getSectionBlacklist();
 
     void saveConfig();
+
+    boolean reload();
 }

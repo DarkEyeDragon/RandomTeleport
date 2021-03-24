@@ -1,21 +1,16 @@
 package me.darkeyedragon.randomtp.world;
 
-import me.darkeyedragon.randomtp.api.world.RandomBlockType;
-import me.darkeyedragon.randomtp.api.world.RandomMaterial;
+import me.darkeyedragon.randomtp.common.world.block.CommonBlockType;
 import me.darkeyedragon.randomtp.world.block.SpigotMaterial;
 import org.bukkit.Material;
 
-public class SpigotBlockType implements RandomBlockType {
+public class SpigotBlockType extends CommonBlockType {
 
     private final Material material;
 
     public SpigotBlockType(Material material) {
+        super(new SpigotMaterial(material));
         this.material = material;
-    }
-
-    @Override
-    public RandomMaterial getType() {
-        return new SpigotMaterial(material);
     }
 
     @Override

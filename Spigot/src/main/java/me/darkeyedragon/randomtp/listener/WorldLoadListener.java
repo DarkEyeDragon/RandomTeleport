@@ -1,17 +1,16 @@
 package me.darkeyedragon.randomtp.listener;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
-import me.darkeyedragon.randomtp.config.BukkitConfigHandler;
 import org.bukkit.event.Listener;
 
 public class WorldLoadListener implements Listener {
 
-    private final BukkitConfigHandler bukkitConfigHandler;
+    //private final BukkitConfigHandler bukkitConfigHandler;
     private final RandomTeleport plugin;
 
     public WorldLoadListener(RandomTeleport plugin) {
         this.plugin = plugin;
-        this.bukkitConfigHandler = plugin.getConfigHandler();
+        //this.bukkitConfigHandler = plugin.getConfigHandler();
     }
 
     /*@EventHandler

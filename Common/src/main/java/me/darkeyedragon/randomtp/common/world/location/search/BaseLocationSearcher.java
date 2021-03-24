@@ -2,8 +2,8 @@ package me.darkeyedragon.randomtp.common.world.location.search;
 
 import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
 import me.darkeyedragon.randomtp.api.config.Dimension;
-import me.darkeyedragon.randomtp.api.config.DimensionData;
 import me.darkeyedragon.randomtp.api.config.RandomBlacklist;
+import me.darkeyedragon.randomtp.api.config.RandomDimensionData;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.world.RandomBiome;
 import me.darkeyedragon.randomtp.api.world.RandomBlockType;
@@ -11,8 +11,8 @@ import me.darkeyedragon.randomtp.api.world.RandomChunkSnapshot;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.block.BlockFace;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
-import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.api.world.location.RandomOffset;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
 import me.darkeyedragon.randomtp.common.exception.NoRandomLocationFoundException;
 import me.darkeyedragon.randomtp.common.util.ChunkTraverser;
@@ -97,7 +97,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
                         RandomChunkSnapshot snapshot = chunkTraverser.next().get();
                         int x = snapshot.getX() << CHUNK_SHIFT;
                         int z = snapshot.getZ() << CHUNK_SHIFT;
-                        Offset offset = sectionWorldDetail.getOffset();
+                        RandomOffset offset = sectionWorldDetail.getOffset();
                         boolean withinBounds = (x < offset.getRadius() + offset.getX() && z < offset.getRadius() + offset.getZ()) || (x > offset.getRadius() - offset.getX() && z > offset.getRadius() - offset.getZ());
                         if (withinBounds && isSafeChunk(snapshot)) {
                             return CompletableFuture.completedFuture(snapshot);
@@ -115,7 +115,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
 
     CompletableFuture<RandomChunkSnapshot> getRandomChunkAsync(SectionWorldDetail sectionWorldDetail) {
         ThreadLocalRandom rnd = ThreadLocalRandom.current();
-        Offset offset = sectionWorldDetail.getOffset();
+        RandomOffset offset = sectionWorldDetail.getOffset();
         int chunkRadius = offset.getRadius() >> CHUNK_SHIFT;
         int chunkOffsetX = offset.getX() >> CHUNK_SHIFT;
         int chunkOffsetZ = offset.getZ() >> CHUNK_SHIFT;
@@ -135,7 +135,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         RandomBlockType blockType = loc.getBlock().getBlockType();
         //Check if it passes the global blacklist
         if (!isValidGlobalBlockType(loc)) return false;
-        DimensionData dimensionData = blacklist.getDimensionData(dimension);
+        RandomDimensionData dimensionData = blacklist.getDimensionData(dimension);
         //Check if it passes the dimension blacklist
         if (dimensionData.getBlockTypes().contains(blockType)) return false;
         if (block.isPassable()) return false;
@@ -209,13 +209,13 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
      */
     protected boolean isValidGlobalBlockType(RandomLocation location) {
         RandomBlock randomBlock = location.getBlock();
-        DimensionData dimensionData = blacklist.getDimensionData(Dimension.GLOBAL);
+        RandomDimensionData dimensionData = blacklist.getDimensionData(Dimension.GLOBAL);
         return !dimensionData.getBlockTypes().contains(randomBlock.getBlockType());
     }
 
     protected boolean isBlacklistedBiome(RandomBiome randomBiome) {
-        DimensionData globalData = blacklist.getDimensionData(Dimension.GLOBAL);
-        DimensionData dimensionData = blacklist.getDimensionData(dimension);
+        RandomDimensionData globalData = blacklist.getDimensionData(Dimension.GLOBAL);
+        RandomDimensionData dimensionData = blacklist.getDimensionData(dimension);
         return globalData.getBiomes().contains(randomBiome) || dimensionData.getBiomes().contains(randomBiome);
     }
 
