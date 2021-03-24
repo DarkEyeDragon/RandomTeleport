@@ -6,7 +6,7 @@ messages:
   teleport_canceled: "&aYou moved! Teleportation canceled"
   #valid placeholders: %posX, %posY, %posZ
   teleport: "&bA safe place has been found! Teleporting to &a%posX %posY %posZ"
-  depleted_queue: "&6Locations queue depleted... Forcing generation of a new location"
+  depleted_queue: "&6Locations queue depleted... Please wait a bit for the queue to fill."
   #valid placeholders: %hp (hours partial) %mp (minutes partial) %sp (seconds partial) %h (total hours) %m (total minutes) %s(total seconds)
   countdown: "&cYou cannot teleport for another &6%mp minutes %sp seconds"
   #valid placeholders: %world
