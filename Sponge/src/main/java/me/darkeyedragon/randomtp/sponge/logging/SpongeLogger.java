@@ -1,6 +1,6 @@
 package me.darkeyedragon.randomtp.sponge.logging;
 
-import me.darkeyedragon.randomtp.common.logging.PluginLogger;
+import me.darkeyedragon.randomtp.api.logging.PluginLogger;
 import net.kyori.adventure.text.Component;
 import org.slf4j.Logger;
 

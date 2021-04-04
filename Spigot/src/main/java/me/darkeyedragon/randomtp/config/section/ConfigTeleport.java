@@ -1,6 +1,7 @@
 package me.darkeyedragon.randomtp.config.section;
 
 import me.darkeyedragon.randomtp.api.config.section.SectionTeleport;
+import me.darkeyedragon.randomtp.api.teleport.RandomParticle;
 import me.darkeyedragon.randomtp.api.teleport.TeleportParticle;
 import org.bukkit.Particle;
 
@@ -10,7 +11,7 @@ public class ConfigTeleport implements SectionTeleport {
     private long delay;
     private boolean cancelOnMove;
     private long deathTimer;
-    private TeleportParticle<Particle> particle;
+    private RandomParticle<?> particle;
     private boolean useDefaultWorld;
     private String defaultWorld;
 
@@ -66,11 +67,11 @@ public class ConfigTeleport implements SectionTeleport {
 
     @Override
     public TeleportParticle<Particle> getParticle() {
-        return particle;
+        return (TeleportParticle<Particle>) particle;
     }
 
     @Override
-    public void setParticle(TeleportParticle teleportParticle) {
+    public void setParticle(RandomParticle<?> teleportParticle) {
         this.particle = teleportParticle;
     }
 

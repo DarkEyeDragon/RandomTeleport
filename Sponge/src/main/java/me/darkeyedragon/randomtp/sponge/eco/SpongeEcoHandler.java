@@ -1,7 +1,6 @@
 package me.darkeyedragon.randomtp.sponge.eco;
 
-import me.darkeyedragon.randomtp.common.eco.EcoHandler;
-import me.darkeyedragon.randomtp.sponge.SpongeRandomTeleport;
+import me.darkeyedragon.randomtp.api.eco.EcoHandler;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.cause.EventContextKeys;

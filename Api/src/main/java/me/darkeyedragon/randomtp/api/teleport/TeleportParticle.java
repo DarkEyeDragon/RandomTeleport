@@ -17,8 +17,6 @@ public class TeleportParticle<T> implements RandomParticle<T> {
         this.amount = amount;
     }
 
-
-
     public int getAmount() {
         return amount;
     }

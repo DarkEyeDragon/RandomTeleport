@@ -1,7 +1,7 @@
 package me.darkeyedragon.randomtp.common.addon.response;
 
+import me.darkeyedragon.randomtp.api.addon.RandomAddon;
 import me.darkeyedragon.randomtp.api.addon.RequiredPlugin;
-import me.darkeyedragon.randomtp.common.addon.RandomAddon;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -1,6 +1,6 @@
 package me.darkeyedragon.randomtp.event;
 
-import me.darkeyedragon.randomtp.teleport.TeleportProperty;
+import me.darkeyedragon.randomtp.common.teleport.CommonTeleportProperty;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -10,16 +10,17 @@ import org.jetbrains.annotations.NotNull;
 public class RandomPreTeleportEvent extends Event implements Cancellable {
 
     private final Player player;
-    private final TeleportProperty property;
+    private final CommonTeleportProperty property;
     private static final HandlerList handlers = new HandlerList();
     private boolean cancel;
 
     /**
      * Event that's triggered before a player is teleported. This is before cooldowns and validation.
-     * @param player The player about to be teleported
+     *
+     * @param player   The player about to be teleported
      * @param property The properties associated with the teleport.
      */
-    public RandomPreTeleportEvent(Player player, TeleportProperty property) {
+    public RandomPreTeleportEvent(Player player, CommonTeleportProperty property) {
         this.player = player;
         this.property = property;
     }
@@ -28,7 +29,7 @@ public class RandomPreTeleportEvent extends Event implements Cancellable {
         return player;
     }
 
-    public TeleportProperty getProperty() {
+    public CommonTeleportProperty getProperty() {
         return property;
     }
 

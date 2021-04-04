@@ -101,9 +101,9 @@ public class ConfigMessage implements SectionMessage {
         String message = teleport;
         if (message != null) {
             message = ChatColor.translateAlternateColorCodes('&', message);
-            message = message.replaceAll("%posX", location.getX() + "")
-                    .replaceAll("%posY", location.getY() + "")
-                    .replaceAll("%posZ", location.getZ() + "");
+            message = message.replaceAll("%posX", location.getBlockX() + "")
+                    .replaceAll("%posY", location.getBlockY() + "")
+                    .replaceAll("%posZ", location.getBlockZ() + "");
             return MiniMessage.get().parse(message);
         }
         return null;
@@ -229,7 +229,7 @@ public class ConfigMessage implements SectionMessage {
     private static class Sign implements SubSectionSign {
 
         private final List<String> list;
-        private List<Component> componentList;
+        private final List<Component> componentList;
 
         public Sign() {
             list = new ArrayList<>(4);

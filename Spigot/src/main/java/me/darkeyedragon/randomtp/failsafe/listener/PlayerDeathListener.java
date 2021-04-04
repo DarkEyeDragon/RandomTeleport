@@ -1,7 +1,8 @@
 package me.darkeyedragon.randomtp.failsafe.listener;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
-import me.darkeyedragon.randomtp.failsafe.DeathTracker;
+import me.darkeyedragon.randomtp.api.world.RandomPlayer;
+import me.darkeyedragon.randomtp.failsafe.SpigotDeathTracker;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,15 +18,15 @@ public class PlayerDeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        DeathTracker deathTracker = randomTeleport.getDeathTracker();
-        if (deathTracker.contains(event.getEntity())) {
+        SpigotDeathTracker deathTracker = (SpigotDeathTracker) randomTeleport.getDeathTracker();
+        RandomPlayer player = randomTeleport.getPlayerHandler().getPlayer(event.getEntity().getUniqueId());
+        if (deathTracker.contains(player)) {
             event.setKeepInventory(true);
             event.setKeepLevel(true);
             event.getDrops().clear();
-            deathTracker.remove(event.getEntity());
+            deathTracker.remove(player);
             event.getEntity().sendMessage(ChatColor.GOLD + "Whoops. Looks like you died while random teleporting. This is a fail safe and should not occur. Please report this.");
-            randomTeleport.getCooldowns().remove(event.getEntity().getUniqueId());
+            randomTeleport.getCooldownHandler().removeCooldown(event.getEntity().getUniqueId());
         }
     }
-
 }

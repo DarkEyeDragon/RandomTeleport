@@ -1,7 +1,7 @@
 package me.darkeyedragon.randomtp.log;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
-import me.darkeyedragon.randomtp.common.logging.PluginLogger;
+import me.darkeyedragon.randomtp.api.logging.PluginLogger;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 

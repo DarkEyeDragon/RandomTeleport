@@ -1,58 +1,47 @@
 package me.darkeyedragon.randomtp.api.world.location;
 
+import me.darkeyedragon.randomtp.api.util.RandomVector;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
+import org.jetbrains.annotations.NotNull;
 
-public class RandomLocation {
+public interface RandomLocation extends Cloneable {
 
-    private final RandomWorld randomWorld;
-    private final int x;
-    private final int y;
-    private final int z;
-    private int tries;
+    double getX();
 
+    void setX(double x);
 
-    public RandomLocation(RandomWorld world, int x, int y, int z) {
-        this(world, x, y, z, -1);
-    }
+    double getY();
 
-    public RandomLocation(RandomWorld randomWorld, int x, int y, int z, int tries) {
-        this.randomWorld = randomWorld;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.tries = tries;
-    }
+    void setY(double y);
 
-    public int getX() {
-        return x;
-    }
+    double getZ();
 
-    public int getY() {
-        return y;
-    }
+    void setZ(double z);
 
-    public int getZ() {
-        return z;
-    }
+    int getBlockX();
 
-    public RandomWorld getRandomWorld() {
-        return randomWorld;
-    }
+    int getBlockY();
 
-    public int getTries() {
-        return tries;
-    }
+    int getBlockZ();
 
-    public void setTries(int tries) {
-        this.tries = tries;
-    }
+    RandomWorld getWorld();
 
-    public RandomWorld getWorld() {
-        return randomWorld;
-    }
+    RandomBlock getBlock();
 
-    public RandomBlock getBlock() {
-        return randomWorld.getBlockAt(this);
-    }
+    RandomLocation clone();
+
+    RandomLocation add(double x, double y, double z);
+
+    RandomLocation add(RandomVector direction);
+
+    /**
+     * Gets a unit-vector pointing in the direction that this Location is
+     * facing.
+     *
+     * @return a vector pointing the direction of this location's yaw and pitch
+     */
+    @NotNull
+    RandomVector getDirection();
+
 }

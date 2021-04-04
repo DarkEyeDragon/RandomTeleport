@@ -1,14 +1,10 @@
 package me.darkeyedragon.randomtp.config.section;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
-import me.darkeyedragon.randomtp.api.config.section.SectionQueue;
 import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
-import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.Offset;
-import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
-import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.Set;
@@ -57,10 +53,8 @@ public class ConfigWorld implements SectionWorld {
     }
 
     @Override
-    public LocationQueue add(SectionWorldDetail sectionWorldDetail) {
-        if (section == null) {
-            return null;
-        }
+    public boolean add(SectionWorldDetail sectionWorldDetail) {
+        if (sectionWorldDetail == null) return false;
         RandomWorld randomWorld = sectionWorldDetail.getWorld();
         String worldName = randomWorld.getName();
         Offset offset = sectionWorldDetail.getOffset();
@@ -70,18 +64,7 @@ public class ConfigWorld implements SectionWorld {
         section.set(worldName + ".offsetX", offset.getX());
         section.set(worldName + ".offsetZ", offset.getZ());
         plugin.getPlugin().saveConfig();
-        sectionWorldDetailSet.add(sectionWorldDetail);
-        return generateLocations(randomWorld);
-    }
-
-    private LocationQueue generateLocations(RandomWorld world) {
-        WorldConfigSection worldConfigSection = plugin.getLocationFactory().getWorldConfigSection(world);
-        SectionQueue sectionQueue = plugin.getConfigHandler().getSectionQueue();
-        LocationQueue locationQueue = new LocationQueue(sectionQueue.getSize(), LocationSearcherFactory.getLocationSearcher(world, plugin));
-        plugin.subscribe(locationQueue, world);
-        locationQueue.generate(worldConfigSection, sectionQueue.getSize());
-        plugin.getWorldQueue().put(world, locationQueue);
-        return locationQueue;
+        return sectionWorldDetailSet.add(sectionWorldDetail);
     }
 
     @Override
@@ -92,7 +75,7 @@ public class ConfigWorld implements SectionWorld {
         section.set(world.getName(), null);
         sectionWorldDetailSet.remove(getSectionWorldDetail(world));
         plugin.getPlugin().saveConfig();
-        plugin.getWorldQueue().remove(world);
+        plugin.getWorldHandler().getWorldQueue().remove(world);
         return true;
     }
 
