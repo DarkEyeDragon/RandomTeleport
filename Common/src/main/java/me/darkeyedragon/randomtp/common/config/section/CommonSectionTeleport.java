@@ -2,7 +2,9 @@ package me.darkeyedragon.randomtp.common.config.section;
 
 import me.darkeyedragon.randomtp.api.config.section.SectionTeleport;
 import me.darkeyedragon.randomtp.api.world.RandomParticle;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
+@ConfigSerializable
 public class CommonSectionTeleport implements SectionTeleport {
 
     private long cooldown;

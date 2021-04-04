@@ -5,12 +5,12 @@ import me.darkeyedragon.randomtp.api.world.RandomWorld;
 
 import java.util.Set;
 
-public interface SectionWorld {
+public interface SectionWorldHolder {
     Set<SectionWorldDetail> getSectionWorldDetailSet();
 
     boolean add(SectionWorldDetail sectionWorldDetail);
 
-    SectionWorld setSectionDetail(SectionWorldDetail sectionWorld);
+    SectionWorldHolder setSectionDetail(SectionWorldDetail sectionWorld);
 
     Set<RandomWorld> getWorlds();
 

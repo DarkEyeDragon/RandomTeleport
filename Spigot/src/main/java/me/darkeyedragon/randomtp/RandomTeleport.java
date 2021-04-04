@@ -16,9 +16,9 @@ import me.darkeyedragon.randomtp.api.world.RandomWorldHandler;
 import me.darkeyedragon.randomtp.command.completion.Registrar;
 import me.darkeyedragon.randomtp.common.addon.AddonManager;
 import me.darkeyedragon.randomtp.common.command.RandomTeleportCommand;
+import me.darkeyedragon.randomtp.common.config.CommonConfigHandler;
 import me.darkeyedragon.randomtp.common.message.CommonMessageHandler;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
-import me.darkeyedragon.randomtp.config.BukkitConfigHandler;
 import me.darkeyedragon.randomtp.eco.BukkitEcoHandler;
 import me.darkeyedragon.randomtp.failsafe.SpigotDeathTracker;
 import me.darkeyedragon.randomtp.failsafe.listener.PlayerDeathListener;
@@ -83,6 +83,8 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
 
     public void init() {
         // Plugin startup logic
+        configHandler = new CommonConfigHandler(this);
+        configHandler.reload();
         scheduler = new SpigotScheduler(this);
         playerHandler = new SpigotPlayerHandler();
         messageHandler = new CommonMessageHandler(this);
@@ -93,8 +95,6 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         }
         bukkitAudience = BukkitAudiences.create(plugin);
         commandManager = new PaperCommandManager(plugin);
-        configHandler = new BukkitConfigHandler(this);
-        configHandler.reload();
         //locationFactory = new LocationFactory(bukkitConfigHandler);
         worldHandler = new SpigotWorldHandler(this);
         deathTracker = new SpigotDeathTracker(this);

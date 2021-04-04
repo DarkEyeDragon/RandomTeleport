@@ -11,7 +11,7 @@ import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.config.section.SectionMessage;
 import me.darkeyedragon.randomtp.api.config.section.SectionQueue;
 import me.darkeyedragon.randomtp.api.config.section.SectionTeleport;
-import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
+import me.darkeyedragon.randomtp.api.config.section.SectionWorldHolder;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.message.MessageHandler;
 import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
@@ -29,9 +29,6 @@ import me.darkeyedragon.randomtp.common.teleport.BasicTeleportHandler;
 import me.darkeyedragon.randomtp.common.teleport.CommonTeleportProperty;
 import me.darkeyedragon.randomtp.common.util.TimeUtil;
 import me.darkeyedragon.randomtp.common.world.CommonParticle;
-import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
-import me.darkeyedragon.randomtp.common.world.location.Offset;
-import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +46,7 @@ public class RandomTeleportCommand extends BaseCommand {
     //Config sections
     private SectionMessage configMessage;
     private SectionQueue configQueue;
-    private SectionWorld configWorld;
+    private SectionWorldHolder configWorld;
     private SectionTeleport configTeleport;
 
     public RandomTeleportCommand(RandomTeleportPlugin<?> plugin) {
@@ -204,9 +201,10 @@ public class RandomTeleportCommand extends BaseCommand {
                 if (offsetX == null) offsetX = 0;
                 if (offsetZ == null) offsetZ = 0;
             }
-            if (configWorld.add(new WorldConfigSection(new Offset(offsetX, offsetZ, radius), randomWorld, price, useWorldBorder, needsWorldPermission))) {
+            //TODO add to config
+            /*if (configWorld.add(new WorldConfigSection(new Offset(offsetX, offsetZ, radius), randomWorld, price, useWorldBorder, needsWorldPermission))) {
                 plugin.getWorldHandler().getWorldQueue().put(randomWorld, new LocationQueue(plugin, configQueue.getSize(), LocationSearcherFactory.getLocationSearcher(randomWorld, plugin)));
-            }
+            }*/
             LocationQueue locationQueue = worldQueue.get(randomWorld);
             if (locationQueue != null) {
                 messageHandler.sendMessage(sender, "<green>Successfully added to config.");

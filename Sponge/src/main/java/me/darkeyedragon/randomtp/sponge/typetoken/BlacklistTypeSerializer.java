@@ -2,8 +2,8 @@ package me.darkeyedragon.randomtp.sponge.typetoken;
 
 import com.google.common.reflect.TypeToken;
 import me.darkeyedragon.randomtp.api.config.Dimension;
-import me.darkeyedragon.randomtp.common.config.Blacklist;
-import me.darkeyedragon.randomtp.common.config.DimensionData;
+import me.darkeyedragon.randomtp.common.config.datatype.Blacklist;
+import me.darkeyedragon.randomtp.common.config.datatype.DimensionData;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;

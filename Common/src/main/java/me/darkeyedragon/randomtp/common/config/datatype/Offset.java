@@ -1,7 +1,9 @@
-package me.darkeyedragon.randomtp.common.world.location;
+package me.darkeyedragon.randomtp.common.config.datatype;
 
 import me.darkeyedragon.randomtp.api.world.location.RandomOffset;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
+@ConfigSerializable
 public class Offset implements RandomOffset {
     private int x;
     private int z;

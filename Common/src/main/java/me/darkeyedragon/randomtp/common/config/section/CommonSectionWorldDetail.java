@@ -2,13 +2,13 @@ package me.darkeyedragon.randomtp.common.config.section;
 
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
-import me.darkeyedragon.randomtp.common.world.location.Offset;
+import me.darkeyedragon.randomtp.common.config.datatype.Offset;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
 @ConfigSerializable
 public class CommonSectionWorldDetail implements SectionWorldDetail {
 
-    private String name;
+    //private String name;
     private Offset offset;
     private RandomWorld world;
     private boolean worldBorder;
@@ -18,7 +18,7 @@ public class CommonSectionWorldDetail implements SectionWorldDetail {
 
     @Override
     public String getName() {
-        return name;
+        return "name";
     }
 
     @Override

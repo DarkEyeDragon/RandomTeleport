@@ -1,12 +1,6 @@
 package me.darkeyedragon.randomtp.common.world.location;
 
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
-import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
-import me.darkeyedragon.randomtp.api.world.RandomWorld;
-import me.darkeyedragon.randomtp.api.world.RandomWorldBorder;
-import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
-import me.darkeyedragon.randomtp.api.world.location.RandomOffset;
-import me.darkeyedragon.randomtp.common.world.WorldConfigSection;
 
 public class LocationFactory {
 
@@ -16,7 +10,7 @@ public class LocationFactory {
         this.configHandler = configHandler;
     }
 
-    public WorldConfigSection getWorldConfigSection(RandomWorld randomWorld){
+    /*public CommonSectionWorldDetail getWorldConfigSection(RandomWorld randomWorld){
         SectionWorldDetail sectionWorldDetail = configHandler.getSectionWorld().getSectionWorldDetail(randomWorld);
         RandomOffset offset;
         if(sectionWorldDetail == null) return null;
@@ -27,8 +21,8 @@ public class LocationFactory {
         } else {
             offset = sectionWorldDetail.getOffset();
         }
-        return new WorldConfigSection(offset, sectionWorldDetail.getWorld(), sectionWorldDetail.getPrice(), sectionWorldDetail.useWorldBorder(), sectionWorldDetail.needsWorldPermission());
-    }
+        return new CommonSectionWorldDetail(offset, sectionWorldDetail.getWorld(), sectionWorldDetail.getPrice(), sectionWorldDetail.useWorldBorder(), sectionWorldDetail.needsWorldPermission());
+    }*/
 
     public RandomConfigHandler getConfigHandler() {
         return configHandler;
