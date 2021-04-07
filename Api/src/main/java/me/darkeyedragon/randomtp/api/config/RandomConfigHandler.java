@@ -11,5 +11,9 @@ public interface RandomConfigHandler {
     SectionWorld getSectionWorld();
     SectionBlacklist getSectionBlacklist();
 
+    void populateWorldConfigSection();
+
     void saveConfig();
+
+    void reload();
 }

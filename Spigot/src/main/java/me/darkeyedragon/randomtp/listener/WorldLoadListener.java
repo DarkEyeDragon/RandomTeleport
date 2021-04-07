@@ -1,42 +1,33 @@
 package me.darkeyedragon.randomtp.listener;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
-import me.darkeyedragon.randomtp.config.BukkitConfigHandler;
+import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
+import me.darkeyedragon.randomtp.api.world.RandomWorld;
+import me.darkeyedragon.randomtp.util.WorldUtil;
+import org.bukkit.ChatColor;
+import org.bukkit.World;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.world.WorldLoadEvent;
 
 public class WorldLoadListener implements Listener {
 
-    private final BukkitConfigHandler bukkitConfigHandler;
+    private final RandomConfigHandler configHandler;
     private final RandomTeleport plugin;
 
     public WorldLoadListener(RandomTeleport plugin) {
         this.plugin = plugin;
-        this.bukkitConfigHandler = plugin.getConfigHandler();
+        this.configHandler = plugin.getConfigHandler();
     }
 
-    /*@EventHandler
+    @EventHandler
     public void onWorldLoad(WorldLoadEvent event) {
         World world = event.getWorld();
-        if (bukkitConfigHandler.getSectionWorld().getWorlds().contains(world)) {
-            //Add a new world to the world queue and generate random locations
-            LocationQueue locationQueue = new LocationQueue(bukkitConfigHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(world, plugin));
-            //Subscribe to the locationqueue to be notified of changes
-            if (bukkitConfigHandler.getSectionDebug().isShowQueuePopulation()) {
-                int size = bukkitConfigHandler.getSectionQueue().getSize();
-                locationQueue.subscribe(new QueueListener<Location>() {
-                    @Override
-                    public void onAdd(Location element) {
-                        plugin.getLogger().info("Safe location added for " + world.getName() + " (" + locationQueue.size() + "/" + size + ")");
-                    }
-
-                    @Override
-                    public void onRemove(Location element) {
-                        plugin.getLogger().info("Safe location consumed for " + world.getName() + " (" + locationQueue.size() + "/" + size + ")");
-                    }
-                });
-            }
-            locationQueue.generate(plugin.getLocationFactory().getWorldConfigSection(world));
-            plugin.getWorldQueue().put(world, locationQueue);
+        RandomWorld randomworld = WorldUtil.toRandomWorld(world);
+        configHandler.populateWorldConfigSection();
+        if (configHandler.getSectionWorld().getWorlds().contains(randomworld)) {
+            plugin.getLogger().info(ChatColor.GOLD + "World load detected for " + world.getName() + "! Starting generation of worlds...");
+            plugin.getWorldHandler().populateWorld(randomworld);
         }
-    }*/
+    }
 }

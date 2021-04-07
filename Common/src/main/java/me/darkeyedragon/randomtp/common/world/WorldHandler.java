@@ -41,7 +41,6 @@ public abstract class WorldHandler implements RandomWorldHandler {
         //Add a new world to the world queue and generate random locations
         RandomConfigHandler configHandler = plugin.getConfigHandler();
         LocationQueue locationQueue = new LocationQueue(plugin, configHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(world, plugin));
-
         //Subscribe to the locationqueue to be notified of changes
         subscribe(locationQueue, world);
         SectionWorldDetail sectionWorldDetail = configHandler.getSectionWorld().getSectionWorldDetail(world);

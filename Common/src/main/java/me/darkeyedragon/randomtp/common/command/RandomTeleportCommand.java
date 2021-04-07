@@ -185,6 +185,9 @@ public class RandomTeleportCommand extends BaseCommand {
     @Syntax("<world> <useWorldBorder> <needsWorldPermission> [radius] [offsetX] [offsetZ]")
     @CommandCompletion("@worlds true|false true|false")
     public void onAddWorld(CommandIssuer sender, RandomWorld randomWorld, boolean useWorldBorder, boolean needsWorldPermission, @Optional Integer radius, @Optional Integer offsetX, @Optional Integer offsetZ) {
+        if (randomWorld == null) {
+            throw new InvalidCommandArgument("This world does not exist.", true);
+        }
         if (!useWorldBorder && (radius == null || offsetX == null || offsetZ == null)) {
             messageHandler.sendMessage(sender, "<gold>If <aqua>useWorldBorder<gold> is false you need to provide the other parameters.");
             throw new InvalidCommandArgument(true);

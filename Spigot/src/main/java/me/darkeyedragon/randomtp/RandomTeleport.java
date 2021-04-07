@@ -8,7 +8,6 @@ import me.darkeyedragon.randomtp.api.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.api.logging.PluginLogger;
 import me.darkeyedragon.randomtp.api.message.MessageHandler;
 import me.darkeyedragon.randomtp.api.metric.Metric;
-import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 import me.darkeyedragon.randomtp.api.scheduler.Scheduler;
 import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
 import me.darkeyedragon.randomtp.api.world.PlayerHandler;
@@ -23,7 +22,6 @@ import me.darkeyedragon.randomtp.eco.BukkitEcoHandler;
 import me.darkeyedragon.randomtp.failsafe.SpigotDeathTracker;
 import me.darkeyedragon.randomtp.failsafe.listener.PlayerDeathListener;
 import me.darkeyedragon.randomtp.listener.ServerLoadListener;
-import me.darkeyedragon.randomtp.listener.WorldBorderChangeListener;
 import me.darkeyedragon.randomtp.listener.WorldLoadListener;
 import me.darkeyedragon.randomtp.log.BukkitLogger;
 import me.darkeyedragon.randomtp.scheduler.SpigotScheduler;
@@ -33,7 +31,6 @@ import me.darkeyedragon.randomtp.world.SpigotWorldHandler;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
@@ -44,8 +41,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
     private final SpigotImpl plugin;
 
     private PaperCommandManager commandManager;
-    private WorldQueue worldQueue;
-    private BukkitConfigHandler bukkitConfigHandler;
+    private BukkitConfigHandler configHandler;
     private DeathTracker deathTracker;
     private BukkitAudiences bukkitAudience;
     private RandomWorldHandler worldHandler;
@@ -95,22 +91,16 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         }
         bukkitAudience = BukkitAudiences.create(plugin);
         commandManager = new PaperCommandManager(plugin);
-        bukkitConfigHandler = new BukkitConfigHandler(this);
-        try {
-            bukkitConfigHandler.reload();
-        } catch (InvalidConfigurationException e) {
-            e.printStackTrace();
-            Bukkit.getPluginManager().disablePlugin(plugin);
-        }
+        configHandler = new BukkitConfigHandler(this);
+        configHandler.reload();
         //locationFactory = new LocationFactory(bukkitConfigHandler);
         worldHandler = new SpigotWorldHandler(this);
         deathTracker = new SpigotDeathTracker(this);
         //check if the first argument is a world or player
-        worldQueue = new WorldQueue();
         commandManager.enableUnstableAPI("help");
         commandManager.enableUnstableAPI("brigadier");
         //Register all completions and contexts for ACF
-        Registrar.registerCompletions(commandManager, addonManager, bukkitConfigHandler);
+        Registrar.registerCompletions(commandManager, addonManager, configHandler);
         Registrar.registerContexts(commandManager, worldHandler, playerHandler);
         commandManager.registerCommand(new RandomTeleportCommand(this));
 
@@ -123,7 +113,6 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         cooldownHandler = new SpigotCooldownHandler();
 
         registerListeners();
-        registerEvents();
     }
 
     private void registerListeners() {
@@ -131,12 +120,6 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         pluginManager.registerEvents(new WorldLoadListener(this), plugin);
         pluginManager.registerEvents(new PlayerDeathListener(this), plugin);
         pluginManager.registerEvents(new ServerLoadListener(this), plugin);
-    }
-
-    private void registerEvents() {
-        plugin.getServer().getPluginManager().registerEvents(new WorldLoadListener(this), plugin);
-        plugin.getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), plugin);
-        plugin.getServer().getPluginManager().registerEvents(new WorldBorderChangeListener(this), plugin);
     }
 
     @Override
@@ -164,10 +147,6 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
 
     public EcoHandler getEcoHandler() {
         return ecoHandler;
-    }
-
-    public BukkitConfigHandler getConfigHandler() {
-        return bukkitConfigHandler;
     }
 
     public PaperCommandManager getCommandManager() {
@@ -201,11 +180,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
 
     @Override
     public void reloadConfig() {
-        try {
-            getConfigHandler().reload();
-        } catch (InvalidConfigurationException e) {
-            e.printStackTrace();
-        }
+        getConfigHandler().reload();
     }
 
     @Override
@@ -233,8 +208,8 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         return deathTracker;
     }
 
-    public BukkitConfigHandler getBukkitConfigHandler() {
-        return bukkitConfigHandler;
+    public BukkitConfigHandler getConfigHandler() {
+        return configHandler;
     }
 
     public RandomWorldHandler getWorldHandler() {

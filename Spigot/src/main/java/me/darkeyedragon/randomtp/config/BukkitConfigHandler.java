@@ -19,7 +19,6 @@ import me.darkeyedragon.randomtp.world.SpigotBlockType;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashSet;
@@ -50,7 +49,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
      * (re)loads the config.
      * When invalid fiels are found, they will be defaulted to prevent errors.
      */
-    public void reload() throws InvalidConfigurationException {
+    public void reload() {
         populateConfigMessage();
         populateConfigQueue();
         populateWorldConfigSection();
@@ -60,7 +59,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
         populateBlacklist();
     }
 
-    public void populateBlacklist() throws InvalidConfigurationException {
+    public void populateBlacklist() {
         configBlacklist = new ConfigBlacklist(getBlacklist());
     }
 
@@ -87,6 +86,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
                 .initDelay(getInitDelay());
     }
 
+    @Override
     public void populateWorldConfigSection() {
         configWorld = new ConfigWorld(instance, getOffsets());
     }
@@ -266,7 +266,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
         return plugin.getConfig().getStringList("message.sign");
     }
 
-    public Blacklist getBlacklist() throws InvalidConfigurationException {
+    public Blacklist getBlacklist() {
         Blacklist blacklist = new Blacklist();
         for (Dimension dimension : Dimension.values()) {
             blacklist.addDimensionData(dimension, getDimData(dimension));
@@ -274,9 +274,9 @@ public class BukkitConfigHandler implements RandomConfigHandler {
         return blacklist;
     }
 
-    private DimensionData getDimData(Dimension dimension) throws InvalidConfigurationException {
+    private DimensionData getDimData(Dimension dimension) {
         ConfigurationSection blacklistSec = plugin.getConfig().getConfigurationSection("blacklist");
-        if (blacklistSec == null) throw new InvalidConfigurationException("blacklist section missing!");
+        //if (blacklistSec == null) throw new InvalidConfigurationException("blacklist section missing!");
         DimensionData dimensionData = new DimensionData();
 
         ConfigurationSection section;
@@ -297,7 +297,7 @@ public class BukkitConfigHandler implements RandomConfigHandler {
                 section = null;
                 break;
         }
-        if (section == null) throw new InvalidConfigurationException("blacklist.global section missing!");
+        //if (section == null) throw new InvalidConfigurationException("blacklist.global section missing!");
         List<String> blockStrings = section.getStringList("block");
         Material[] materials = Material.values();
         for (String s : blockStrings) {

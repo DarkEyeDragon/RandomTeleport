@@ -42,7 +42,17 @@ public class ConfigHandler implements RandomConfigHandler {
     }
 
     @Override
+    public void populateWorldConfigSection() {
+
+    }
+
+    @Override
     public void saveConfig() {
+
+    }
+
+    @Override
+    public void reload() {
 
     }
 }
