@@ -78,7 +78,8 @@ public class SpigotWorld implements RandomWorld {
         if (obj == null) return false;
         if (world == obj) return true;
         if (obj instanceof RandomWorld) {
-            return this.getUUID().equals(((RandomWorld) obj).getUUID());
+            RandomWorld world = (RandomWorld) obj;
+            return this.getUUID().equals(world.getUUID());
         }
         return false;
     }

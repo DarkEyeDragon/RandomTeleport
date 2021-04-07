@@ -58,6 +58,7 @@ public class RandomTeleportCommand extends BaseCommand {
         setConfigs();
     }
 
+    //Call this before commands that rely on config values to make sure they are updated with their latest values
     private void setConfigs() {
         this.configHandler = plugin.getConfigHandler();
         this.configMessage = configHandler.getSectionMessage();
@@ -73,6 +74,7 @@ public class RandomTeleportCommand extends BaseCommand {
     @Description("Teleport players to a random location.")
     @Syntax("[world/player] [world]")
     public void onTeleport(CommandIssuer sender, @Optional PlayerWorldContext target, @Optional @CommandPermission("rtp.teleport.world") RandomWorld world) {
+        setConfigs();
         RandomPlayer player = null;
         List<RandomPlayer> targets = new ArrayList<>();
         RandomWorld newWorld;
@@ -155,6 +157,7 @@ public class RandomTeleportCommand extends BaseCommand {
     }
 
     private void teleport(CommandIssuer sender, RandomPlayer player, RandomWorld world) {
+        setConfigs();
         final boolean useEco = configHandler.getSectionEconomy().useEco();
         boolean bypassDelay = player.hasPermission("rtp.teleportdelay.bypass") || sender.hasPermission("rtp.teleportdelay.bypass");
         boolean bypasCooldown = player.hasPermission("rtp.teleport.bypass") || sender.hasPermission("rtp.teleport.bypass");
@@ -185,6 +188,10 @@ public class RandomTeleportCommand extends BaseCommand {
     @Syntax("<world> <useWorldBorder> <needsWorldPermission> [radius] [offsetX] [offsetZ]")
     @CommandCompletion("@worlds true|false true|false")
     public void onAddWorld(CommandIssuer sender, RandomWorld randomWorld, boolean useWorldBorder, boolean needsWorldPermission, @Optional Integer radius, @Optional Integer offsetX, @Optional Integer offsetZ) {
+        setConfigs();
+        if (randomWorld == null) {
+            throw new InvalidCommandArgument("This world does not exist.", true);
+        }
         if (!useWorldBorder && (radius == null || offsetX == null || offsetZ == null)) {
             messageHandler.sendMessage(sender, "<gold>If <aqua>useWorldBorder<gold> is false you need to provide the other parameters.");
             throw new InvalidCommandArgument(true);
@@ -223,7 +230,7 @@ public class RandomTeleportCommand extends BaseCommand {
     @CommandCompletion("@worlds")
     @CommandPermission("rtp.admin.removeworld")
     public void removeWorld(CommandIssuer sender, RandomWorld world) {
-
+        setConfigs();
         if (configWorld.contains(world)) {
             if (configWorld.remove(world)) {
                 messageHandler.sendMessage(sender, "<green>Removed world from the config and queue!");
