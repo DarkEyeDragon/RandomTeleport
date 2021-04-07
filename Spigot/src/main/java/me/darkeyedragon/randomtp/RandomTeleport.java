@@ -22,7 +22,7 @@ import me.darkeyedragon.randomtp.eco.BukkitEcoHandler;
 import me.darkeyedragon.randomtp.failsafe.SpigotDeathTracker;
 import me.darkeyedragon.randomtp.failsafe.listener.PlayerDeathListener;
 import me.darkeyedragon.randomtp.listener.ServerLoadListener;
-import me.darkeyedragon.randomtp.listener.WorldLoadListener;
+import me.darkeyedragon.randomtp.listener.WorldListener;
 import me.darkeyedragon.randomtp.log.BukkitLogger;
 import me.darkeyedragon.randomtp.scheduler.SpigotScheduler;
 import me.darkeyedragon.randomtp.teleport.SpigotCooldownHandler;
@@ -117,7 +117,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
 
     private void registerListeners() {
         PluginManager pluginManager = plugin.getServer().getPluginManager();
-        pluginManager.registerEvents(new WorldLoadListener(this), plugin);
+        pluginManager.registerEvents(new WorldListener(this), plugin);
         pluginManager.registerEvents(new PlayerDeathListener(this), plugin);
         pluginManager.registerEvents(new ServerLoadListener(this), plugin);
     }
