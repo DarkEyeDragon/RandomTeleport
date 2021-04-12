@@ -13,6 +13,8 @@ public interface RandomConfigHandler {
 
     SectionBlacklist getSectionBlacklist();
 
+    void populateWorldConfigSection();
+
     void saveConfig();
 
     boolean reload();

@@ -18,7 +18,6 @@
             <url>https://repo.aikar.co/content/groups/aikar/</url>
         </repository>
     </repositories>
-
     <dependencies>
         <dependency>
             <groupId>me.darkeyedragon.randomtp</groupId>
@@ -29,7 +28,7 @@
         <dependency>
             <groupId>io.github.classgraph</groupId>
             <artifactId>classgraph</artifactId>
-            <version>4.8.98</version>
+            <version>4.8.102</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -40,12 +39,12 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-artifact</artifactId>
-            <version>3.6.3</version>
+            <version>3.8.1</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.7.0</version>
+            <version>5.7.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
