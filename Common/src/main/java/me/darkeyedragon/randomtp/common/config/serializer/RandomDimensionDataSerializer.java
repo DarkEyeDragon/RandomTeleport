@@ -1,6 +1,5 @@
 package me.darkeyedragon.randomtp.common.config.serializer;
 
-import io.leangen.geantyref.TypeToken;
 import me.darkeyedragon.randomtp.api.config.RandomDimensionData;
 import me.darkeyedragon.randomtp.common.config.datatype.DimensionData;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -16,9 +15,7 @@ public class RandomDimensionDataSerializer implements TypeSerializer<RandomDimen
 
     @Override
     public RandomDimensionData deserialize(Type type, ConfigurationNode node) throws SerializationException {
-
-        return node.get(new TypeToken<DimensionData>() {
-        });
+        return node.get(DimensionData.class);
     }
 
     @Override

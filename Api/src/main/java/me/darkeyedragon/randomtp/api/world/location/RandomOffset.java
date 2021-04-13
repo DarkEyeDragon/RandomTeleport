@@ -10,8 +10,4 @@ public interface RandomOffset {
 
     void setZ(int z);
 
-    int getRadius();
-
-    void setRadius(int radius);
-
 }

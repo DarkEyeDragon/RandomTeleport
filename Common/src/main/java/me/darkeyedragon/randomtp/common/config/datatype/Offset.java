@@ -7,20 +7,14 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 public class Offset implements RandomOffset {
     private int x;
     private int z;
-    private int radius;
 
-    public Offset(int x, int z, int radius) {
+    public Offset(int x, int z) {
         this.x = x;
         this.z = z;
-        this.radius = radius;
-    }
-
-    public Offset(int radius) {
-        this(0,0,radius);
     }
 
     public Offset() {
-        this(0);
+        this(0, 0);
     }
 
     public int getX() {
@@ -31,9 +25,6 @@ public class Offset implements RandomOffset {
         return z;
     }
 
-    public int getRadius() {
-        return radius;
-    }
 
     public void setX(int x) {
         this.x = x;
@@ -43,7 +34,4 @@ public class Offset implements RandomOffset {
         this.z = z;
     }
 
-    public void setRadius(int radius) {
-        this.radius = radius;
-    }
 }

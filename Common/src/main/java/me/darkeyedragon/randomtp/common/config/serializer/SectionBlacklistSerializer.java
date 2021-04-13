@@ -2,7 +2,6 @@ package me.darkeyedragon.randomtp.common.config.serializer;
 
 import io.leangen.geantyref.TypeToken;
 import me.darkeyedragon.randomtp.api.config.section.SectionBlacklist;
-import me.darkeyedragon.randomtp.common.config.datatype.Blacklist;
 import me.darkeyedragon.randomtp.common.config.section.CommonSectionBlacklist;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurationNode;
@@ -17,9 +16,8 @@ public class SectionBlacklistSerializer implements TypeSerializer<SectionBlackli
 
     @Override
     public SectionBlacklist deserialize(Type type, ConfigurationNode node) throws SerializationException {
-        Blacklist blacklist = node.get(new TypeToken<Blacklist>() {
+        return node.get(new TypeToken<CommonSectionBlacklist>() {
         });
-        return new CommonSectionBlacklist(blacklist);
     }
 
     @Override

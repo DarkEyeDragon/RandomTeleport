@@ -1,7 +1,7 @@
 package me.darkeyedragon.randomtp.common.queue;
 
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
-import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
+import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorld;
 import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.QueueListener;
@@ -38,10 +38,10 @@ public class CommonQueueListener implements QueueListener<RandomLocation> {
 
     @Override
     public void onRemove(RandomLocation element) {
-        SectionWorldDetail sectionWorldDetail = configHandler.getSectionWorld().getSectionWorldDetail(randomWorld);
+        ConfigWorld configWorld = configHandler.getSectionWorld().getConfigWorld(randomWorld.getName());
         long initDelay = configHandler.getSectionQueue().getInitDelay();
         plugin.getScheduler().runTaskLater(() -> {
-            plugin.getWorldHandler().getWorldQueue().get(randomWorld).generate(sectionWorldDetail);
+            plugin.getWorldHandler().getWorldQueue().get(randomWorld).generate(configWorld);
             if (configHandler.getSectionDebug().isShowQueuePopulation()) {
                 plugin.getLogger().info("Safe location consumed for " + element.getWorld().getName() + " (" + locationQueue.size() + "/" + size + ")");
             }

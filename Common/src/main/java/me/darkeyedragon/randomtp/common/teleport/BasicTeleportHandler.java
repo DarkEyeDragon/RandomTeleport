@@ -1,7 +1,7 @@
 package me.darkeyedragon.randomtp.common.teleport;
 
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
-import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
+import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorld;
 import me.darkeyedragon.randomtp.api.eco.EcoHandler;
 import me.darkeyedragon.randomtp.api.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
@@ -119,7 +119,7 @@ public class BasicTeleportHandler implements TeleportHandler {
     private void teleport(RandomPlayer player) {
         RandomLocation location = property.getLocation();
         if (location == null) {
-            plugin.getMessageHandler().sendMessage(property.getCommandIssuer(), configHandler.getSectionMessage().getDepletedQueue());
+            plugin.getMessageHandler().sendMessage(property.getCommandIssuer(), configHandler.getSectionMessage().getEmptyQueue());
             return;
         }
         location.getWorld().getChunkAtAsync(location.getWorld(), location.getBlockX(), location.getBlockZ()).thenAccept(chunk -> {
@@ -150,9 +150,9 @@ public class BasicTeleportHandler implements TeleportHandler {
             //Generate a new location after the init delay
             plugin.getScheduler().runTaskLater(() -> {
                 RandomWorld randomWorld = property.getLocation().getWorld();
-                SectionWorldDetail sectionWorldDetail = configHandler.getSectionWorld().getSectionWorldDetail(randomWorld);
+                ConfigWorld configWorld = configHandler.getSectionWorld().getConfigWorld(randomWorld.getName());
                 try {
-                    plugin.getWorldHandler().getWorldQueue().get(randomWorld).generate(sectionWorldDetail, 1);
+                    plugin.getWorldHandler().getWorldQueue().get(randomWorld).generate(configWorld, 1);
                 } catch (IllegalArgumentException ex) {
                     plugin.getLogger().warn(ex.getMessage());
                 }

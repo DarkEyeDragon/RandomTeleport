@@ -15,8 +15,6 @@ public interface SectionMessage {
 
     Component getTeleport(RandomLocation location);
 
-    Component getDepletedQueue();
-
     Component getCountdown(long remaining);
 
     Component getNoWorldPermission(RandomWorld world);

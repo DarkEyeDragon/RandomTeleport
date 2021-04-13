@@ -13,7 +13,6 @@ import org.spongepowered.configurate.serialize.TypeSerializer;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-//TODO make dimentions
 public class RandomBlacklistSerializer implements TypeSerializer<RandomBlacklist> {
     public static final RandomBlacklistSerializer INSTANCE = new RandomBlacklistSerializer();
 

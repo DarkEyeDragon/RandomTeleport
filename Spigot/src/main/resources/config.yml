@@ -6,7 +6,6 @@ messages:
   teleport-canceled: "&aYou moved! Teleportation canceled"
   #valid placeholders: %posX, %posY, %posZ
   teleport: "&bA safe place has been found! Teleporting to &a%posX %posY %posZ"
-  depleted-queue: "&6Locations queue depleted... Please wait a bit for the queue to fill."
   #valid placeholders: %hp (hours partial) %mp (minutes partial) %sp (seconds partial) %h (total hours) %m (total minutes) %s(total seconds)
   countdown: "&cYou cannot teleport for another &6%mp minutes %sp seconds"
   #valid placeholders: %world
@@ -37,15 +36,13 @@ worlds:
     offsetZ: 0
     price: 0
 teleport:
-  #m = minutes, s = seconds
-  #default: "60m"
-  cooldown: "60m"
-  #default: "0s"
-  delay: "0s"
+  cooldown: 72000
+  #default: 0
+  delay: 0
   cancel-on-move: true
   #If players die within this time after RTP'ing they wont lose anything.
   #Set to 0 to disable. Default "10s"
-  death-timer: "10s"
+  death-timer: 200
   #The particle to display when the player is teleporting. NONE for no particles. A full list can be found on
   #https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
   #You also need to provide the amount of particles.

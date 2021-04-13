@@ -8,7 +8,7 @@ public class Configuration {
 
     private CommonSectionMessage message;
     private CommonSectionQueue queue;
-    private CommonSectionWorldHolder worlds;
+    private CommonSectionWorld worlds;
     private CommonSectionTeleport teleport;
     private CommonSectionDebug debug;
     private CommonSectionEconomy economy;
@@ -22,7 +22,7 @@ public class Configuration {
         return queue;
     }
 
-    public CommonSectionWorldHolder getWorlds() {
+    public CommonSectionWorld getWorlds() {
         return worlds;
     }
 

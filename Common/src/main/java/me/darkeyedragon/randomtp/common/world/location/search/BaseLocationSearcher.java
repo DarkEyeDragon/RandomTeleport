@@ -4,7 +4,9 @@ import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
 import me.darkeyedragon.randomtp.api.config.Dimension;
 import me.darkeyedragon.randomtp.api.config.RandomBlacklist;
 import me.darkeyedragon.randomtp.api.config.RandomDimensionData;
-import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
+import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorld;
+import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorldborder;
+import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.world.RandomBiome;
 import me.darkeyedragon.randomtp.api.world.RandomBlockType;
 import me.darkeyedragon.randomtp.api.world.RandomChunkSnapshot;
@@ -28,6 +30,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
 
     protected final Map<String, ? extends RandomLocationValidator> validatorMap;
     private final Dimension dimension;
+    private final RandomTeleportPlugin<?> plugin;
     private final RandomBlacklist blacklist;
 
     protected final byte CHUNK_SIZE = 16; //The size (in blocks) of a chunk in all directions
@@ -35,7 +38,8 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
     protected int count = 1;
     protected int max = 50;
 
-    public BaseLocationSearcher(Map<String, ? extends RandomLocationValidator> validatorMap, RandomBlacklist blacklist, Dimension dimension) {
+    public BaseLocationSearcher(RandomTeleportPlugin<?> plugin, Map<String, ? extends RandomLocationValidator> validatorMap, RandomBlacklist blacklist, Dimension dimension) {
+        this.plugin = plugin;
         this.blacklist = blacklist;
         this.dimension = dimension;
         this.validatorMap = validatorMap;
@@ -44,18 +48,18 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
     /**
      * This method will search recursively until it reached 50 tries, then fail silently.
      *
-     * @param sectionWorldDetail
+     * @param configWorld
      * @return a {@link CompletableFuture<RandomLocation>} holding the location. Null if no location is found.
      */
     @Override
-    public CompletableFuture<RandomLocation> getRandom(SectionWorldDetail sectionWorldDetail) {
-        return pickRandomLocation(sectionWorldDetail).thenCompose((loc) -> {
+    public CompletableFuture<RandomLocation> getRandom(ConfigWorld configWorld) {
+        return pickRandomLocation(configWorld).thenCompose((loc) -> {
             if (loc == null) {
                 if (count < max) {
                     count++;
-                    return getRandom(sectionWorldDetail);
+                    return getRandom(configWorld);
                 }
-                throw new NoRandomLocationFoundException(count, sectionWorldDetail.getWorld());
+                throw new NoRandomLocationFoundException(count, configWorld.getName());
             } else {
                 count = 1;
                 return CompletableFuture.completedFuture(loc);
@@ -64,8 +68,8 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
     }
 
     /*Pick a random location based on chunks*/
-    private CompletableFuture<RandomLocation> pickRandomLocation(SectionWorldDetail sectionWorldDetail) {
-        CompletableFuture<RandomChunkSnapshot> chunk = getRandomChunk(sectionWorldDetail);
+    private CompletableFuture<RandomLocation> pickRandomLocation(ConfigWorld configWorld) {
+        CompletableFuture<RandomChunkSnapshot> chunk = getRandomChunk(configWorld);
         return chunk.thenApply(this::getRandomLocationFromChunk);
     }
 
@@ -86,8 +90,8 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         return null;
     }
 
-    CompletableFuture<RandomChunkSnapshot> getRandomChunk(SectionWorldDetail sectionWorldDetail) {
-        CompletableFuture<RandomChunkSnapshot> chunkFuture = getRandomChunkAsync(sectionWorldDetail);
+    CompletableFuture<RandomChunkSnapshot> getRandomChunk(ConfigWorld configWorld) {
+        CompletableFuture<RandomChunkSnapshot> chunkFuture = getRandomChunkAsync(configWorld);
         return chunkFuture.thenCompose((chunk) -> {
             boolean isSafe = isSafeChunk(chunk);
             if (!isSafe) {
@@ -97,8 +101,10 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
                         RandomChunkSnapshot snapshot = chunkTraverser.next().get();
                         int x = snapshot.getX() << CHUNK_SHIFT;
                         int z = snapshot.getZ() << CHUNK_SHIFT;
-                        RandomOffset offset = sectionWorldDetail.getOffset();
-                        boolean withinBounds = (x < offset.getRadius() + offset.getX() && z < offset.getRadius() + offset.getZ()) || (x > offset.getRadius() - offset.getX() && z > offset.getRadius() - offset.getZ());
+                        ConfigWorldborder configWorldborder = configWorld.getConfigWorldborder();
+                        RandomOffset offset = configWorldborder.getOffset();
+                        int radius = configWorldborder.getRadius();
+                        boolean withinBounds = (x < radius + offset.getX() && z < radius + offset.getZ()) || (x > radius - offset.getX() && z > radius - offset.getZ());
                         if (withinBounds && isSafeChunk(snapshot)) {
                             return CompletableFuture.completedFuture(snapshot);
                         }
@@ -106,22 +112,24 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
                         e.printStackTrace();
                     }
                 }
-                return getRandomChunk(sectionWorldDetail);
+                return getRandomChunk(configWorld);
             } else {
                 return CompletableFuture.completedFuture(chunk);
             }
         });
     }
 
-    CompletableFuture<RandomChunkSnapshot> getRandomChunkAsync(SectionWorldDetail sectionWorldDetail) {
+    CompletableFuture<RandomChunkSnapshot> getRandomChunkAsync(ConfigWorld configWorld) {
         ThreadLocalRandom rnd = ThreadLocalRandom.current();
-        RandomOffset offset = sectionWorldDetail.getOffset();
-        int chunkRadius = offset.getRadius() >> CHUNK_SHIFT;
+        ConfigWorldborder configWorldborder = configWorld.getConfigWorldborder();
+        RandomOffset offset = configWorldborder.getOffset();
+        int radius = configWorldborder.getRadius();
+        int chunkRadius = configWorldborder.getRadius() >> CHUNK_SHIFT;
         int chunkOffsetX = offset.getX() >> CHUNK_SHIFT;
         int chunkOffsetZ = offset.getZ() >> CHUNK_SHIFT;
         int x = rnd.nextInt(-chunkRadius, chunkRadius + 1);
         int z = rnd.nextInt(-chunkRadius, chunkRadius + 1);
-        RandomWorld world = sectionWorldDetail.getWorld();
+        RandomWorld world = plugin.getWorldHandler().getWorld(configWorld.getName());
         if (world == null) return CompletableFuture.completedFuture(null);
         return world.getChunkAtAsync(world, x + chunkOffsetX, z + chunkOffsetZ);
     }

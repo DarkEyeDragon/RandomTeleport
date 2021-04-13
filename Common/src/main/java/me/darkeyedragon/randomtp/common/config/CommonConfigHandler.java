@@ -1,12 +1,15 @@
 package me.darkeyedragon.randomtp.common.config;
 
-import me.darkeyedragon.randomtp.api.config.RandomBlacklist;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.config.RandomDimensionData;
 import me.darkeyedragon.randomtp.api.config.section.*;
 import me.darkeyedragon.randomtp.api.world.RandomParticle;
-import me.darkeyedragon.randomtp.common.config.serializer.*;
+import me.darkeyedragon.randomtp.common.config.serializer.RandomDimensionDataSerializer;
+import me.darkeyedragon.randomtp.common.config.serializer.RandomParticleSerializer;
+import me.darkeyedragon.randomtp.common.config.serializer.SectionBlacklistSerializer;
+import me.darkeyedragon.randomtp.common.config.serializer.SectionWorldSerializer;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
+import net.kyori.adventure.serializer.configurate4.ConfigurateComponentSerializer;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
@@ -28,11 +31,12 @@ public class CommonConfigHandler implements RandomConfigHandler {
                 .path(Paths.get(this.randomTeleportPlugin.getDataFolder().getPath(), "config.yml"))
                 .defaultOptions(
                         configurationOptions -> configurationOptions.serializers(builder -> {
-                                    builder.register(RandomBlacklist.class, RandomBlacklistSerializer.INSTANCE);
+                                    //builder.register(RandomBlacklist.class, RandomBlacklistSerializer.INSTANCE);
                                     builder.registerExact(RandomDimensionData.class, RandomDimensionDataSerializer.INSTANCE);
                                     builder.register(RandomParticle.class, RandomParticleSerializer.INSTANCE);
-                                    builder.register(SectionWorldHolder.class, SectionWorldSerializer.INSTANCE);
-                                    builder.register(SectionBlacklist.class, SectionBlacklistSerializer.INSTANCE);
+                                    builder.register(SectionWorld.class, SectionWorldSerializer.INSTANCE);
+                                    builder.registerExact(SectionBlacklist.class, SectionBlacklistSerializer.INSTANCE);
+                                    builder.registerAll(ConfigurateComponentSerializer.configurate().serializers());
                                 }
                         )
                 )
@@ -70,13 +74,18 @@ public class CommonConfigHandler implements RandomConfigHandler {
     }
 
     @Override
-    public SectionWorldHolder getSectionWorld() {
+    public SectionWorld getSectionWorld() {
         return configuration.getWorlds();
     }
 
     @Override
     public SectionBlacklist getSectionBlacklist() {
         return configuration.getBlacklist();
+    }
+
+    @Override
+    public void populateWorldConfigSection() {
+
     }
 
     @Override

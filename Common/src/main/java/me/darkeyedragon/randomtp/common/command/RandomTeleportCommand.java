@@ -8,11 +8,11 @@ import me.darkeyedragon.randomtp.api.addon.RandomAddon;
 import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
 import me.darkeyedragon.randomtp.api.addon.RequiredPlugin;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
+import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorld;
 import me.darkeyedragon.randomtp.api.config.section.SectionMessage;
 import me.darkeyedragon.randomtp.api.config.section.SectionQueue;
 import me.darkeyedragon.randomtp.api.config.section.SectionTeleport;
-import me.darkeyedragon.randomtp.api.config.section.SectionWorldHolder;
-import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
+import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
 import me.darkeyedragon.randomtp.api.message.MessageHandler;
 import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
@@ -46,7 +46,7 @@ public class RandomTeleportCommand extends BaseCommand {
     //Config sections
     private SectionMessage configMessage;
     private SectionQueue configQueue;
-    private SectionWorldHolder configWorld;
+    private SectionWorld configWorld;
     private SectionTeleport configTeleport;
 
     public RandomTeleportCommand(RandomTeleportPlugin<?> plugin) {
@@ -94,7 +94,7 @@ public class RandomTeleportCommand extends BaseCommand {
                 } else {
                     newWorld = plugin.getWorldHandler().getWorld(player.getWorld().getName());
                 }
-                if (!configWorld.contains(newWorld)) {
+                if (!configWorld.contains(newWorld.getName())) {
                     plugin.getMessageHandler().sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
                     return;
                 }
@@ -111,7 +111,7 @@ public class RandomTeleportCommand extends BaseCommand {
                     } else {
                         newWorld = world;
                     }
-                    if (!configWorld.contains(newWorld)) {
+                    if (!configWorld.contains(newWorld.getName())) {
                         if (newWorld == null) {
 
                             throw new InvalidCommandArgument(true);
@@ -127,12 +127,12 @@ public class RandomTeleportCommand extends BaseCommand {
                 if (sender.isPlayer()) {
                     player = plugin.getPlayerHandler().getPlayer(sender.getUniqueId());
                     newWorld = target.getWorld();
-                    if (!configWorld.contains(newWorld)) {
+                    if (!configWorld.contains(newWorld.getName())) {
                         plugin.getMessageHandler().sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
                         return;
                     }
-                    SectionWorldDetail sectionWorldDetail = plugin.getConfigHandler().getSectionWorld().getSectionWorldDetail(newWorld);
-                    if (sectionWorldDetail == null || ((!sender.hasPermission("rtp.world." + newWorld.getName())) && sectionWorldDetail.needsWorldPermission())) {
+                    ConfigWorld worldDetail = plugin.getConfigHandler().getSectionWorld().getConfigWorld(newWorld.getName());
+                    if (worldDetail == null || ((!sender.hasPermission("rtp.world." + newWorld.getName())) && worldDetail.isNeedsWorldPermission())) {
                         plugin.getMessageHandler().sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
                         return;
                     }
@@ -156,8 +156,8 @@ public class RandomTeleportCommand extends BaseCommand {
 
     private void teleport(CommandIssuer sender, RandomPlayer player, RandomWorld world) {
         setConfigs();
-        final SectionWorldDetail worldDetail = plugin.getConfigHandler().getSectionWorld().getSectionWorldDetail(world);
-        final boolean useWorldEco = worldDetail.useEco();
+        final ConfigWorld worldDetail = plugin.getConfigHandler().getSectionWorld().getConfigWorld(world.getName());
+        final boolean useWorldEco = worldDetail.isUseEco();
         final boolean useGlobalEco = configHandler.getSectionEconomy().useEco();
         double price = 0;
         if (useWorldEco) {
@@ -203,7 +203,7 @@ public class RandomTeleportCommand extends BaseCommand {
             messageHandler.sendMessage(sender, "<gold>If <aqua>useWorldBorder<gold> is false you need to provide the other parameters.");
             throw new InvalidCommandArgument(true);
         }
-        if (!configWorld.contains(randomWorld)) {
+        if (!configWorld.contains(randomWorld.getName())) {
             if (useWorldBorder) {
                 if (radius == null) radius = 0;
                 if (offsetX == null) offsetX = 0;
@@ -239,8 +239,8 @@ public class RandomTeleportCommand extends BaseCommand {
     @CommandPermission("rtp.admin.removeworld")
     public void removeWorld(CommandIssuer sender, RandomWorld world) {
         setConfigs();
-        if (configWorld.contains(world)) {
-            if (configWorld.remove(world)) {
+        if (configWorld.contains(world.getName())) {
+            if (configWorld.remove(world.getName())) {
                 messageHandler.sendMessage(sender, "<green>Removed world from the config and queue!");
             } else {
                 messageHandler.sendMessage(sender, "<red>Something went wrong with removing the world! Is it already removed?");

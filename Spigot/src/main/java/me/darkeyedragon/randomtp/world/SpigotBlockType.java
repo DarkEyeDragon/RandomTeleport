@@ -3,7 +3,9 @@ package me.darkeyedragon.randomtp.world;
 import me.darkeyedragon.randomtp.common.world.block.CommonBlockType;
 import me.darkeyedragon.randomtp.world.block.SpigotMaterial;
 import org.bukkit.Material;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
+@ConfigSerializable
 public class SpigotBlockType extends CommonBlockType {
 
     private final Material material;

@@ -2,7 +2,9 @@ package me.darkeyedragon.randomtp.world;
 
 import me.darkeyedragon.randomtp.api.world.RandomBiome;
 import org.bukkit.block.Biome;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
+@ConfigSerializable
 public class SpigotBiome implements RandomBiome {
 
     protected final Biome biome;

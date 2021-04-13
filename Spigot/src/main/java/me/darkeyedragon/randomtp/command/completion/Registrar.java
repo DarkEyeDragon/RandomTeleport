@@ -6,7 +6,7 @@ import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
 import com.google.common.collect.ImmutableList;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
-import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
+import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorld;
 import me.darkeyedragon.randomtp.api.world.PlayerHandler;
 import me.darkeyedragon.randomtp.api.world.RandomPlayer;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
@@ -41,18 +41,17 @@ public class Registrar {
     }
 
     private static List<String> getFilteredWorlds(RandomConfigHandler configHandler, BukkitCommandCompletionContext context) {
-        Set<RandomWorld> randomWorlds = configHandler.getSectionWorld().getWorlds();
-        Iterator<RandomWorld> randomWorldIterator = randomWorlds.iterator();
+        Set<ConfigWorld> configWorlds = configHandler.getSectionWorld().getConfigWorlds();
+        Iterator<ConfigWorld> randomWorldIterator = configWorlds.iterator();
         while (randomWorldIterator.hasNext()) {
-            RandomWorld randomWorld = randomWorldIterator.next();
-            SectionWorldDetail sectionWorldDetail = configHandler.getSectionWorld().getSectionWorldDetail(randomWorld);
-            if (sectionWorldDetail.needsWorldPermission() && !(context.getSender() instanceof ConsoleCommandSender)) {
-                if (!context.getPlayer().hasPermission("rtp.world." + randomWorld.getName())) {
+            ConfigWorld configWorld = randomWorldIterator.next();
+            if (configWorld.isNeedsWorldPermission() && !(context.getSender() instanceof ConsoleCommandSender)) {
+                if (!context.getPlayer().hasPermission("rtp.world." + configWorld.getName())) {
                     randomWorldIterator.remove();
                 }
             }
         }
-        return randomWorlds.stream().map(RandomWorld::getName).collect(Collectors.toList());
+        return configWorlds.stream().map(ConfigWorld::getName).collect(Collectors.toList());
     }
 
     public static void registerContexts(PaperCommandManager manager, RandomWorldHandler worldHandler, PlayerHandler playerHandler) {

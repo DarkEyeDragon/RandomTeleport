@@ -1,28 +1,45 @@
 package me.darkeyedragon.randomtp.common.config.datatype;
 
-import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorld;
+import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorldborder;
 
-@ConfigSerializable
-public class World {
+public class World implements ConfigWorld {
 
-    private boolean useWorldborder;
-    private boolean needsWorldPermission;
-    private Worldborder worldborder;
-    private double price;
+    private final String name;
+
+    private final WorldDetail worldDetail;
+
+    public World(String name, WorldDetail worldDetail) {
+        this.name = name;
+        this.worldDetail = worldDetail;
+    }
 
     public boolean isUseWorldborder() {
-        return useWorldborder;
+        return worldDetail.isUseWorldborder();
     }
 
     public boolean isNeedsWorldPermission() {
-        return needsWorldPermission;
+        return worldDetail.isNeedsWorldPermission();
     }
 
-    public Worldborder getWorldborder() {
-        return worldborder;
+    public ConfigWorldborder getConfigWorldborder() {
+        return worldDetail.getConfigWorldborder();
     }
 
     public double getPrice() {
-        return price;
+        return worldDetail.getPrice();
+    }
+
+    @Override
+    public boolean isUseEco() {
+        return getPrice() > 0;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public WorldDetail getWorldDetail() {
+        return worldDetail;
     }
 }

@@ -9,7 +9,7 @@ public interface RandomConfigHandler {
     SectionQueue getSectionQueue();
     SectionTeleport getSectionTeleport();
 
-    SectionWorldHolder getSectionWorld();
+    SectionWorld getSectionWorld();
 
     SectionBlacklist getSectionBlacklist();
 

@@ -1,7 +1,7 @@
 package me.darkeyedragon.randomtp.common.world;
 
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
-import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
+import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorld;
 import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
@@ -30,22 +30,22 @@ public abstract class WorldHandler implements RandomWorldHandler {
         RandomConfigHandler configHandler = plugin.getConfigHandler();
         plugin.getLogger().info("Populating WorldQueue");
         long startTime = System.currentTimeMillis();
-        for (RandomWorld world : configHandler.getSectionWorld().getWorlds()) {
-            populateWorld(world);
+        for (ConfigWorld configWorld : configHandler.getSectionWorld().getConfigWorlds()) {
+            populateWorld(configWorld);
         }
         plugin.getLogger().info("WorldQueue population finished in " + (System.currentTimeMillis() - startTime) + "ms");
     }
 
     @Override
-    public final void populateWorld(RandomWorld world) {
+    public final void populateWorld(ConfigWorld configWorld) {
         //Add a new world to the world queue and generate random locations
         RandomConfigHandler configHandler = plugin.getConfigHandler();
+        RandomWorld world = getWorld(configWorld.getName());
         LocationQueue locationQueue = new LocationQueue(plugin, configHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(world, plugin));
 
         //Subscribe to the locationqueue to be notified of changes
         subscribe(locationQueue, world);
-        SectionWorldDetail sectionWorldDetail = configHandler.getSectionWorld().getSectionWorldDetail(world);
-        locationQueue.generate(sectionWorldDetail);
+        locationQueue.generate(configWorld);
         plugin.getWorldHandler().getWorldQueue().put(world, locationQueue);
     }
 
