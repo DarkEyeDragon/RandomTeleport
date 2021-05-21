@@ -8,7 +8,11 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 @ConfigSerializable
 public class CommonSectionBlacklist implements SectionBlacklist {
 
-    private Blacklist blacklist;
+    private final Blacklist blacklist;
+
+    public CommonSectionBlacklist(Blacklist blacklist) {
+        this.blacklist = blacklist;
+    }
 
     @Override
     public RandomBlacklist getBlacklist() {

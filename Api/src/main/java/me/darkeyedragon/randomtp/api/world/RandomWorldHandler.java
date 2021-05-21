@@ -16,4 +16,6 @@ public interface RandomWorldHandler {
     void populateWorld(ConfigWorld world);
 
     RandomWorld getWorld(String worldName);
+
+    RandomBiomeHandler getBiomeHandler();
 }

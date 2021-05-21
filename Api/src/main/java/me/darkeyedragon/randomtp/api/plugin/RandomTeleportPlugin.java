@@ -11,6 +11,7 @@ import me.darkeyedragon.randomtp.api.metric.Metric;
 import me.darkeyedragon.randomtp.api.scheduler.Scheduler;
 import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
 import me.darkeyedragon.randomtp.api.world.PlayerHandler;
+import me.darkeyedragon.randomtp.api.world.RandomMaterialHandler;
 import me.darkeyedragon.randomtp.api.world.RandomWorldHandler;
 import net.kyori.adventure.platform.AudienceProvider;
 
@@ -55,4 +56,6 @@ public interface RandomTeleportPlugin<T> {
     Scheduler getScheduler();
 
     RandomAddonManager getAddonManager();
+
+    RandomMaterialHandler getMaterialHandler();
 }

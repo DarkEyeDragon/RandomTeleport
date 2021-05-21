@@ -5,7 +5,6 @@ import me.darkeyedragon.randomtp.api.config.RandomBlacklist;
 import me.darkeyedragon.randomtp.api.config.RandomDimensionData;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @ConfigSerializable
@@ -15,10 +14,6 @@ public class Blacklist implements RandomBlacklist {
 
     public Blacklist(Map<Dimension, RandomDimensionData> dimensions) {
         this.dimensions = dimensions;
-    }
-
-    public Blacklist() {
-        this(new HashMap<>());
     }
 
     public Map<Dimension, RandomDimensionData> getDimensions() {

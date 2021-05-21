@@ -1,4 +1,4 @@
-package me.darkeyedragon.randomtp.common.world.block;
+package me.darkeyedragon.randomtp.common.world;
 
 import me.darkeyedragon.randomtp.api.world.RandomBlockType;
 import me.darkeyedragon.randomtp.api.world.RandomMaterial;

@@ -1,10 +1,19 @@
 package me.darkeyedragon.randomtp.common.config;
 
+import io.leangen.geantyref.TypeToken;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.config.RandomDimensionData;
-import me.darkeyedragon.randomtp.api.config.section.*;
+import me.darkeyedragon.randomtp.api.config.section.SectionBlacklist;
+import me.darkeyedragon.randomtp.api.config.section.SectionDebug;
+import me.darkeyedragon.randomtp.api.config.section.SectionEconomy;
+import me.darkeyedragon.randomtp.api.config.section.SectionMessage;
+import me.darkeyedragon.randomtp.api.config.section.SectionQueue;
+import me.darkeyedragon.randomtp.api.config.section.SectionTeleport;
+import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
+import me.darkeyedragon.randomtp.api.world.RandomMaterial;
 import me.darkeyedragon.randomtp.api.world.RandomParticle;
 import me.darkeyedragon.randomtp.common.config.serializer.RandomDimensionDataSerializer;
+import me.darkeyedragon.randomtp.common.config.serializer.RandomMaterialSerializer;
 import me.darkeyedragon.randomtp.common.config.serializer.RandomParticleSerializer;
 import me.darkeyedragon.randomtp.common.config.serializer.SectionBlacklistSerializer;
 import me.darkeyedragon.randomtp.common.config.serializer.SectionWorldSerializer;
@@ -15,6 +24,7 @@ import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 import java.nio.file.Paths;
+import java.util.Set;
 
 //TODO implement common config system
 public class CommonConfigHandler implements RandomConfigHandler {
@@ -35,7 +45,9 @@ public class CommonConfigHandler implements RandomConfigHandler {
                                     builder.registerExact(RandomDimensionData.class, RandomDimensionDataSerializer.INSTANCE);
                                     builder.register(RandomParticle.class, RandomParticleSerializer.INSTANCE);
                                     builder.register(SectionWorld.class, SectionWorldSerializer.INSTANCE);
-                                    builder.registerExact(SectionBlacklist.class, SectionBlacklistSerializer.INSTANCE);
+                                    builder.register(SectionBlacklist.class, new SectionBlacklistSerializer(randomTeleportPlugin));
+                                    builder.register(new TypeToken<Set<RandomMaterial>>() {
+                                    }, new RandomMaterialSerializer(randomTeleportPlugin));
                                     builder.registerAll(ConfigurateComponentSerializer.configurate().serializers());
                                 }
                         )

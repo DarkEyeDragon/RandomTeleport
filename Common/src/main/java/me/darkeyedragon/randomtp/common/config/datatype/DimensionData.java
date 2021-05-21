@@ -6,13 +6,19 @@ import me.darkeyedragon.randomtp.api.world.RandomBlockType;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 @ConfigSerializable
 public class DimensionData implements RandomDimensionData {
 
-    private Set<RandomBlockType> blockTypes;
-    private Set<RandomBiome> biomes;
+    private final Set<RandomBlockType> blockTypes;
+    private final Set<RandomBiome> biomes;
+
+    public DimensionData() {
+        blockTypes = new HashSet<>();
+        biomes = new HashSet<>();
+    }
 
     public Set<RandomBlockType> getBlockTypes() {
         return blockTypes;

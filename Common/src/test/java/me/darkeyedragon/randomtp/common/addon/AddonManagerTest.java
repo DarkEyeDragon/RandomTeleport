@@ -12,6 +12,7 @@ import me.darkeyedragon.randomtp.api.metric.Metric;
 import me.darkeyedragon.randomtp.api.scheduler.Scheduler;
 import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
 import me.darkeyedragon.randomtp.api.world.PlayerHandler;
+import me.darkeyedragon.randomtp.api.world.RandomMaterialHandler;
 import me.darkeyedragon.randomtp.api.world.RandomWorldHandler;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.common.addon.response.AddonResponse;
@@ -40,6 +41,11 @@ class AddonManagerTest {
             @Override
             public AddonManager getAddonManager() {
                 return addonManager;
+            }
+
+            @Override
+            public RandomMaterialHandler getMaterialHandler() {
+                return null;
             }
 
             @Override

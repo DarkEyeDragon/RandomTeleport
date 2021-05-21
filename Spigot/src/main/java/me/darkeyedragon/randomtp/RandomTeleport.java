@@ -12,6 +12,7 @@ import me.darkeyedragon.randomtp.api.metric.Metric;
 import me.darkeyedragon.randomtp.api.scheduler.Scheduler;
 import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
 import me.darkeyedragon.randomtp.api.world.PlayerHandler;
+import me.darkeyedragon.randomtp.api.world.RandomMaterialHandler;
 import me.darkeyedragon.randomtp.api.world.RandomWorldHandler;
 import me.darkeyedragon.randomtp.command.completion.Registrar;
 import me.darkeyedragon.randomtp.common.addon.AddonManager;
@@ -28,6 +29,8 @@ import me.darkeyedragon.randomtp.listener.WorldListener;
 import me.darkeyedragon.randomtp.log.BukkitLogger;
 import me.darkeyedragon.randomtp.scheduler.SpigotScheduler;
 import me.darkeyedragon.randomtp.teleport.SpigotCooldownHandler;
+import me.darkeyedragon.randomtp.world.SpigotBiomeHandler;
+import me.darkeyedragon.randomtp.world.SpigotMaterialHandler;
 import me.darkeyedragon.randomtp.world.SpigotPlayerHandler;
 import me.darkeyedragon.randomtp.world.SpigotWorldHandler;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -47,6 +50,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
     private DeathTracker deathTracker;
     private BukkitAudiences bukkitAudience;
     private RandomWorldHandler worldHandler;
+    private RandomMaterialHandler materialHandler;
     private PlayerHandler playerHandler;
     private Metric metric;
     private CooldownHandler cooldownHandler;
@@ -83,6 +87,8 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
 
     public void init() {
         // Plugin startup logic
+        materialHandler = new SpigotMaterialHandler();
+        worldHandler = new SpigotWorldHandler(this, new SpigotBiomeHandler());
         configHandler = new CommonConfigHandler(this);
         configHandler.reload();
         scheduler = new SpigotScheduler(this);
@@ -95,7 +101,6 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         }
         bukkitAudience = BukkitAudiences.create(plugin);
         commandManager = new PaperCommandManager(plugin);
-        worldHandler = new SpigotWorldHandler(this);
         deathTracker = new SpigotDeathTracker(this);
         commandManager.enableUnstableAPI("help");
         commandManager.enableUnstableAPI("brigadier");
@@ -126,6 +131,11 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
     @Override
     public AddonManager getAddonManager() {
         return addonManager;
+    }
+
+    @Override
+    public RandomMaterialHandler getMaterialHandler() {
+        return materialHandler;
     }
 
     public SpigotImpl getPlugin() {
