@@ -6,53 +6,57 @@ import me.darkeyedragon.randomtp.api.config.section.subsection.SubSectionSign;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.Template;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
 @ConfigSerializable
 public class CommonSectionMessage implements SectionMessage {
 
-    private Component initTeleport;
-    private Component initTeleportDelay;
-    private Component teleportCanceled;
-    private Component teleport;
-    private Component countdown;
-    private Component noWorldPermission;
-    private Component emptyQueue;
-    private Component invalidDefaultWorld;
+    private String initTeleport;
+    private String initTeleportDelay;
+    private String teleportCanceled;
+    private String teleport;
+    private String countdown;
+    private String noWorldPermission;
+    private String emptyQueue;
+    private String invalidDefaultWorld;
 
     @Override
     public Component getInitTeleport() {
-        return initTeleport;
+        return toComponent(initTeleport);
     }
 
     @Override
     public Component getInitTeleportDelay(long millis) {
-        return initTeleportDelay;
+        String format = CommonSectionFormat.TIME;
+        return toComponent(initTeleport, Template.of("time", format));
     }
 
     @Override
     public Component getTeleportCanceled() {
-        return teleportCanceled;
+        return toComponent(teleportCanceled);
     }
 
     @Override
     public Component getTeleport(RandomLocation location) {
-        return teleport;
+        return toComponent(teleport, Template.of("posX", location.getBlockX() + ""), Template.of("posY", location.getBlockY() + ""), Template.of("posZ", location.getBlockZ() + ""));
     }
 
     @Override
     public Component getCountdown(long remaining) {
-        return countdown;
+        String format = CommonSectionFormat.TIME;
+        return toComponent(countdown, Template.of("time", format));
     }
 
     @Override
     public Component getNoWorldPermission(RandomWorld world) {
-        return noWorldPermission;
+        return toComponent(noWorldPermission, Template.of("world", world.getName()));
     }
 
     @Override
     public Component getEmptyQueue() {
-        return emptyQueue;
+        return toComponent(emptyQueue);
     }
 
     @Override
@@ -69,6 +73,14 @@ public class CommonSectionMessage implements SectionMessage {
 
     @Override
     public Component getInvalidDefaultWorld(String worldName) {
-        return invalidDefaultWorld;
+        return toComponent(invalidDefaultWorld);
+    }
+
+    private Component toComponent(String message) {
+        return MiniMessage.get().parse(message);
+    }
+
+    private Component toComponent(String message, Template... template) {
+        return MiniMessage.get().parse(message, template);
     }
 }

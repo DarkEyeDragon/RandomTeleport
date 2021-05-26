@@ -96,8 +96,7 @@ public class CommonLocation implements RandomLocation {
      * Gets a unit-vector pointing in the direction that this Location is
      * facing.
      *
-     * @return a vector pointing the direction of this location's {@link
-     * #getPitch() pitch} and {@link #getYaw() yaw}
+     * @return a vector pointing the direction of this location's
      */
     @NotNull
     public Vector getDirection() {
