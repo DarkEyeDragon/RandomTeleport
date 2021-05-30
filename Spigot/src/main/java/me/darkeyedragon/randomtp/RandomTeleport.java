@@ -16,6 +16,7 @@ import me.darkeyedragon.randomtp.api.world.RandomMaterialHandler;
 import me.darkeyedragon.randomtp.api.world.RandomWorldHandler;
 import me.darkeyedragon.randomtp.command.completion.Registrar;
 import me.darkeyedragon.randomtp.common.addon.AddonManager;
+import me.darkeyedragon.randomtp.common.command.DebugCommand;
 import me.darkeyedragon.randomtp.common.command.RandomTeleportCommand;
 import me.darkeyedragon.randomtp.common.config.CommonConfigHandler;
 import me.darkeyedragon.randomtp.common.message.CommonMessageHandler;
@@ -108,6 +109,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         Registrar.registerCompletions(commandManager, addonManager, configHandler);
         Registrar.registerContexts(commandManager, worldHandler, playerHandler);
         commandManager.registerCommand(new RandomTeleportCommand(this));
+        commandManager.registerCommand(new DebugCommand(this));
 
         if (setupEconomy()) {
             plugin.getLogger().info("Vault found. Hooking into it.");

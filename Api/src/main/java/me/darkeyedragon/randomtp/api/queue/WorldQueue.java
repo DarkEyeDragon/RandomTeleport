@@ -38,4 +38,8 @@ public class WorldQueue {
         }
         return locationQueue.poll();
     }
+
+    public Map<RandomWorld, LocationQueue> getWorldQueueMap() {
+        return worldQueueMap;
+    }
 }
