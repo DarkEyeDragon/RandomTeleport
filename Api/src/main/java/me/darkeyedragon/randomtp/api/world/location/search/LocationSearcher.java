@@ -1,14 +1,13 @@
 package me.darkeyedragon.randomtp.api.world.location.search;
 
 
-import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 
 import java.util.concurrent.CompletableFuture;
 
 public interface LocationSearcher {
 
-    CompletableFuture<RandomLocation> getRandom(ConfigWorld configWorld);
+    CompletableFuture<RandomLocation> getRandom(LocationDataProvider dataProvider);
 
     boolean isSafe(RandomLocation location);
 

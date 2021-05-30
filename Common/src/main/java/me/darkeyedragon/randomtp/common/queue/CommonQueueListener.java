@@ -41,9 +41,12 @@ public class CommonQueueListener implements QueueListener<RandomLocation> {
         ConfigWorld configWorld = configHandler.getSectionWorld().getConfigWorld(randomWorld.getName());
         long initDelay = configHandler.getSectionQueue().getInitDelay();
         plugin.getScheduler().runTaskLater(() -> {
-            plugin.getWorldHandler().getWorldQueue().get(randomWorld).generate(configWorld);
-            if (configHandler.getSectionDebug().isShowQueuePopulation()) {
-                plugin.getLogger().info("Safe location consumed for " + element.getWorld().getName() + " (" + locationQueue.size() + "/" + size + ")");
+            //TODO find a proper algorithm to determine generation
+            if (locationQueue.size() < size / 2) {
+                plugin.getWorldHandler().generate(configWorld, randomWorld);
+                if (configHandler.getSectionDebug().isShowQueuePopulation()) {
+                    plugin.getLogger().info("Safe location consumed for " + element.getWorld().getName() + " (" + locationQueue.size() + "/" + size + ")");
+                }
             }
         }, initDelay);
     }

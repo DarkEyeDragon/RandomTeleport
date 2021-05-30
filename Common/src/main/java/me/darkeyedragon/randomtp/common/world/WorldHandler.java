@@ -6,8 +6,14 @@ import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
+import me.darkeyedragon.randomtp.api.world.RandomWorldBorder;
 import me.darkeyedragon.randomtp.api.world.RandomWorldHandler;
+import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.api.world.location.RandomOffset;
+import me.darkeyedragon.randomtp.api.world.location.search.LocationDataProvider;
+import me.darkeyedragon.randomtp.common.config.datatype.Offset;
 import me.darkeyedragon.randomtp.common.queue.CommonQueueListener;
+import me.darkeyedragon.randomtp.common.world.location.search.CommonLocationDataProvider;
 import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
 
 public abstract class WorldHandler implements RandomWorldHandler {
@@ -38,7 +44,6 @@ public abstract class WorldHandler implements RandomWorldHandler {
 
     @Override
     public final void populateWorld(ConfigWorld configWorld) {
-        //Add a new world to the world queue and generate random locations
         RandomConfigHandler configHandler = plugin.getConfigHandler();
         RandomWorld world = getWorld(configWorld.getName());
         if (world == null) {
@@ -49,8 +54,32 @@ public abstract class WorldHandler implements RandomWorldHandler {
 
         //Subscribe to the locationqueue to be notified of changes
         subscribe(locationQueue, world);
-        locationQueue.generate(configWorld);
-        plugin.getWorldHandler().getWorldQueue().put(world, locationQueue);
+        getWorldQueue().put(world, locationQueue);
+        generate(configWorld, world);
+    }
+
+    private LocationDataProvider createDataProvider(ConfigWorld configWorld, RandomWorld world) {
+        RandomOffset offset;
+        int radius;
+        if (configWorld.isUseWorldborder()) {
+            RandomWorldBorder worldBorder = world.getWorldBorder();
+            RandomLocation location = worldBorder.getCenter();
+            offset = new Offset(location.getBlockX(), location.getBlockZ());
+            //keep warning distance of the worldborder in mind
+            radius = (int) Math.floor(worldBorder.getSize() / 2 - worldBorder.getWarningDistance());
+        } else {
+            offset = configWorld.getConfigWorldborder().getOffset();
+            radius = configWorld.getConfigWorldborder().getRadius();
+        }
+        return new CommonLocationDataProvider(world, offset, radius);
+    }
+
+    public void generate(ConfigWorld configWorld, RandomWorld randomWorld) {
+        getWorldQueue().get(randomWorld).generate(createDataProvider(configWorld, randomWorld));
+    }
+
+    public void generate(ConfigWorld configWorld, RandomWorld randomWorld, int size) {
+        getWorldQueue().get(randomWorld).generate(createDataProvider(configWorld, randomWorld), size);
     }
 
     public void subscribe(LocationQueue locationQueue, RandomWorld world) {

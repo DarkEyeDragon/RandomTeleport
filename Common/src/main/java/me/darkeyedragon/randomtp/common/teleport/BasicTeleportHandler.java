@@ -5,7 +5,12 @@ import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorld;
 import me.darkeyedragon.randomtp.api.eco.EcoHandler;
 import me.darkeyedragon.randomtp.api.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
-import me.darkeyedragon.randomtp.api.teleport.*;
+import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
+import me.darkeyedragon.randomtp.api.teleport.RandomCooldown;
+import me.darkeyedragon.randomtp.api.teleport.TeleportHandler;
+import me.darkeyedragon.randomtp.api.teleport.TeleportProperty;
+import me.darkeyedragon.randomtp.api.teleport.TeleportResponse;
+import me.darkeyedragon.randomtp.api.teleport.TeleportType;
 import me.darkeyedragon.randomtp.api.world.RandomParticle;
 import me.darkeyedragon.randomtp.api.world.RandomPlayer;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
@@ -152,7 +157,7 @@ public class BasicTeleportHandler implements TeleportHandler {
                 RandomWorld randomWorld = property.getLocation().getWorld();
                 ConfigWorld configWorld = configHandler.getSectionWorld().getConfigWorld(randomWorld.getName());
                 try {
-                    plugin.getWorldHandler().getWorldQueue().get(randomWorld).generate(configWorld, 1);
+                    plugin.getWorldHandler().generate(configWorld, randomWorld);
                 } catch (IllegalArgumentException ex) {
                     plugin.getLogger().warn(ex.getMessage());
                 }

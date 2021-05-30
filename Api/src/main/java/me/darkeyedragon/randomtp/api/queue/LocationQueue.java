@@ -1,8 +1,8 @@
 package me.darkeyedragon.randomtp.api.queue;
 
-import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorld;
 import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.api.world.location.search.LocationDataProvider;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -20,23 +20,23 @@ public class LocationQueue extends ObservableQueue<RandomLocation> {
         this.baseLocationSearcher = baseLocationSearcher;
     }
 
-    public void generate(ConfigWorld configWorld) {
-        generate(configWorld, super.remainingCapacity());
+    public void generate(LocationDataProvider dataProvider) {
+        generate(dataProvider, super.remainingCapacity());
     }
 
     /**
-     * Generates locations based on the {@link ConfigWorld}.
+     * Generates locations based on the {@link LocationDataProvider}.
      * To prevent the thread from choking a hard limit is placed on the loop. Limiting the amount of
      * searches that can be scheduled at once.
      *
-     * @param configWorld the {@link ConfigWorld}
-     * @param amount      the amount of required locations to be found.
+     * @param dataProvider the {@link LocationDataProvider}
+     * @param amount       the amount of required locations to be found.
      * @author Trigary
      */
-    public void generate(ConfigWorld configWorld, int amount) {
+    public void generate(LocationDataProvider dataProvider, int amount) {
         AtomicInteger startedAmount = new AtomicInteger();
         AtomicReference<Runnable> worker = new AtomicReference<>();
-        worker.set(() -> baseLocationSearcher.getRandom(configWorld).thenAccept(randomLocation -> {
+        worker.set(() -> baseLocationSearcher.getRandom(dataProvider).thenAccept(randomLocation -> {
             offer(randomLocation);
             if (startedAmount.getAndIncrement() < amount) {
                 worker.get().run();

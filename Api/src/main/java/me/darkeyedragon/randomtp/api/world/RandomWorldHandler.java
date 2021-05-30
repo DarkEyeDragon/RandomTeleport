@@ -18,4 +18,8 @@ public interface RandomWorldHandler {
     RandomWorld getWorld(String worldName);
 
     RandomBiomeHandler getBiomeHandler();
+
+    void generate(ConfigWorld configWorld, RandomWorld world);
+
+    void generate(ConfigWorld configWorld, RandomWorld world, int amount);
 }
