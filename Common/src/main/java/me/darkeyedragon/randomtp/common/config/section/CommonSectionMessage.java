@@ -19,7 +19,7 @@ public class CommonSectionMessage implements SectionMessage {
     private String teleport;
     private String countdown;
     private String noWorldPermission;
-    private String emptyQueue;
+    private String depletedQueue;
     private String invalidDefaultWorld;
 
     @Override
@@ -29,8 +29,7 @@ public class CommonSectionMessage implements SectionMessage {
 
     @Override
     public Component getInitTeleportDelay(long millis) {
-        String format = CommonSectionFormat.TIME;
-        return toComponent(initTeleport, Template.of("time", format));
+        return toComponent(initTeleportDelay);
     }
 
     @Override
@@ -45,8 +44,7 @@ public class CommonSectionMessage implements SectionMessage {
 
     @Override
     public Component getCountdown(long remaining) {
-        String format = CommonSectionFormat.TIME;
-        return toComponent(countdown, Template.of("time", format));
+        return toComponent(countdown, Template.of("time", remaining + ""));
     }
 
     @Override
@@ -56,7 +54,7 @@ public class CommonSectionMessage implements SectionMessage {
 
     @Override
     public Component getEmptyQueue() {
-        return toComponent(emptyQueue);
+        return toComponent(depletedQueue);
     }
 
     @Override
