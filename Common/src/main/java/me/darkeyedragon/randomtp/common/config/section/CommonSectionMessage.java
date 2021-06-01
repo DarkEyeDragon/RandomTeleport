@@ -5,6 +5,8 @@ import me.darkeyedragon.randomtp.api.config.section.subsection.SubSectionEconomy
 import me.darkeyedragon.randomtp.api.config.section.subsection.SubSectionSign;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.common.util.CustomTime;
+import me.darkeyedragon.randomtp.common.util.TimeUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.Template;
@@ -29,7 +31,8 @@ public class CommonSectionMessage implements SectionMessage {
 
     @Override
     public Component getInitTeleportDelay(long millis) {
-        return toComponent(initTeleportDelay);
+        CustomTime customTime = TimeUtil.formatTime(millis);
+        return toComponent(initTeleportDelay, Template.of("time", customTime.toFormattedString()));
     }
 
     @Override
@@ -44,7 +47,8 @@ public class CommonSectionMessage implements SectionMessage {
 
     @Override
     public Component getCountdown(long remaining) {
-        return toComponent(countdown, Template.of("time", remaining + ""));
+        CustomTime customTime = TimeUtil.formatTime(remaining);
+        return toComponent(countdown, Template.of("time", customTime.toFormattedString()));
     }
 
     @Override

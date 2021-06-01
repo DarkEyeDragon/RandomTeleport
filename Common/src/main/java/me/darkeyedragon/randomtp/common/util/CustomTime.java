@@ -1,13 +1,13 @@
 package me.darkeyedragon.randomtp.common.util;
 
 public class CustomTime {
-    private long totalSeconds;
-    private long totalMinutes;
-    private long totalHours;
+    private final long totalSeconds;
+    private final long totalMinutes;
+    private final long totalHours;
 
-    private long seconds;
-    private long minutes;
-    private long hours;
+    private final long seconds;
+    private final long minutes;
+    private final long hours;
 
     public CustomTime(long totalSeconds, long totalMinutes, long totalHours) {
         this.totalSeconds = totalSeconds;
@@ -41,5 +41,17 @@ public class CustomTime {
 
     public long getHours() {
         return hours;
+    }
+
+    public String toFormattedString() {
+        StringBuilder builder = new StringBuilder();
+        if (totalHours > 0) {
+            builder.append(hours).append("h ");
+        }
+        if (totalMinutes > 0) {
+            builder.append(minutes).append("m ");
+        }
+        builder.append(seconds).append("s");
+        return builder.toString();
     }
 }
