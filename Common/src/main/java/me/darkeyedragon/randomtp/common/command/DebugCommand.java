@@ -46,10 +46,11 @@ public class DebugCommand extends BaseCommand {
                 for (Class<?> type : parameterTypes) {
                     System.out.println(type.getTypeName());
                     if (type.isPrimitive()) {
-                        args.add(1);
+                        args.add(100000);
                     } else if (type.isAssignableFrom(String.class)) {
                         args.add("testStr");
                     } else if (type.isAssignableFrom(RandomWorld.class)) {
+                        //TODO make sure the world actually exists
                         args.add(plugin.getWorldHandler().getWorld("world"));
                     } else if (type.isAssignableFrom(RandomLocation.class)) {
                         args.add(plugin.getWorldHandler().getWorld("world").getBlockAt(150, 10, 200).getLocation());
