@@ -87,7 +87,7 @@ public class BasicTeleportHandler implements TeleportHandler {
             int taskId = plugin.getScheduler().runTaskLater(() -> {
                 complete.set(true);
                 teleport(player);
-            }, delay).getTaskId();
+            }, delay / 50).getTaskId();
             RandomLocation originalLoc = player.getLocation().clone();
             if (configHandler.getSectionTeleport().isCancelOnMove()) {
                 //Cancel the teleport task if the player moves
