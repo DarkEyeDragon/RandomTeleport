@@ -30,8 +30,8 @@ public class CommonSectionMessage implements SectionMessage {
     }
 
     @Override
-    public Component getInitTeleportDelay(long millis) {
-        CustomTime customTime = TimeUtil.formatTime(millis);
+    public Component getInitTeleportDelay(long ticks) {
+        CustomTime customTime = TimeUtil.formatTime(ticks);
         return toComponent(initTeleportDelay, Template.of("time", customTime.toFormattedString()));
     }
 
@@ -46,8 +46,8 @@ public class CommonSectionMessage implements SectionMessage {
     }
 
     @Override
-    public Component getCountdown(long remaining) {
-        CustomTime customTime = TimeUtil.formatTime(remaining);
+    public Component getCountdown(long remainingTicks) {
+        CustomTime customTime = TimeUtil.formatTime(remainingTicks);
         return toComponent(countdown, Template.of("time", customTime.toFormattedString()));
     }
 

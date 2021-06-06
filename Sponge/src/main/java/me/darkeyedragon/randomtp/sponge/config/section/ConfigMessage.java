@@ -61,7 +61,7 @@ public class ConfigMessage implements SectionMessage {
     }
 
     @Override
-    public Component getCountdown(long remaining) {
+    public Component getCountdown(long remainingTicks) {
         return null;
     }
 
