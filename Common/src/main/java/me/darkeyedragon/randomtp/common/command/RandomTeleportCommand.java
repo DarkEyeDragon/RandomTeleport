@@ -3,7 +3,14 @@ package me.darkeyedragon.randomtp.common.command;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandIssuer;
 import co.aikar.commands.InvalidCommandArgument;
-import co.aikar.commands.annotation.*;
+import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandCompletion;
+import co.aikar.commands.annotation.CommandPermission;
+import co.aikar.commands.annotation.Default;
+import co.aikar.commands.annotation.Description;
+import co.aikar.commands.annotation.Optional;
+import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.Syntax;
 import me.darkeyedragon.randomtp.api.addon.RandomAddon;
 import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
 import me.darkeyedragon.randomtp.api.addon.RequiredPlugin;
@@ -42,7 +49,7 @@ public class RandomTeleportCommand extends BaseCommand {
     private final CooldownHandler cooldownHandler;
     private RandomConfigHandler configHandler;
     private WorldQueue worldQueue;
-
+    private long timeSpan;
     //Config sections
     private SectionMessage configMessage;
     private SectionQueue configQueue;
@@ -72,6 +79,9 @@ public class RandomTeleportCommand extends BaseCommand {
     @Description("Teleport players to a random location.")
     @Syntax("[world/player] [world]")
     public void onTeleport(CommandIssuer sender, @Optional PlayerWorldContext target, @Optional @CommandPermission("rtp.teleport.world") RandomWorld world) {
+        if (plugin.getConfigHandler().getSectionDebug().isShowExecutionTimes()) {
+            timeSpan = System.currentTimeMillis();
+        }
         setConfigs();
         RandomPlayer player = null;
         List<RandomPlayer> targets = new ArrayList<>();
@@ -170,9 +180,13 @@ public class RandomTeleportCommand extends BaseCommand {
         boolean bypassCooldown = player.hasPermission("rtp.teleport.bypass") || sender.hasPermission("rtp.teleport.bypass");
         boolean bypassEco = player.hasPermission("rtp.eco.bypass") || sender.hasPermission("rtp.eco.bypass");
         RandomLocation location = worldQueue.popLocation(world);
-        TeleportProperty teleportProperty = new CommonTeleportProperty(location, sender, player, price, bypassEco, bypassDelay, bypassCooldown, configTeleport.getParticle());
+        TeleportProperty teleportProperty = new CommonTeleportProperty(location, sender, player, price, bypassEco, bypassDelay, bypassCooldown, configTeleport.getParticle(), timeSpan);
         BasicTeleportHandler teleportHandler = new BasicTeleportHandler(plugin, teleportProperty);
         teleportHandler.toRandomLocation(player);
+        if (timeSpan != 0 && configHandler.getSectionDebug().isShowExecutionTimes()) {
+            long totalTime = System.currentTimeMillis() - timeSpan;
+            plugin.getLogger().info("Debug: Teleport request took: " + totalTime + "ms");
+        }
     }
 
     @Subcommand("reload")

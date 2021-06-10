@@ -8,6 +8,8 @@ import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 
 public interface TeleportProperty {
 
+    long getInitTime();
+
     RandomLocation getLocation();
 
     void setLocation(RandomLocation location);

@@ -122,6 +122,9 @@ public class BasicTeleportHandler implements TeleportHandler {
     }
 
     private void teleport(RandomPlayer player) {
+        if (configHandler.getSectionDebug().isShowExecutionTimes()) {
+            plugin.getLogger().info("Debug: teleport setup took " + (System.currentTimeMillis() - property.getInitTime()) + "ms");
+        }
         RandomLocation location = property.getLocation();
         if (location == null) {
             plugin.getMessageHandler().sendMessage(property.getCommandIssuer(), configHandler.getSectionMessage().getEmptyQueue());

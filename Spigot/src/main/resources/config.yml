@@ -99,10 +99,10 @@ blacklist:
   overworld:
     biome:
       - ".*OCEAN"
-    block: []
+    block: [ ]
   nether:
-    biome: []
-    block: []
+    biome: [ ]
+    block: [ ]
   end:
-    biome: []
-    block: []
+    biome: [ ]
+    block: [ ]

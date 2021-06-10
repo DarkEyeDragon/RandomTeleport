@@ -14,6 +14,8 @@ import org.bukkit.entity.Player;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 public class PlayerSpigot implements RandomPlayer {
 
@@ -59,6 +61,10 @@ public class PlayerSpigot implements RandomPlayer {
         RandomLocation randomLocation = teleportProperty.getLocation();
         //Teleport the player async if possible
         return PaperLib.teleportAsync(player, WorldUtil.toLocation(randomLocation)).thenApply(aBoolean -> {
+            if (teleportProperty.getInitTime() != 0) {
+                Logger logger = LogManager.getLogManager().getLogger("RandomTeleport");
+                logger.info("Debug: total teleport time took: " + (System.currentTimeMillis() - teleportProperty.getInitTime()) + "ms");
+            }
             if (aBoolean) {
                 return new BasicTeleportResponse(TeleportType.SUCCESS);
             } else {
