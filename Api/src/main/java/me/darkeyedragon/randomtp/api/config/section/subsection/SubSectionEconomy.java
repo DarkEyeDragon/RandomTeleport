@@ -5,5 +5,5 @@ import net.kyori.adventure.text.Component;
 public interface SubSectionEconomy {
     Component getInsufficientFunds();
 
-    Component getPayment();
+    Component getPayment(double price, String currency);
 }

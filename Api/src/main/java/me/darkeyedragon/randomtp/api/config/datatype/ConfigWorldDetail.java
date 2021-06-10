@@ -1,5 +1,7 @@
 package me.darkeyedragon.randomtp.api.config.datatype;
 
+import me.darkeyedragon.randomtp.api.eco.EcoType;
+
 public interface ConfigWorldDetail {
     boolean isUseWorldborder();
 
@@ -9,5 +11,5 @@ public interface ConfigWorldDetail {
 
     double getPrice();
 
-    boolean isUseEco();
+    EcoType getEcoType();
 }

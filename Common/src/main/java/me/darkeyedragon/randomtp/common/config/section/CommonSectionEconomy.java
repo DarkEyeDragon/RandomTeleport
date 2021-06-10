@@ -6,21 +6,15 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 @ConfigSerializable
 public class CommonSectionEconomy implements SectionEconomy {
 
-    private double price;
-    private boolean useEco;
+    private double defaultPrice;
 
     @Override
     public double getPrice() {
-        return price;
+        return defaultPrice;
     }
 
     @Override
     public void setPrice(double price) {
-        this.price = price;
-    }
-
-    @Override
-    public boolean useEco() {
-        return useEco;
+        this.defaultPrice = price;
     }
 }

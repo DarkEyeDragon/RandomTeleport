@@ -2,6 +2,7 @@ package me.darkeyedragon.randomtp.common.config.datatype;
 
 import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorld;
 import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorldborder;
+import me.darkeyedragon.randomtp.api.eco.EcoType;
 
 public class World implements ConfigWorld {
 
@@ -31,8 +32,8 @@ public class World implements ConfigWorld {
     }
 
     @Override
-    public boolean isUseEco() {
-        return getPrice() > 0;
+    public EcoType getEcoType() {
+        return worldDetail.getEcoType();
     }
 
     public String getName() {

@@ -1,6 +1,7 @@
 package me.darkeyedragon.randomtp.common.config.datatype;
 
 import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorldDetail;
+import me.darkeyedragon.randomtp.api.eco.EcoType;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
 @ConfigSerializable
@@ -31,7 +32,10 @@ public class WorldDetail implements ConfigWorldDetail {
     }
 
     @Override
-    public boolean isUseEco() {
-        return getPrice() > 0;
+    public EcoType getEcoType() {
+        if (price == -1) return EcoType.NONE;
+        if (price == 0) return EcoType.GLOBAL;
+        else return EcoType.LOCAL;
     }
+
 }

@@ -16,7 +16,7 @@ message:
   invalid-default-world: '<red>The default world is not set or is invalid. Cannot teleport. Contact an admin to fix this issue.'
   economy:
     insufficient-funds: '<red>You do not have enough money to rtp!'
-    payment: '<green>You just paid <aqua><price><currency> &ato rtp!'
+    payment: '<green>You just paid <aqua><price><currency> <green>to rtp!'
   sign:
     - '<aqua>[RandomTeleport]'
     - 'in <world>'

@@ -145,9 +145,10 @@ public class BasicTeleportHandler implements TeleportHandler {
             if (configHandler.getSectionTeleport().getDeathTimer() > 0) {
                 addToDeathTimer(player);
             }
-            if (configHandler.getSectionEconomy().useEco() && !property.isBypassEco() && plugin.getEcoHandler() != null) {
-                ecoHandler.makePayment(player.getUniqueId(), configHandler.getSectionEconomy().getPrice());
-                plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getSubSectionEconomy().getPayment());
+            if (configHandler.getSectionEconomy().getPrice() > 0 && !property.isBypassEco() && plugin.getEcoHandler() != null) {
+                ecoHandler.makePayment(player.getUniqueId(), property.getPrice());
+                String currency = property.getPrice() == 1 ? ecoHandler.getCurrencySingular() : ecoHandler.getCurrencyPlural();
+                plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getSubSectionEconomy().getPayment(property.getPrice(), currency));
             }
             drawWarpParticles(player, property.getParticle());
             plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getTeleport(location));

@@ -167,15 +167,18 @@ public class RandomTeleportCommand extends BaseCommand {
     private void teleport(CommandIssuer sender, RandomPlayer player, RandomWorld world) {
         setConfigs();
         final ConfigWorld worldDetail = plugin.getConfigHandler().getSectionWorld().getConfigWorld(world.getName());
-        final boolean useWorldEco = worldDetail.isUseEco();
-        final boolean useGlobalEco = configHandler.getSectionEconomy().useEco();
         double price = 0;
-        if (useWorldEco) {
-            price = configHandler.getSectionEconomy().getPrice();
-        } else if (useGlobalEco) {
-            price = worldDetail.getPrice();
+        switch (worldDetail.getEcoType()) {
+            case GLOBAL:
+                price = configHandler.getSectionEconomy().getPrice();
+                break;
+            case LOCAL:
+                price = worldDetail.getPrice();
+                break;
+            case NONE:
+                price = 0;
+                break;
         }
-        final boolean useEco = configHandler.getSectionEconomy().useEco();
         boolean bypassDelay = player.hasPermission("rtp.teleportdelay.bypass") || sender.hasPermission("rtp.teleportdelay.bypass");
         boolean bypassCooldown = player.hasPermission("rtp.teleport.bypass") || sender.hasPermission("rtp.teleport.bypass");
         boolean bypassEco = player.hasPermission("rtp.eco.bypass") || sender.hasPermission("rtp.eco.bypass");
