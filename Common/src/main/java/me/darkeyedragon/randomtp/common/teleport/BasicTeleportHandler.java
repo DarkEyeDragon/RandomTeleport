@@ -79,7 +79,6 @@ public class BasicTeleportHandler implements TeleportHandler {
             plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getCountdown(remaining));
             return new BasicTeleportResponse(TeleportType.COOLDOWN);
         }
-        //TODO figure out scheduler
         //Initiate the delay timer if the delay is higher than 0
         if (delay > 0) {
             plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getInitTeleportDelay(delay));
@@ -106,8 +105,7 @@ public class BasicTeleportHandler implements TeleportHandler {
             teleport(player);
             return new BasicTeleportResponse(TeleportType.SUCCESS);
         }
-        //TODO proper return type
-        return null;
+        return new BasicTeleportResponse(TeleportType.FAIL);
     }
 
     private void addToDeathTimer(RandomPlayer player) {

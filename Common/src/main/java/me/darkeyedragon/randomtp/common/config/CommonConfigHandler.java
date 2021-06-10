@@ -26,7 +26,6 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 import java.nio.file.Paths;
 import java.util.Set;
 
-//TODO implement common config system
 public class CommonConfigHandler implements RandomConfigHandler {
 
     protected final YamlConfigurationLoader loader;
@@ -41,7 +40,6 @@ public class CommonConfigHandler implements RandomConfigHandler {
                 .path(Paths.get(this.randomTeleportPlugin.getDataFolder().getPath(), "config.yml"))
                 .defaultOptions(
                         configurationOptions -> configurationOptions.serializers(builder -> {
-                                    //builder.register(RandomBlacklist.class, RandomBlacklistSerializer.INSTANCE);
                                     builder.registerExact(RandomDimensionData.class, RandomDimensionDataSerializer.INSTANCE);
                                     builder.register(RandomParticle.class, RandomParticleSerializer.INSTANCE);
                                     builder.register(SectionWorld.class, SectionWorldSerializer.INSTANCE);

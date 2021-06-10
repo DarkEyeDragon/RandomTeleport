@@ -11,13 +11,5 @@ public class OverworldLocationSearcher extends BaseLocationSearcher {
      */
     public OverworldLocationSearcher(RandomTeleportPlugin<?> plugin) {
         super(plugin, plugin.getAddonManager().getAddons(), plugin.getConfigHandler().getSectionBlacklist().getBlacklist(), Dimension.OVERWORLD);
-
-        //TODO parse regex
-        //Illegal biomes
-        /*for (Biome biome : Biome.values()) {
-            if (biome.toString().toLowerCase().contains(OCEAN)) {
-                blacklistBiome.add(new SpigotBiome(biome));
-            }
-        }*/
     }
 }
