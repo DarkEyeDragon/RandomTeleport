@@ -19,7 +19,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 @CommandAlias("rtpdebug")
 public class DebugCommand extends BaseCommand {
@@ -50,8 +52,10 @@ public class DebugCommand extends BaseCommand {
                     } else if (type.isAssignableFrom(String.class)) {
                         args.add("testStr");
                     } else if (type.isAssignableFrom(RandomWorld.class)) {
-                        //TODO make sure the world actually exists
-                        args.add(plugin.getWorldHandler().getWorld("world"));
+                        //Grab the first world from the world queue. If non exists... well then it dies.
+                        Set<RandomWorld> worldQueue = plugin.getWorldHandler().getWorldQueue().getWorldQueueMap().keySet();
+                        Iterator<RandomWorld> worldIterator = worldQueue.iterator();
+                        args.add(worldIterator.next());
                     } else if (type.isAssignableFrom(RandomLocation.class)) {
                         args.add(plugin.getWorldHandler().getWorld("world").getBlockAt(150, 10, 200).getLocation());
                     }
