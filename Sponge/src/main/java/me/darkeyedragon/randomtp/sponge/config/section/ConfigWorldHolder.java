@@ -1,14 +1,13 @@
 package me.darkeyedragon.randomtp.sponge.config.section;
 
-import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
+import me.darkeyedragon.randomtp.api.config.section.SectionWorldHolder;
 import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 
-import java.util.List;
 import java.util.Set;
 
-public class ConfigWorld implements SectionWorld {
+public class ConfigWorldHolder implements SectionWorldHolder {
 
 
     @Override
@@ -22,7 +21,7 @@ public class ConfigWorld implements SectionWorld {
     }
 
     @Override
-    public SectionWorld setSectionDetail(SectionWorldDetail sectionWorld) {
+    public SectionWorldHolder setSectionDetail(SectionWorldDetail sectionWorld) {
         return null;
     }
 

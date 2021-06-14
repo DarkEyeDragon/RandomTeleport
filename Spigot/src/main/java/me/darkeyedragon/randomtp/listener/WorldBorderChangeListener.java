@@ -3,7 +3,7 @@ package me.darkeyedragon.randomtp.listener;
 import io.papermc.paper.event.world.border.WorldBorderBoundsChangeFinishEvent;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
-import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
+import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorld;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
@@ -27,11 +27,11 @@ public class WorldBorderChangeListener implements Listener {
      * */
     @EventHandler
     public void onWorldBorderChange(WorldBorderBoundsChangeFinishEvent event) {
-        plugin.getLogger().info("Worldborder changed. Updating worlds that rely on it...");
+        plugin.getLogger().info("WorldBorder changed. Updating worlds that rely on it...");
         RandomConfigHandler configHandler = plugin.getConfigHandler();
         RandomWorld world = WorldUtil.toRandomWorld(event.getWorld());
-        SectionWorldDetail sectionWorldDetail = configHandler.getSectionWorld().getSectionWorldDetail(world);
-        if (sectionWorldDetail.useWorldBorder()) {
+        ConfigWorld configWorld = configHandler.getSectionWorld().getConfigWorld(world.getName());
+        if (configWorld.isUseWorldborder()) {
             WorldQueue worldQueue = plugin.getWorldHandler().getWorldQueue();
             worldQueue.remove(world);
             worldQueue.put(
@@ -40,7 +40,7 @@ public class WorldBorderChangeListener implements Listener {
                             LocationSearcherFactory.getLocationSearcher(world, plugin)
                     )
             );
-            plugin.getWorldHandler().populateWorld(world);
+            plugin.getWorldHandler().populateWorld(configWorld);
         }
     }
 }

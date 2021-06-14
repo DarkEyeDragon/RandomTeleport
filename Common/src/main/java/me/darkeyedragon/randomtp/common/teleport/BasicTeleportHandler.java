@@ -1,11 +1,17 @@
 package me.darkeyedragon.randomtp.common.teleport;
 
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
-import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
+import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorld;
 import me.darkeyedragon.randomtp.api.eco.EcoHandler;
 import me.darkeyedragon.randomtp.api.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
-import me.darkeyedragon.randomtp.api.teleport.*;
+import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
+import me.darkeyedragon.randomtp.api.teleport.RandomCooldown;
+import me.darkeyedragon.randomtp.api.teleport.TeleportHandler;
+import me.darkeyedragon.randomtp.api.teleport.TeleportProperty;
+import me.darkeyedragon.randomtp.api.teleport.TeleportResponse;
+import me.darkeyedragon.randomtp.api.teleport.TeleportType;
+import me.darkeyedragon.randomtp.api.world.RandomParticle;
 import me.darkeyedragon.randomtp.api.world.RandomPlayer;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
@@ -43,7 +49,7 @@ public class BasicTeleportHandler implements TeleportHandler {
             return;
         }*/
         final long delay;
-        double price = configHandler.getSectionEconomy().getPrice();
+        double price = property.getPrice();
         if (!property.isBypassEco() && price > 0) {
             if (ecoHandler != null) {
                 if (!ecoHandler.hasEnough(player.getUniqueId(), price)) {
@@ -73,7 +79,6 @@ public class BasicTeleportHandler implements TeleportHandler {
             plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getCountdown(remaining));
             return new BasicTeleportResponse(TeleportType.COOLDOWN);
         }
-        //TODO figure out scheduler
         //Initiate the delay timer if the delay is higher than 0
         if (delay > 0) {
             plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getInitTeleportDelay(delay));
@@ -100,8 +105,7 @@ public class BasicTeleportHandler implements TeleportHandler {
             teleport(player);
             return new BasicTeleportResponse(TeleportType.SUCCESS);
         }
-        //TODO proper return type
-        return null;
+        return new BasicTeleportResponse(TeleportType.FAIL);
     }
 
     private void addToDeathTimer(RandomPlayer player) {
@@ -110,15 +114,18 @@ public class BasicTeleportHandler implements TeleportHandler {
         plugin.getDeathTracker().add(player, configHandler.getSectionTeleport().getDeathTimer());
     }
 
-    private void drawWarpParticles(RandomPlayer player, RandomParticle<?> particle) {
+    private void drawWarpParticles(RandomPlayer player, RandomParticle particle) {
         RandomLocation spawnLoc = player.getEyeLocation().add(player.getLocation().getDirection());
-        player.getWorld().spawnParticle(particle, spawnLoc, particle.getAmount());
+        player.getWorld().spawnParticle(particle.getId(), spawnLoc, particle.getAmount());
     }
 
     private void teleport(RandomPlayer player) {
+        if (configHandler.getSectionDebug().isShowExecutionTimes()) {
+            plugin.getLogger().info("Debug: teleport setup took " + (System.currentTimeMillis() - property.getInitTime()) + "ms");
+        }
         RandomLocation location = property.getLocation();
         if (location == null) {
-            plugin.getMessageHandler().sendMessage(property.getCommandIssuer(), configHandler.getSectionMessage().getDepletedQueue());
+            plugin.getMessageHandler().sendMessage(property.getCommandIssuer(), configHandler.getSectionMessage().getEmptyQueue());
             return;
         }
         location.getWorld().getChunkAtAsync(location.getWorld(), location.getBlockX(), location.getBlockZ()).thenAccept(chunk -> {
@@ -136,9 +143,10 @@ public class BasicTeleportHandler implements TeleportHandler {
             if (configHandler.getSectionTeleport().getDeathTimer() > 0) {
                 addToDeathTimer(player);
             }
-            if (configHandler.getSectionEconomy().useEco() && !property.isBypassEco() && plugin.getEcoHandler() != null) {
-                ecoHandler.makePayment(player.getUniqueId(), configHandler.getSectionEconomy().getPrice());
-                plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getSubSectionEconomy().getPayment());
+            if (configHandler.getSectionEconomy().getPrice() > 0 && !property.isBypassEco() && plugin.getEcoHandler() != null) {
+                ecoHandler.makePayment(player.getUniqueId(), property.getPrice());
+                String currency = property.getPrice() == 1 ? ecoHandler.getCurrencySingular() : ecoHandler.getCurrencyPlural();
+                plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getSubSectionEconomy().getPayment(property.getPrice(), currency));
             }
             drawWarpParticles(player, property.getParticle());
             plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getTeleport(location));
@@ -149,9 +157,9 @@ public class BasicTeleportHandler implements TeleportHandler {
             //Generate a new location after the init delay
             plugin.getScheduler().runTaskLater(() -> {
                 RandomWorld randomWorld = property.getLocation().getWorld();
-                SectionWorldDetail sectionWorldDetail = configHandler.getSectionWorld().getSectionWorldDetail(randomWorld);
+                ConfigWorld configWorld = configHandler.getSectionWorld().getConfigWorld(randomWorld.getName());
                 try {
-                    plugin.getWorldHandler().getWorldQueue().get(randomWorld).generate(sectionWorldDetail, 1);
+                    plugin.getWorldHandler().generate(configWorld, randomWorld);
                 } catch (IllegalArgumentException ex) {
                     plugin.getLogger().warn(ex.getMessage());
                 }

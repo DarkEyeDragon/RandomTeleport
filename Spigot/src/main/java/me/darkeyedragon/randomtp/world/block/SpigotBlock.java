@@ -10,7 +10,9 @@ import me.darkeyedragon.randomtp.world.SpigotBiome;
 import me.darkeyedragon.randomtp.world.SpigotBlockType;
 import me.darkeyedragon.randomtp.world.SpigotWorld;
 import org.bukkit.block.Block;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
+@ConfigSerializable
 public class SpigotBlock implements RandomBlock {
 
     final Block block;

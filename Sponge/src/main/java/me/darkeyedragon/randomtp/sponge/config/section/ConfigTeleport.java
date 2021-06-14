@@ -1,8 +1,7 @@
 package me.darkeyedragon.randomtp.sponge.config.section;
 
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.Particle;
 import me.darkeyedragon.randomtp.api.config.section.SectionTeleport;
-import me.darkeyedragon.randomtp.api.teleport.TeleportParticle;
+import me.darkeyedragon.randomtp.api.world.RandomParticle;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
@@ -20,7 +19,7 @@ public class ConfigTeleport implements SectionTeleport {
     private boolean useDefaultWorld;
     private String defaultWorld;
 
-    TeleportParticle<Particle> teleportParticle;
+    RandomParticle particle;
 
     @Override
     public long getCooldown() {
@@ -63,13 +62,13 @@ public class ConfigTeleport implements SectionTeleport {
     }
 
     @Override
-    public TeleportParticle getParticle() {
-        return teleportParticle;
+    public RandomParticle getParticle() {
+        return particle;
     }
 
     @Override
-    public void setParticle(TeleportParticle teleportParticle) {
-        this.teleportParticle = teleportParticle;
+    public void setParticle(RandomParticle teleportParticle) {
+        this.particle = teleportParticle;
     }
 
     @Override

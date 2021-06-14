@@ -1,29 +1,19 @@
-package me.darkeyedragon.randomtp.config.section;
+package me.darkeyedragon.randomtp.common.config.section;
 
 import me.darkeyedragon.randomtp.api.config.section.SectionTeleport;
-import me.darkeyedragon.randomtp.api.teleport.RandomParticle;
-import me.darkeyedragon.randomtp.api.teleport.TeleportParticle;
-import org.bukkit.Particle;
+import me.darkeyedragon.randomtp.api.world.RandomParticle;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
-public class ConfigTeleport implements SectionTeleport {
+@ConfigSerializable
+public class CommonSectionTeleport implements SectionTeleport {
 
     private long cooldown;
     private long delay;
     private boolean cancelOnMove;
     private long deathTimer;
-    private RandomParticle<?> particle;
+    private RandomParticle particle;
     private boolean useDefaultWorld;
     private String defaultWorld;
-
-    public ConfigTeleport(long cooldown, long delay, boolean cancelOnMove, long deathTimer, TeleportParticle<Particle> particle, boolean useDefaultWorld, String defaultWorld) {
-        this.cooldown = cooldown;
-        this.delay = delay;
-        this.cancelOnMove = cancelOnMove;
-        this.deathTimer = deathTimer;
-        this.particle = particle;
-        this.useDefaultWorld = useDefaultWorld;
-        this.defaultWorld = defaultWorld;
-    }
 
     @Override
     public long getCooldown() {
@@ -66,12 +56,12 @@ public class ConfigTeleport implements SectionTeleport {
     }
 
     @Override
-    public TeleportParticle<Particle> getParticle() {
-        return (TeleportParticle<Particle>) particle;
+    public RandomParticle getParticle() {
+        return particle;
     }
 
     @Override
-    public void setParticle(RandomParticle<?> teleportParticle) {
+    public void setParticle(RandomParticle teleportParticle) {
         this.particle = teleportParticle;
     }
 

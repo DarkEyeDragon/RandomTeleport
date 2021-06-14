@@ -14,7 +14,7 @@ public class EndLocationSearcher extends BaseLocationSearcher {
      * @param plugin The plugin instance
      */
     public EndLocationSearcher(RandomTeleportPlugin<?> plugin) {
-        super(plugin.getAddonManager().getAddons(), plugin.getConfigHandler().getSectionBlacklist().getBlacklist(), Dimension.END);
+        super(plugin, plugin.getAddonManager().getAddons(), plugin.getConfigHandler().getSectionBlacklist().getBlacklist(), Dimension.END);
     }
 
     /*@Override

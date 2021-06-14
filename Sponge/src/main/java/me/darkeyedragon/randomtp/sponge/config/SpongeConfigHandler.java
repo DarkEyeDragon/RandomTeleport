@@ -8,10 +8,8 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import org.spongepowered.api.config.DefaultConfig;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class SpongeConfigHandler implements RandomConfigHandler {
 
@@ -26,9 +24,8 @@ public class SpongeConfigHandler implements RandomConfigHandler {
     private ConfigPlugin configPlugin;
     private ConfigQueue configQueue;
     private ConfigTeleport configTeleport;
-    private ConfigWorld configWorld;
-
-    private HoconConfigurationLoader loader;
+    private final HoconConfigurationLoader loader;
+    private ConfigWorldHolder configWorld;
 
     public SpongeConfigHandler() {
         loader = HoconConfigurationLoader.builder()
@@ -73,7 +70,7 @@ public class SpongeConfigHandler implements RandomConfigHandler {
     }
 
     @Override
-    public SectionWorld getSectionWorld() {
+    public SectionWorldHolder getSectionWorld() {
         return configWorld;
     }
 

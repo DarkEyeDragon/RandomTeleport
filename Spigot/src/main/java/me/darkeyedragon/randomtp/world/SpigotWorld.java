@@ -1,7 +1,6 @@
 package me.darkeyedragon.randomtp.world;
 
 import io.papermc.lib.PaperLib;
-import me.darkeyedragon.randomtp.api.teleport.RandomParticle;
 import me.darkeyedragon.randomtp.api.world.RandomChunkSnapshot;
 import me.darkeyedragon.randomtp.api.world.RandomEnvironment;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
@@ -90,7 +89,7 @@ public class SpigotWorld implements RandomWorld {
     }
 
     @Override
-    public void spawnParticle(RandomParticle<?> particle, RandomLocation spawnLoc, int amount) {
-        world.spawnParticle((Particle) particle.getParticle(), WorldUtil.toLocation(spawnLoc), amount);
+    public void spawnParticle(String particleId, RandomLocation spawnLoc, int amount) {
+        world.spawnParticle(Particle.valueOf(particleId), WorldUtil.toLocation(spawnLoc), amount);
     }
 }

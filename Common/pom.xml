@@ -18,6 +18,7 @@
             <url>https://repo.aikar.co/content/groups/aikar/</url>
         </repository>
     </repositories>
+
     <dependencies>
         <dependency>
             <groupId>me.darkeyedragon.randomtp</groupId>
@@ -51,6 +52,22 @@
             <groupId>co.aikar</groupId>
             <artifactId>acf-core</artifactId>
             <version>0.5.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.spongepowered</groupId>
+            <artifactId>configurate-yaml</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-serializer-configurate4</artifactId>
+            <version>4.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-text-serializer-plain</artifactId>
+            <version>4.8.0</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

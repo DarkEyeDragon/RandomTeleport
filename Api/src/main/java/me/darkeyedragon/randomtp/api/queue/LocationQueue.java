@@ -1,8 +1,8 @@
 package me.darkeyedragon.randomtp.api.queue;
 
-import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
 import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.api.world.location.search.LocationDataProvider;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -20,33 +20,29 @@ public class LocationQueue extends ObservableQueue<RandomLocation> {
         this.baseLocationSearcher = baseLocationSearcher;
     }
 
-    public void generate(SectionWorldDetail sectionWorldDetail) {
-        generate(sectionWorldDetail, super.remainingCapacity());
+    public void generate(LocationDataProvider dataProvider) {
+        generate(dataProvider, super.remainingCapacity());
     }
 
     /**
-     * Generates locations based on the {@link SectionWorldDetail}.
+     * Generates locations based on the {@link LocationDataProvider}.
      * To prevent the thread from choking a hard limit is placed on the loop. Limiting the amount of
      * searches that can be scheduled at once.
      *
-     * @param sectionWorldDetail the {@link SectionWorldDetail}
-     * @param amount             the amount of required locations to be found.
+     * @param dataProvider the {@link LocationDataProvider}
+     * @param amount       the amount of required locations to be found.
      * @author Trigary
      */
-    public void generate(SectionWorldDetail sectionWorldDetail, int amount) {
+    public void generate(LocationDataProvider dataProvider, int amount) {
         AtomicInteger startedAmount = new AtomicInteger();
         AtomicReference<Runnable> worker = new AtomicReference<>();
-        worker.set(() -> baseLocationSearcher.getRandom(sectionWorldDetail).thenAccept(randomLocation -> {
-            if (super.contains(randomLocation)) {
-                worker.get().run();
-                return;
-            }
+        worker.set(() -> baseLocationSearcher.getRandom(dataProvider).thenAccept(randomLocation -> {
             offer(randomLocation);
             if (startedAmount.getAndIncrement() < amount) {
                 worker.get().run();
             }
         }).exceptionally(throwable -> {
-            plugin.getLogger().warn(throwable.getMessage());
+            throwable.printStackTrace();
             return null;
         }));
         int workersToStart = Math.min(amount, MAX_CONCURRENT);

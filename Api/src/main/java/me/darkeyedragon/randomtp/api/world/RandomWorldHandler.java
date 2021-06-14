@@ -1,5 +1,6 @@
 package me.darkeyedragon.randomtp.api.world;
 
+import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorld;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 
 /**
@@ -12,7 +13,13 @@ public interface RandomWorldHandler {
 
     void populateWorldQueue();
 
-    void populateWorld(RandomWorld world);
+    void populateWorld(ConfigWorld world);
 
     RandomWorld getWorld(String worldName);
+
+    RandomBiomeHandler getBiomeHandler();
+
+    void generate(ConfigWorld configWorld, RandomWorld world);
+
+    void generate(ConfigWorld configWorld, RandomWorld world, int amount);
 }

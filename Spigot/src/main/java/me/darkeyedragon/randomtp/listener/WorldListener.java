@@ -2,6 +2,7 @@ package me.darkeyedragon.randomtp.listener;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
+import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorld;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.util.WorldUtil;
@@ -25,11 +26,11 @@ public class WorldListener implements Listener {
     @EventHandler
     public void onWorldLoad(WorldLoadEvent event) {
         World world = event.getWorld();
-        RandomWorld randomworld = WorldUtil.toRandomWorld(world);
+        ConfigWorld configWorld = plugin.getConfigHandler().getSectionWorld().getConfigWorld(world.getName());
         configHandler.populateWorldConfigSection();
-        if (configHandler.getSectionWorld().getWorlds().contains(randomworld)) {
+        if (configHandler.getSectionWorld().getConfigWorlds().contains(configWorld)) {
             plugin.getLogger().info(ChatColor.GOLD + "World load detected for " + world.getName() + "! Starting generation of worlds...");
-            plugin.getWorldHandler().populateWorld(randomworld);
+            plugin.getWorldHandler().populateWorld(configWorld);
         }
     }
 

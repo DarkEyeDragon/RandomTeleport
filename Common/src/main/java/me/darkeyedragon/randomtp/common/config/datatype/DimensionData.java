@@ -1,13 +1,17 @@
-package me.darkeyedragon.randomtp.api.config;
+package me.darkeyedragon.randomtp.common.config.datatype;
 
+import me.darkeyedragon.randomtp.api.config.RandomDimensionData;
 import me.darkeyedragon.randomtp.api.world.RandomBiome;
 import me.darkeyedragon.randomtp.api.world.RandomBlockType;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class DimensionData {
+@ConfigSerializable
+public class DimensionData implements RandomDimensionData {
+
     private final Set<RandomBlockType> blockTypes;
     private final Set<RandomBiome> biomes;
 

@@ -1,57 +1,68 @@
+# Random Teleport by DarkEyeDragon
+# NOTE: All delays/cooldowns are in ticks. 20 ticks is 1 second.
 message:
-  initteleport: "&aSearching for safe location to teleport to..."
+  init-teleport: '<green>Searching for safe location to teleport to...'
   #Used when teleport delay is larger than 0. This supports placeholders
   #valid placeholders: %hp (hours partial) %mp (minutes partial) %sp (seconds partial) %h (total hours) %m (total minutes) %s(total seconds)
-  initteleport_delay: "&aYou will be teleported in &6%s seconds. &aDo not move!"
-  teleport_canceled: "&aYou moved! Teleportation canceled"
+  init-teleport-delay: '<green>You will be teleported in <gold><time>. <green>Do not move!'
+  teleport-canceled: '<red>You moved! Teleportation canceled'
   #valid placeholders: %posX, %posY, %posZ
-  teleport: "&bA safe place has been found! Teleporting to &a%posX %posY %posZ"
-  depleted_queue: "&6Locations queue depleted... Forcing generation of a new location"
+  teleport: '<aqua>A safe place has been found! Teleporting to <gold><posX>x <posY>y <posZ>z'
   #valid placeholders: %hp (hours partial) %mp (minutes partial) %sp (seconds partial) %h (total hours) %m (total minutes) %s(total seconds)
-  countdown: "&cYou cannot teleport for another &6%mp minutes %sp seconds"
+  countdown: '<gold>You cannot teleport for another <aqua><time>'
   #valid placeholders: %world
-  no_world_permission: "&cI'm sorry, you cannot rtp in %world"
-  empty_queue: "&cThere are no locations available for this world! Try again in a bit or ask an admin to reload the config."
-  invalid_default_world: "&cThe default world is not set or is invalid. Cannot teleport you. Contact an admin to fix this issue."
+  no-world-permission: '<red>I''m sorry, you cannot rtp in <gold><world>!'
+  depleted-queue: '<red>The teleport queue is currently empty. Try again later'
+  invalid-default-world: '<red>The default world is not set or is invalid. Cannot teleport. Contact an admin to fix this issue.'
   economy:
-    insufficient_funds: "&cYou do not have enough money to rtp!"
-    payment: "&aYou just paid &b%price &ato rtp!"
+    insufficient-funds: '<red>You do not have enough money to rtp!'
+    payment: '<green>You just paid <aqua><price><currency> <green>to rtp!'
   sign:
-    - "<aqua>[RandomTeleport]</aqua>"
-    - "teleport to %world"
+    - '<aqua>[RandomTeleport]'
+    - 'in <world>'
 #The amount of pre-generated locations in the queue
 queue:
   size: 5
-  #The delay in ticks (20 ticks = 1 second) for the queue to kick in, lower is faster but searching at the same time as teleporting the player
+  #Delay for the queue to kick in, lower is faster but searching at the same time as teleporting the player
   #can be heavy on the server, if the player that just got teleported also needs to generate chunks. So generally not a bad idea to delay it a least a little bit
-  init_delay: 60
+  init-delay: 5
 worlds:
   world:
     #Use the worldborder for offset. This is the vanilla worldborder.
-    use_worldborder: true
+    use-worldborder: true
     #Whether or not the user needs the rtp.world.<worldname> permission
-    needs_world_permission: false
-    #Radius and offset will be ignored if use_worldborder is true.
-    radius: 21474836
-    offsetX: 0
-    offsetZ: 0
+    needs-world-permission: false
+    worldborder:
+      #Radius and offset will be ignored if use-worldborder is true.
+      radius: 1000000
+      #The offset from the world center.
+      offset:
+        x: 0
+        z: 0
+    #Price for this world.
+    #Value of 0 -> use default-price under economy section
+    #Value of -1 -> don't use a price for this world
+    price: 0
 teleport:
-  #m = minutes, s = seconds
-  #default: "60m"
-  cooldown: "60m"
-  #default: "0s"
-  delay: "0s"
-  cancel_on_move: true
+  #Default 12000 -> 10 minutes
+  cooldown: 12000
+  #Delay between initiating the teleport and actually teleporting.
+  delay: 0
+  #If set to true rtp's will be canceled if the player moves.
+  #Movement is checked every 5 ticks. Delay should be at least 10 ticks to behave properly.
+  cancel-on-move: false
   #If players die within this time after RTP'ing they wont lose anything.
-  #Set to 0 to disable. Default "10s"
-  death_timer: "10s"
+  #Set to 0 to disable. Default: 200 (10 seconds)
+  death-timer: 200
   #The particle to display when the player is teleporting. NONE for no particles. A full list can be found on
   #https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
   #You also need to provide the amount of particles.
   #Default: TOTEM:20
   particle: TOTEM:20
-  use_default_world: false
-  default_world: "world"
+  #The default world to use if no world is specified in the /rtp command.
+  #If use-default-world is false current world is used (if its allowed to be rtp'd in)
+  use-default-world: false
+  default-world: "world"
 #Plugins to take into consideration when teleporting. A player will not be teleported in those regions
 #Currently supports Factions (FactionsUUID), WorldGuard, GriefPrevention, RedProtect, Towny
 #If you want more plugins to be supported: https://github.com/DarkEyeDragon/RandomTeleport/issues
@@ -64,14 +75,16 @@ plugins:
 debug:
   #Safe location added for world(3/5)
   #Location removed from world(2/5)
-  show_queue_population: true
+  show-queue-population: true
   #Shows debug messages in game on the execution times of the entire teleport process.
   #Normally only enable to figure out what is causing teleport delays.
-  show_execution_times: false
+  show-execution-times: false
+#Default price for worlds without a price defined.
+#0 to disable
 economy:
-  price: 0
+  default-price: 0
 #The items to blacklist. Block uses the Material enum for names, find all of them here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
-#Blocks also support Tags ($PRESSURE_PLATES = all types of pressure plates) a full list can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Tag.html
+#Blocks also support Tags ($PRESSURE-PLATES = all types of pressure plates) a full list can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Tag.html
 #All Tags are prefixed with $
 #Also supports regex.
 blacklist:
@@ -80,16 +93,16 @@ blacklist:
       - LAVA
       - CACTUS
       - $FIRE
-      - MAGMA_BLOCK
+      - MAGMA-BLOCK
       - TRIPWIRE
-      - $PRESSURE_PLATES
+      - $PRESSURE-PLATES
   overworld:
     biome:
       - ".*OCEAN"
-    block: []
+    block: [ ]
   nether:
-    biome: []
-    block: []
+    biome: [ ]
+    block: [ ]
   end:
-    biome: []
-    block: []
+    biome: [ ]
+    block: [ ]

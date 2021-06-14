@@ -1,22 +1,20 @@
 package me.darkeyedragon.randomtp.api.config.section;
 
-import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
-import me.darkeyedragon.randomtp.api.world.RandomWorld;
+import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorld;
 
 import java.util.Set;
 
 public interface SectionWorld {
-    Set<SectionWorldDetail> getSectionWorldDetailSet();
 
-    boolean add(SectionWorldDetail sectionWorldDetail);
+    Set<ConfigWorld> getConfigWorlds();
 
-    SectionWorld setSectionDetail(SectionWorldDetail sectionWorld);
+    boolean contains(ConfigWorld world);
 
-    Set<RandomWorld> getWorlds();
+    boolean contains(String worldName);
 
-    boolean contains(RandomWorld world);
+    boolean remove(ConfigWorld world);
 
-    boolean remove(RandomWorld world);
+    boolean remove(String worldName);
 
-    SectionWorldDetail getSectionWorldDetail(RandomWorld randomWorld);
+    ConfigWorld getConfigWorld(String worldName);
 }

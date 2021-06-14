@@ -8,12 +8,14 @@ public interface RandomConfigHandler {
     SectionMessage getSectionMessage();
     SectionQueue getSectionQueue();
     SectionTeleport getSectionTeleport();
+
     SectionWorld getSectionWorld();
+
     SectionBlacklist getSectionBlacklist();
 
     void populateWorldConfigSection();
 
     void saveConfig();
 
-    void reload();
+    boolean reload();
 }

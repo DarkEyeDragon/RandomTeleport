@@ -2,17 +2,18 @@ package me.darkeyedragon.randomtp.common.world.location.search;
 
 import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
 import me.darkeyedragon.randomtp.api.config.Dimension;
-import me.darkeyedragon.randomtp.api.config.DimensionData;
 import me.darkeyedragon.randomtp.api.config.RandomBlacklist;
-import me.darkeyedragon.randomtp.api.config.section.subsection.SectionWorldDetail;
+import me.darkeyedragon.randomtp.api.config.RandomDimensionData;
+import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.world.RandomBiome;
 import me.darkeyedragon.randomtp.api.world.RandomBlockType;
 import me.darkeyedragon.randomtp.api.world.RandomChunkSnapshot;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.block.BlockFace;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
-import me.darkeyedragon.randomtp.api.world.location.Offset;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.api.world.location.RandomOffset;
+import me.darkeyedragon.randomtp.api.world.location.search.LocationDataProvider;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
 import me.darkeyedragon.randomtp.common.exception.NoRandomLocationFoundException;
 import me.darkeyedragon.randomtp.common.util.ChunkTraverser;
@@ -28,6 +29,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
 
     protected final Map<String, ? extends RandomLocationValidator> validatorMap;
     private final Dimension dimension;
+    private final RandomTeleportPlugin<?> plugin;
     private final RandomBlacklist blacklist;
 
     protected final byte CHUNK_SIZE = 16; //The size (in blocks) of a chunk in all directions
@@ -35,7 +37,8 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
     protected int count = 1;
     protected int max = 50;
 
-    public BaseLocationSearcher(Map<String, ? extends RandomLocationValidator> validatorMap, RandomBlacklist blacklist, Dimension dimension) {
+    public BaseLocationSearcher(RandomTeleportPlugin<?> plugin, Map<String, ? extends RandomLocationValidator> validatorMap, RandomBlacklist blacklist, Dimension dimension) {
+        this.plugin = plugin;
         this.blacklist = blacklist;
         this.dimension = dimension;
         this.validatorMap = validatorMap;
@@ -44,18 +47,18 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
     /**
      * This method will search recursively until it reached 50 tries, then fail silently.
      *
-     * @param sectionWorldDetail
+     * @param dataProvider the data required to find a random location
      * @return a {@link CompletableFuture<RandomLocation>} holding the location. Null if no location is found.
      */
     @Override
-    public CompletableFuture<RandomLocation> getRandom(SectionWorldDetail sectionWorldDetail) {
-        return pickRandomLocation(sectionWorldDetail).thenCompose((loc) -> {
+    public CompletableFuture<RandomLocation> getRandom(LocationDataProvider dataProvider) {
+        return pickRandomLocation(dataProvider).thenCompose((loc) -> {
             if (loc == null) {
                 if (count < max) {
                     count++;
-                    return getRandom(sectionWorldDetail);
+                    return getRandom(dataProvider);
                 }
-                throw new NoRandomLocationFoundException(count, sectionWorldDetail.getWorld());
+                throw new NoRandomLocationFoundException(count, dataProvider.getWorld().getName());
             } else {
                 count = 1;
                 return CompletableFuture.completedFuture(loc);
@@ -64,8 +67,8 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
     }
 
     /*Pick a random location based on chunks*/
-    private CompletableFuture<RandomLocation> pickRandomLocation(SectionWorldDetail sectionWorldDetail) {
-        CompletableFuture<RandomChunkSnapshot> chunk = getRandomChunk(sectionWorldDetail);
+    private CompletableFuture<RandomLocation> pickRandomLocation(LocationDataProvider dataProvider) {
+        CompletableFuture<RandomChunkSnapshot> chunk = getRandomChunk(dataProvider);
         return chunk.thenApply(this::getRandomLocationFromChunk);
     }
 
@@ -86,8 +89,8 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         return null;
     }
 
-    CompletableFuture<RandomChunkSnapshot> getRandomChunk(SectionWorldDetail sectionWorldDetail) {
-        CompletableFuture<RandomChunkSnapshot> chunkFuture = getRandomChunkAsync(sectionWorldDetail);
+    CompletableFuture<RandomChunkSnapshot> getRandomChunk(LocationDataProvider dataProvider) {
+        CompletableFuture<RandomChunkSnapshot> chunkFuture = getRandomChunkAsync(dataProvider);
         return chunkFuture.thenCompose((chunk) -> {
             boolean isSafe = isSafeChunk(chunk);
             if (!isSafe) {
@@ -97,8 +100,9 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
                         RandomChunkSnapshot snapshot = chunkTraverser.next().get();
                         int x = snapshot.getX() << CHUNK_SHIFT;
                         int z = snapshot.getZ() << CHUNK_SHIFT;
-                        Offset offset = sectionWorldDetail.getOffset();
-                        boolean withinBounds = x < offset.getRadius() + offset.getX() && z < offset.getRadius() + offset.getZ();
+                        RandomOffset offset = dataProvider.getOffset();
+                        int radius = dataProvider.getRadius();
+                        boolean withinBounds = (x < radius + offset.getX() && z < radius + offset.getZ()) || (x > radius - offset.getX() && z > radius - offset.getZ());
                         if (withinBounds && isSafeChunk(snapshot)) {
                             return CompletableFuture.completedFuture(snapshot);
                         }
@@ -106,33 +110,29 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
                         e.printStackTrace();
                     }
                 }
-                return getRandomChunk(sectionWorldDetail);
+                return getRandomChunk(dataProvider);
             } else {
                 return CompletableFuture.completedFuture(chunk);
             }
         });
     }
 
-    CompletableFuture<RandomChunkSnapshot> getRandomChunkAsync(SectionWorldDetail sectionWorldDetail) {
+    CompletableFuture<RandomChunkSnapshot> getRandomChunkAsync(LocationDataProvider dataProvider) {
         ThreadLocalRandom rnd = ThreadLocalRandom.current();
-        Offset offset = sectionWorldDetail.getOffset();
-        int chunkRadius = offset.getRadius() >> CHUNK_SHIFT;
+        RandomOffset offset = dataProvider.getOffset();
+        int radius = dataProvider.getRadius();
+        int chunkRadius = radius >> CHUNK_SHIFT;
         int chunkOffsetX = offset.getX() >> CHUNK_SHIFT;
         int chunkOffsetZ = offset.getZ() >> CHUNK_SHIFT;
-        int x = rnd.nextInt(-chunkRadius, chunkRadius);
-        int z = rnd.nextInt(-chunkRadius, chunkRadius);
-        RandomWorld world = sectionWorldDetail.getWorld();
+        int x = rnd.nextInt(-chunkRadius, chunkRadius + 1);
+        int z = rnd.nextInt(-chunkRadius, chunkRadius + 1);
+        RandomWorld world = dataProvider.getWorld();
         if (world == null) return CompletableFuture.completedFuture(null);
         return world.getChunkAtAsync(world, x + chunkOffsetX, z + chunkOffsetZ);
     }
 
-    public void isDuplicate(RandomLocation loc) {
-
-    }
-
     @Override
     public boolean isSafe(RandomLocation loc) {
-        //In the case the chunk isn't loaded we just assume the locatoin isn't safe.
         RandomWorld world = loc.getWorld();
         if (world == null) return false;
         RandomBlock block = loc.getBlock();
@@ -140,7 +140,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         RandomBlockType blockType = loc.getBlock().getBlockType();
         //Check if it passes the global blacklist
         if (!isValidGlobalBlockType(loc)) return false;
-        DimensionData dimensionData = blacklist.getDimensionData(dimension);
+        RandomDimensionData dimensionData = blacklist.getDimensionData(dimension);
         //Check if it passes the dimension blacklist
         if (dimensionData.getBlockTypes().contains(blockType)) return false;
         if (block.isPassable()) return false;
@@ -214,13 +214,13 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
      */
     protected boolean isValidGlobalBlockType(RandomLocation location) {
         RandomBlock randomBlock = location.getBlock();
-        DimensionData dimensionData = blacklist.getDimensionData(Dimension.GLOBAL);
+        RandomDimensionData dimensionData = blacklist.getDimensionData(Dimension.GLOBAL);
         return !dimensionData.getBlockTypes().contains(randomBlock.getBlockType());
     }
 
     protected boolean isBlacklistedBiome(RandomBiome randomBiome) {
-        DimensionData globalData = blacklist.getDimensionData(Dimension.GLOBAL);
-        DimensionData dimensionData = blacklist.getDimensionData(dimension);
+        RandomDimensionData globalData = blacklist.getDimensionData(Dimension.GLOBAL);
+        RandomDimensionData dimensionData = blacklist.getDimensionData(dimension);
         return globalData.getBiomes().contains(randomBiome) || dimensionData.getBiomes().contains(randomBiome);
     }
 
