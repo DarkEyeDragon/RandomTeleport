@@ -11,9 +11,6 @@ import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.Optional;
 import co.aikar.commands.annotation.Subcommand;
 import co.aikar.commands.annotation.Syntax;
-import me.darkeyedragon.randomtp.api.addon.RandomAddon;
-import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
-import me.darkeyedragon.randomtp.api.addon.RequiredPlugin;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorld;
 import me.darkeyedragon.randomtp.api.config.section.SectionMessage;
@@ -26,16 +23,12 @@ import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
 import me.darkeyedragon.randomtp.api.teleport.TeleportProperty;
-import me.darkeyedragon.randomtp.api.world.RandomParticle;
 import me.darkeyedragon.randomtp.api.world.RandomPlayer;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.common.command.context.PlayerWorldContext;
-import me.darkeyedragon.randomtp.common.queue.CommonQueueListener;
 import me.darkeyedragon.randomtp.common.teleport.BasicTeleportHandler;
 import me.darkeyedragon.randomtp.common.teleport.CommonTeleportProperty;
-import me.darkeyedragon.randomtp.common.util.TimeUtil;
-import me.darkeyedragon.randomtp.common.world.CommonParticle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +68,7 @@ public class RandomTeleportCommand extends BaseCommand {
 
     @Default
     @CommandPermission("rtp.teleport.self")
-    @CommandCompletion("@playerWorlds")
+    @CommandCompletion(" @worlds")
     @Description("Teleport players to a random location.")
     @Syntax("[world/player] [world]")
     public void onTeleport(CommandIssuer sender, @Optional PlayerWorldContext target, @Optional @CommandPermission("rtp.teleport.world") RandomWorld world) {
@@ -207,7 +200,7 @@ public class RandomTeleportCommand extends BaseCommand {
         messageHandler.sendMessage(sender, "<green>Reloaded config");
     }
 
-    @Subcommand("addworld")
+    /*@Subcommand("addworld")
     @CommandPermission("rtp.admin.addworld")
     @Syntax("<world> <useWorldBorder> <needsWorldPermission> [price] [radius] [offsetX] [offsetZ]")
     @CommandCompletion("@worlds true|false true|false")
@@ -230,7 +223,7 @@ public class RandomTeleportCommand extends BaseCommand {
             /*if (configWorld.add(new WorldConfigSection(new Offset(offsetX, offsetZ, radius), randomWorld, price, useWorldBorder, needsWorldPermission))) {
                 plugin.getWorldHandler().getWorldQueue().put(randomWorld, new LocationQueue(plugin, configQueue.getSize(), LocationSearcherFactory.getLocationSearcher(randomWorld, plugin)));
             }*/
-            LocationQueue locationQueue = worldQueue.get(randomWorld);
+            /*LocationQueue locationQueue = worldQueue.get(randomWorld);
             if (locationQueue != null) {
                 messageHandler.sendMessage(sender, "<green>Successfully added to config.");
                 locationQueue.subscribe(new CommonQueueListener(plugin, randomWorld, locationQueue) {
@@ -327,7 +320,7 @@ public class RandomTeleportCommand extends BaseCommand {
         sign.update();
     }*/
 
-    @Subcommand("addon")
+    /*@Subcommand("addon")
     public class AddonClass extends BaseCommand {
 
         @Subcommand("register")
@@ -435,5 +428,5 @@ public class RandomTeleportCommand extends BaseCommand {
                 plugin.getMessageHandler().sendMessage(sender, "<red>Unable to parse time: " + ex.getMessage());
             }
         }
-    }
+    }*/
 }
