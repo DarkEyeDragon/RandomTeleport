@@ -83,13 +83,13 @@ public class RandomTeleportCommand extends BaseCommand {
             if (sender.isPlayer()) {
                 player = plugin.getPlayerHandler().getPlayer(sender.getUniqueId());
                 if (configTeleport.getUseDefaultWorld()) {
-                    newWorld = plugin.getWorldHandler().getWorld(world.getName());
+                    newWorld = plugin.getWorldHandler().getWorld(configTeleport.getDefaultWorld());
                     if (newWorld == null) {
                         plugin.getMessageHandler().sendMessage(player, configMessage.getInvalidDefaultWorld(configTeleport.getDefaultWorld()));
                         return;
                     }
                     //Check if world is in the queue, if not, well then there are no locations, go figure.
-                    LocationQueue locationQueue = plugin.getWorldHandler().getWorldQueue().get(world);
+                    LocationQueue locationQueue = plugin.getWorldHandler().getWorldQueue().get(newWorld);
                     if (locationQueue == null) {
                         plugin.getMessageHandler().sendMessage(player, configMessage.getInvalidDefaultWorld(configTeleport.getDefaultWorld()));
                         return;
@@ -115,10 +115,6 @@ public class RandomTeleportCommand extends BaseCommand {
                         newWorld = world;
                     }
                     if (!configWorld.contains(newWorld.getName())) {
-                        if (newWorld == null) {
-
-                            throw new InvalidCommandArgument(true);
-                        }
                         plugin.getMessageHandler().sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
                         return;
                     }
