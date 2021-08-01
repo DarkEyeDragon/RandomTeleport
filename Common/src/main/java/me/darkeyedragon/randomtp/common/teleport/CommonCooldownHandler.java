@@ -1,4 +1,4 @@
-package me.darkeyedragon.randomtp.teleport;
+package me.darkeyedragon.randomtp.common.teleport;
 
 import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
 import me.darkeyedragon.randomtp.api.teleport.RandomCooldown;
@@ -7,15 +7,15 @@ import me.darkeyedragon.randomtp.api.world.RandomPlayer;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class SpigotCooldownHandler implements CooldownHandler {
+public class CommonCooldownHandler implements CooldownHandler {
 
     private final HashMap<UUID, RandomCooldown> cooldowns;
 
-    public SpigotCooldownHandler() {
+    public CommonCooldownHandler() {
         this.cooldowns = new HashMap<>();
     }
 
-    public SpigotCooldownHandler(HashMap<UUID, RandomCooldown> cooldowns) {
+    public CommonCooldownHandler(HashMap<UUID, RandomCooldown> cooldowns) {
         this.cooldowns = cooldowns;
     }
 

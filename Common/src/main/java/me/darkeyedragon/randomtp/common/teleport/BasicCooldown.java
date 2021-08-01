@@ -10,6 +10,11 @@ public class BasicCooldown implements RandomCooldown {
     private final long cooldown;
     private final UUID uuid;
 
+    /**
+     * @param uuid      the player's unique id
+     * @param startTime the cooldown start time
+     * @param cooldown  the duration in milliseconds
+     */
     public BasicCooldown(UUID uuid, long startTime, long cooldown) {
         this.uuid = uuid;
         this.startTime = startTime;
@@ -27,6 +32,9 @@ public class BasicCooldown implements RandomCooldown {
         return startTime;
     }
 
+    /**
+     * @return the cooldown in ticks
+     */
     @Override
     public long getCooldown() {
         return cooldown;
@@ -40,7 +48,7 @@ public class BasicCooldown implements RandomCooldown {
         if (isExpired()) {
             return -1;
         } else {
-            return startTime + cooldown - System.currentTimeMillis();
+            return (startTime + cooldown - System.currentTimeMillis());
         }
     }
 
