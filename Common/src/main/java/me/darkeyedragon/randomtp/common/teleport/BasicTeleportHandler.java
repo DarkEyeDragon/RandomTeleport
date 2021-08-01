@@ -76,7 +76,7 @@ public class BasicTeleportHandler implements TeleportHandler {
                 && !property.isBypassCooldown()
         ) {
             long remaining = randomCooldown.getRemainingTime();
-            plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getCountdown(remaining));
+            plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getCountdown(remaining / 50));
             return new BasicTeleportResponse(TeleportType.COOLDOWN);
         }
         //Initiate the delay timer if the delay is higher than 0
@@ -135,10 +135,9 @@ public class BasicTeleportHandler implements TeleportHandler {
                 return;
             }
             property.setLocation(property.getLocation().add(0.5, 1.5, 0.5));
-            plugin.getCooldownHandler().addCooldown(player, new BasicCooldown(player.getUniqueId(), System.currentTimeMillis(), configHandler.getSectionTeleport().getCooldown()));
+            plugin.getCooldownHandler().addCooldown(player, new BasicCooldown(player.getUniqueId(), System.currentTimeMillis(), configHandler.getSectionTeleport().getCooldown() * 50));
             drawWarpParticles(player, property.getParticle());
             player.teleportAsync(property);
-
             //If deathtimer is enabled add it to the collection
             if (configHandler.getSectionTeleport().getDeathTimer() > 0) {
                 addToDeathTimer(player);

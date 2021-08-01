@@ -21,6 +21,7 @@ import me.darkeyedragon.randomtp.common.command.RandomTeleportCommand;
 import me.darkeyedragon.randomtp.common.config.CommonConfigHandler;
 import me.darkeyedragon.randomtp.common.message.CommonMessageHandler;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
+import me.darkeyedragon.randomtp.common.teleport.CommonCooldownHandler;
 import me.darkeyedragon.randomtp.eco.BukkitEcoHandler;
 import me.darkeyedragon.randomtp.failsafe.SpigotDeathTracker;
 import me.darkeyedragon.randomtp.failsafe.listener.PlayerDeathListener;
@@ -29,7 +30,6 @@ import me.darkeyedragon.randomtp.listener.WorldBorderChangeListener;
 import me.darkeyedragon.randomtp.listener.WorldListener;
 import me.darkeyedragon.randomtp.log.BukkitLogger;
 import me.darkeyedragon.randomtp.scheduler.SpigotScheduler;
-import me.darkeyedragon.randomtp.teleport.SpigotCooldownHandler;
 import me.darkeyedragon.randomtp.world.SpigotBiomeHandler;
 import me.darkeyedragon.randomtp.world.SpigotMaterialHandler;
 import me.darkeyedragon.randomtp.world.SpigotPlayerHandler;
@@ -117,8 +117,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
             plugin.getLogger().warning("Vault not found. Currency based options are disabled.");
         }
         pluginManager = Bukkit.getPluginManager();
-        cooldownHandler = new SpigotCooldownHandler();
-
+        cooldownHandler = new CommonCooldownHandler();
         registerListeners();
     }
 
