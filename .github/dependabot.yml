@@ -3,14 +3,14 @@ updates:
 - package-ecosystem: maven
   directory: "/"
   schedule:
-    interval: daily
+    interval: weekly
     time: "04:00"
   open-pull-requests-limit: 10
   target-branch: dev
   ignore:
   - dependency-name: io.github.classgraph:classgraph
     versions:
-    - 4.8.103
+    - 4.8.X
 - package-ecosystem: maven
   directory: "/Api"
   schedule:
