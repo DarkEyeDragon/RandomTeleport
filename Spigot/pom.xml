@@ -19,6 +19,13 @@
 
     <description>Yeet a player to a random location, and hopefully they won't die in the process</description>
 
+    <pluginRepositories>
+        <pluginRepository>
+            <id>apache.snapshots</id>
+            <url>https://repository.apache.org/snapshots/</url>
+        </pluginRepository>
+    </pluginRepositories>
+
     <build>
         <defaultGoal>clean package</defaultGoal>
         <plugins>
@@ -42,10 +49,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
+                <version>3.3.1-SNAPSHOT</version>
                 <configuration>
-                    <!--TODO re-enable minimize when it stops shitting itself for j16-->
-                    <!--<minimizeJar>true</minimizeJar>-->
+                    <minimizeJar>true</minimizeJar>
                     <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml
                     </dependencyReducedPomLocation>
                     <relocations>
