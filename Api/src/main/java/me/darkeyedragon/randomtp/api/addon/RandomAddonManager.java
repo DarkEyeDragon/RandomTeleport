@@ -1,6 +1,8 @@
 package me.darkeyedragon.randomtp.api.addon;
 
 
+import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
+
 import java.util.Map;
 
 public interface RandomAddonManager {
@@ -9,4 +11,6 @@ public interface RandomAddonManager {
     RandomAddon register(String name);
 
     Map<String, RandomAddon> getAddons();
+
+    RandomTeleportPlugin<?> getInstance();
 }
