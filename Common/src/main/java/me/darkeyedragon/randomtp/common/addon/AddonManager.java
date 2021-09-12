@@ -3,7 +3,11 @@ package me.darkeyedragon.randomtp.common.addon;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
-import me.darkeyedragon.randomtp.api.addon.*;
+import me.darkeyedragon.randomtp.api.addon.AddonPlugin;
+import me.darkeyedragon.randomtp.api.addon.RandomAddon;
+import me.darkeyedragon.randomtp.api.addon.RandomAddonManager;
+import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
+import me.darkeyedragon.randomtp.api.addon.RequiredPlugin;
 import me.darkeyedragon.randomtp.api.logging.PluginLogger;
 import me.darkeyedragon.randomtp.common.addon.response.AddonResponse;
 import me.darkeyedragon.randomtp.common.addon.response.AddonResponseType;
@@ -17,13 +21,17 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class AddonManager implements RandomAddonManager {
 
     private static final String ADDON_FOLDER_NAME = "addons";
-    private static final String ABSTRACT_CLASS = "me.darkeyedragon.randomtp.common.addon.RandomAddon";
+    private static final String ABSTRACT_CLASS = "me.darkeyedragon.randomtp.api.addon.RandomAddon";
 
     private final Map<String, RandomAddon> addons;
     private final RandomTeleportPluginImpl instance;
@@ -173,11 +181,17 @@ public class AddonManager implements RandomAddonManager {
         }
         return addonResponse;
     }
-    public String[] getFileNames(){
-        return Arrays.stream(folder.listFiles()).filter(file -> file.getName().endsWith(".jar")).map(File::getName).toArray(String[]::new);
+    
+    public String[] getFileNames() {
+        return Arrays.stream(
+                        Objects.requireNonNull(folder.listFiles())
+                ).map(File::getName)
+                .filter(name -> name.endsWith(".jar"))
+                .toArray(String[]::new);
     }
+
     protected URL[] getJarURLs() {
-        return Arrays.stream(folder.listFiles())
+        return Arrays.stream(Objects.requireNonNull(folder.listFiles()))
                 .filter(file -> file.getName().endsWith(".jar")).map(file -> {
                     try {
                         return file.toURI().toURL();
