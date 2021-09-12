@@ -14,7 +14,7 @@ public class SpigotAddonPlugin implements AddonPlugin {
     }
 
 
-    public SpigotAddonPlugin(String name) {
+    private SpigotAddonPlugin(String name) {
         this.name = name;
         this.plugin = Bukkit.getPluginManager().getPlugin(name);
     }
