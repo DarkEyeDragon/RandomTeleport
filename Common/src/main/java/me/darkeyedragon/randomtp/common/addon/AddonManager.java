@@ -181,11 +181,17 @@ public class AddonManager implements RandomAddonManager {
         }
         return addonResponse;
     }
-    public String[] getFileNames(){
-        return Arrays.stream(folder.listFiles()).filter(file -> file.getName().endsWith(".jar")).map(File::getName).toArray(String[]::new);
+    
+    public String[] getFileNames() {
+        return Arrays.stream(
+                        Objects.requireNonNull(folder.listFiles())
+                ).map(File::getName)
+                .filter(name -> name.endsWith(".jar"))
+                .toArray(String[]::new);
     }
+
     protected URL[] getJarURLs() {
-        return Arrays.stream(folder.listFiles())
+        return Arrays.stream(Objects.requireNonNull(folder.listFiles()))
                 .filter(file -> file.getName().endsWith(".jar")).map(file -> {
                     try {
                         return file.toURI().toURL();
