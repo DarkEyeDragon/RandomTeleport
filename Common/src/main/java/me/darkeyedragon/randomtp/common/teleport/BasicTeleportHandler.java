@@ -50,22 +50,15 @@ public class BasicTeleportHandler implements TeleportHandler {
         }*/
         final long delay;
         double price = property.getPrice();
-        if (!property.isBypassEco() && price > 0) {
-            if (ecoHandler != null) {
-                if (!ecoHandler.hasEnough(player.getUniqueId(), price)) {
-                    plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getSubSectionEconomy().getInsufficientFunds());
-                    return new BasicTeleportResponse(TeleportType.FAIL);
-                }
-            } else {
-                plugin.getMessageHandler().sendMessage(property.getCommandIssuer(), "<red>Economy based features are disabled. Vault not found. Set the rtp cost to 0 or install vault.");
-                plugin.getLogger().severe("Economy based features are disabled. Vault not found. Set the rtp cost to 0 or install vault.");
-            }
-        }
         //Teleport instantly if the command sender has bypass permission
         if (property.isBypassTeleportDelay()) {
             delay = 0;
         } else {
             delay = configHandler.getSectionTeleport().getDelay();
+        }
+        if (!property.isBypassEco() && price > 0 && !ecoHandler.hasEnough(player.getUniqueId(), price)) {
+            plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getSubSectionEconomy().getInsufficientFunds());
+            return new BasicTeleportResponse(TeleportType.INSUFFICIENT_FUNDS);
         }
         // Check if the player still has a cooldown active.
         CooldownHandler cooldownHandler = plugin.getCooldownHandler();
@@ -85,7 +78,7 @@ public class BasicTeleportHandler implements TeleportHandler {
             AtomicBoolean complete = new AtomicBoolean(false);
             int taskId = plugin.getScheduler().runTaskLater(() -> {
                 complete.set(true);
-                teleport(player);
+                teleport(player, price);
             }, delay).getTaskId();
             RandomLocation originalLoc = player.getLocation().clone();
             if (configHandler.getSectionTeleport().isCancelOnMove()) {
@@ -102,7 +95,7 @@ public class BasicTeleportHandler implements TeleportHandler {
                 }, 0, 5L);
             }
         } else {
-            teleport(player);
+            teleport(player, price);
             return new BasicTeleportResponse(TeleportType.SUCCESS);
         }
         return new BasicTeleportResponse(TeleportType.FAIL);
@@ -119,7 +112,7 @@ public class BasicTeleportHandler implements TeleportHandler {
         player.getWorld().spawnParticle(particle.getId(), spawnLoc, particle.getAmount());
     }
 
-    private void teleport(RandomPlayer player) {
+    private void teleport(RandomPlayer player, double price) {
         if (configHandler.getSectionDebug().isShowExecutionTimes()) {
             plugin.getLogger().info("Debug: teleport setup took " + (System.currentTimeMillis() - property.getInitTime()) + "ms");
         }
@@ -137,6 +130,27 @@ public class BasicTeleportHandler implements TeleportHandler {
             property.setLocation(property.getLocation().add(0.5, 1.5, 0.5));
             plugin.getCooldownHandler().addCooldown(player, new BasicCooldown(player.getUniqueId(), System.currentTimeMillis(), configHandler.getSectionTeleport().getCooldown() * 50));
             drawWarpParticles(player, property.getParticle());
+            if (!property.isBypassEco() && price > 0) {
+                if (ecoHandler != null) {
+                    if (!ecoHandler.hasEnough(player.getUniqueId(), price)) {
+                        plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getSubSectionEconomy().getInsufficientFunds());
+                        return;
+                    } else {
+                        String currency;
+                        if (price > 1) {
+                            currency = ecoHandler.getCurrencyPlural();
+                        } else {
+                            currency = ecoHandler.getCurrencySingular();
+                        }
+                        if (ecoHandler.makePayment(player.getUniqueId(), price)) {
+                            plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getSubSectionEconomy().getPayment(price, currency));
+                        }
+                    }
+                } else {
+                    plugin.getMessageHandler().sendMessage(property.getCommandIssuer(), "<red>Economy based features are disabled. Vault not found. Set the rtp cost to 0 or install vault.");
+                    plugin.getLogger().severe("Economy based features are disabled. Vault not found. Set the rtp cost to 0 or install vault.");
+                }
+            }
             player.teleportAsync(property);
             //If deathtimer is enabled add it to the collection
             if (configHandler.getSectionTeleport().getDeathTimer() > 0) {
