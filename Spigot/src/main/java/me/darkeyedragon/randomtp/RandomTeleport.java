@@ -1,78 +1,74 @@
 package me.darkeyedragon.randomtp;
 
-import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
-import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
-import me.darkeyedragon.randomtp.api.queue.LocationQueue;
-import me.darkeyedragon.randomtp.api.queue.QueueListener;
-import me.darkeyedragon.randomtp.api.queue.WorldQueue;
-import me.darkeyedragon.randomtp.api.world.RandomWorld;
-import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
-import me.darkeyedragon.randomtp.command.TeleportCommand;
-import me.darkeyedragon.randomtp.command.context.PlayerWorldContext;
-import me.darkeyedragon.randomtp.common.eco.EcoHandler;
-import me.darkeyedragon.randomtp.common.logging.PluginLogger;
+import me.darkeyedragon.randomtp.addon.SpigotAddonPlugin;
+import me.darkeyedragon.randomtp.api.addon.AddonPlugin;
+import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
+import me.darkeyedragon.randomtp.api.eco.EcoHandler;
+import me.darkeyedragon.randomtp.api.failsafe.DeathTracker;
+import me.darkeyedragon.randomtp.api.logging.PluginLogger;
+import me.darkeyedragon.randomtp.api.message.MessageHandler;
+import me.darkeyedragon.randomtp.api.metric.Metric;
+import me.darkeyedragon.randomtp.api.scheduler.Scheduler;
+import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
+import me.darkeyedragon.randomtp.api.world.PlayerHandler;
+import me.darkeyedragon.randomtp.api.world.RandomMaterialHandler;
+import me.darkeyedragon.randomtp.api.world.RandomWorldHandler;
+import me.darkeyedragon.randomtp.command.completion.Registrar;
+import me.darkeyedragon.randomtp.common.addon.AddonManager;
+import me.darkeyedragon.randomtp.common.command.DebugCommand;
+import me.darkeyedragon.randomtp.common.command.RandomTeleportCommand;
+import me.darkeyedragon.randomtp.common.config.CommonConfigHandler;
+import me.darkeyedragon.randomtp.common.message.CommonMessageHandler;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
-import me.darkeyedragon.randomtp.common.world.location.LocationFactory;
-import me.darkeyedragon.randomtp.config.BukkitConfigHandler;
+import me.darkeyedragon.randomtp.common.teleport.CommonCooldownHandler;
 import me.darkeyedragon.randomtp.eco.BukkitEcoHandler;
-import me.darkeyedragon.randomtp.failsafe.DeathTracker;
+import me.darkeyedragon.randomtp.failsafe.SpigotDeathTracker;
 import me.darkeyedragon.randomtp.failsafe.listener.PlayerDeathListener;
-import me.darkeyedragon.randomtp.listener.PluginLoadListener;
-import me.darkeyedragon.randomtp.listener.WorldLoadListener;
+import me.darkeyedragon.randomtp.listener.ServerLoadListener;
+import me.darkeyedragon.randomtp.listener.WorldBorderChangeListener;
+import me.darkeyedragon.randomtp.listener.WorldListener;
 import me.darkeyedragon.randomtp.log.BukkitLogger;
-import me.darkeyedragon.randomtp.validator.Validator;
+import me.darkeyedragon.randomtp.scheduler.SpigotScheduler;
+import me.darkeyedragon.randomtp.world.SpigotBiomeHandler;
+import me.darkeyedragon.randomtp.world.SpigotMaterialHandler;
+import me.darkeyedragon.randomtp.world.SpigotPlayerHandler;
+import me.darkeyedragon.randomtp.world.SpigotWorldHandler;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.World;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
-import java.util.*;
+import java.io.File;
 
 public final class RandomTeleport extends RandomTeleportPluginImpl {
 
     private final SpigotImpl plugin;
 
-    private HashMap<UUID, Long> cooldowns;
-    private PaperCommandManager manager;
-    private Set<PluginLocationValidator> validatorList;
-    private WorldQueue worldQueue;
-    private BukkitConfigHandler bukkitConfigHandler;
-    private LocationFactory locationFactory;
+    private PaperCommandManager commandManager;
+    private RandomConfigHandler configHandler;
     private DeathTracker deathTracker;
     private BukkitAudiences bukkitAudience;
+    private RandomWorldHandler worldHandler;
+    private RandomMaterialHandler materialHandler;
+    private PlayerHandler playerHandler;
+    private Metric metric;
+    private CooldownHandler cooldownHandler;
+    private static Scheduler scheduler;
 
-    //Economy
-    private Economy econ;
     private static EcoHandler ecoHandler;
 
     PluginLogger logger;
+    private AddonManager addonManager;
+
+    private PluginManager pluginManager;
+    private MessageHandler messageHandler;
 
     public RandomTeleport(SpigotImpl plugin) {
         this.plugin = plugin;
     }
 
-    public void subscribe(LocationQueue locationQueue, RandomWorld world) {
-        if (bukkitConfigHandler.getSectionDebug().isShowQueuePopulation()) {
-            int size = bukkitConfigHandler.getSectionQueue().getSize();
-            locationQueue.subscribe(new QueueListener<RandomLocation>() {
-                @Override
-                public void onAdd(RandomLocation element) {
-                    plugin.getLogger().info("Safe location added for " + world.getName() + " (" + locationQueue.size() + "/" + size + ") in " + element.getTries() + " tries");
-                }
-
-                @Override
-                public void onRemove(RandomLocation element) {
-                    plugin.getLogger().info("Safe location consumed for " + world.getName() + " (" + locationQueue.size() + "/" + size + ")");
-                }
-            });
-        }
-    }
 
     //Economy logic
     @Override
@@ -84,84 +80,63 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         if (rsp == null) {
             return false;
         }
-        econ = rsp.getProvider();
+        //Economy
+        Economy econ = rsp.getProvider();
         ecoHandler = new BukkitEcoHandler(econ);
         return true;
     }
 
-    @Override
     public void init() {
         // Plugin startup logic
-        logger = new BukkitLogger();
-        plugin.saveDefaultConfig();
-        bukkitAudience = BukkitAudiences.create(plugin);
-        manager = new PaperCommandManager(plugin);
-        bukkitConfigHandler = new BukkitConfigHandler(this);
-        try {
-            bukkitConfigHandler.reload();
-        } catch (InvalidConfigurationException e) {
-            e.printStackTrace();
-            Bukkit.getPluginManager().disablePlugin(plugin);
+        materialHandler = new SpigotMaterialHandler();
+        worldHandler = new SpigotWorldHandler(this, new SpigotBiomeHandler());
+        configHandler = new CommonConfigHandler(this);
+        configHandler.reload();
+        scheduler = new SpigotScheduler(this);
+        playerHandler = new SpigotPlayerHandler();
+        messageHandler = new CommonMessageHandler(this);
+        logger = new BukkitLogger(this);
+        addonManager = new AddonManager(this, logger);
+        if (addonManager.createAddonDir()) {
+            logger.info("No addon folder. Creating one...");
         }
-        locationFactory = new LocationFactory(bukkitConfigHandler);
-        deathTracker = new DeathTracker(this);
-        //check if the first argument is a world or player
-        worldQueue = new WorldQueue();
-        manager.getCommandContexts().registerContext(PlayerWorldContext.class, c -> {
-            String arg1 = c.popFirstArg();
-            World world = Bukkit.getWorld(arg1);
-            Player player = Bukkit.getPlayer(arg1);
-            PlayerWorldContext context = new PlayerWorldContext();
-            if (world != null) {
-                context.setWorld(world);
-                return context;
-            } else if (player != null) {
-                context.addPlayer(player);
-                return context;
-            } else {
-                if(!arg1.isEmpty()){
-                    List<Entity> entityList = Bukkit.selectEntities(c.getSender(), arg1);
-                    for (Entity entity : entityList) {
-                        if(entity instanceof Player){
-                            context.addPlayer((Player)entity);
-                        }
-                    }
-                    return context;
-                }else{
-                    throw new InvalidCommandArgument(true);
-                }
-            }
-        });
-        cooldowns = new HashMap<>();
+        bukkitAudience = BukkitAudiences.create(plugin);
+        commandManager = new PaperCommandManager(plugin);
+        deathTracker = new SpigotDeathTracker(this);
+        commandManager.enableUnstableAPI("help");
+        commandManager.enableUnstableAPI("brigadier");
+        //Register all completions and contexts for ACF
+        Registrar.registerCompletions(commandManager, addonManager, configHandler);
+        Registrar.registerContexts(commandManager, worldHandler, playerHandler);
+        commandManager.registerCommand(new RandomTeleportCommand(this));
+        commandManager.registerCommand(new DebugCommand(this));
+
         if (setupEconomy()) {
             plugin.getLogger().info("Vault found. Hooking into it.");
         } else {
             plugin.getLogger().warning("Vault not found. Currency based options are disabled.");
         }
-        manager.registerCommand(new TeleportCommand((SpigotImpl) plugin));
-        plugin.getServer().getPluginManager().registerEvents(new WorldLoadListener(this), plugin);
-        plugin.getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), plugin);
-        validatorList = new HashSet<>();
-        plugin.getLogger().info(ChatColor.AQUA + "======== [Loading validators] ========");
-        bukkitConfigHandler.getSectionPlugin().getPlugins().forEach(s -> {
-            if (plugin.getServer().getPluginManager().getPlugin(s) != null) {
-                PluginLocationValidator validator = Validator.getValidator(s);
-                if (validator != null) {
-                    validator.load();
-                    if (validator.isLoaded()) {
-                        plugin.getLogger().info(ChatColor.GREEN + s + " -- Successfully loaded");
-                    } else {
-                        plugin.getLogger().warning(ChatColor.RED + s + " is not loaded yet. Trying to fix by loading later...");
-                    }
-                    validatorList.add(validator);
-                }
-            } else {
-                plugin.getLogger().warning(ChatColor.RED + s + " -- Not Found.");
-            }
-        });
-        plugin.getServer().getPluginManager().registerEvents(new PluginLoadListener(this), plugin);
-        plugin.getLogger().info(ChatColor.AQUA + "======================================");
-        super.init();
+        pluginManager = Bukkit.getPluginManager();
+        cooldownHandler = new CommonCooldownHandler();
+        registerListeners();
+    }
+
+    private void registerListeners() {
+        PluginManager pluginManager = plugin.getServer().getPluginManager();
+        pluginManager.registerEvents(new WorldListener(this), plugin);
+        pluginManager.registerEvents(new PlayerDeathListener(this), plugin);
+        pluginManager.registerEvents(new ServerLoadListener(this), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new WorldBorderChangeListener(this), plugin);
+    }
+
+    @Override
+    public AddonManager getAddonManager() {
+        return addonManager;
+    }
+
+    @Override
+    public RandomMaterialHandler getMaterialHandler() {
+        return materialHandler;
     }
 
     public SpigotImpl getPlugin() {
@@ -172,8 +147,9 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         return bukkitAudience;
     }
 
-    public Economy getEcon() {
-        return econ;
+    @Override
+    public AddonPlugin getPlugin(String name) {
+        return SpigotAddonPlugin.create(name);
     }
 
     @Override
@@ -185,40 +161,71 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         return ecoHandler;
     }
 
-    public HashMap<UUID, Long> getCooldowns() {
-        return cooldowns;
-    }
-
-    public Set<PluginLocationValidator> getValidatorSet() {
-        return validatorList;
-    }
-
-    public BukkitConfigHandler getConfigHandler() {
-        return bukkitConfigHandler;
-    }
-
-    public WorldQueue getWorldQueue() {
-        return worldQueue;
-    }
-
-    public LocationQueue getQueue(RandomWorld world) {
-        return worldQueue.get(world);
+    public RandomConfigHandler getConfigHandler() {
+        return configHandler;
     }
 
     public PaperCommandManager getCommandManager() {
-        return manager;
-    }
-
-    public LocationFactory getLocationFactory() {
-        return locationFactory;
+        return commandManager;
     }
 
     @Override
-    public RandomTeleportPluginImpl getInstance() {
+    public RandomTeleport getInstance() {
         return this;
     }
 
+    @Override
+    public File getDataFolder() {
+        return plugin.getDataFolder();
+    }
+
+    @Override
+    public boolean isPluginLoaded(String name) {
+        return pluginManager.isPluginEnabled(name);
+    }
+
+    @Override
+    public BukkitAudiences getAudience() {
+        return bukkitAudience;
+    }
+
+    @Override
+    public MessageHandler getMessageHandler() {
+        return messageHandler;
+    }
+
+    @Override
+    public void reloadConfig() {
+        getConfigHandler().reload();
+    }
+
+    @Override
+    public PlayerHandler getPlayerHandler() {
+        return playerHandler;
+    }
+
+    @Override
+    public Metric getStats() {
+        return metric;
+    }
+
+    @Override
+    public CooldownHandler getCooldownHandler() {
+        return cooldownHandler;
+    }
+
+    @Override
+    public Scheduler getScheduler() {
+        return scheduler;
+    }
+
+    @Override
     public DeathTracker getDeathTracker() {
         return deathTracker;
     }
+
+    public RandomWorldHandler getWorldHandler() {
+        return worldHandler;
+    }
+
 }

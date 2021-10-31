@@ -1,6 +1,7 @@
 package me.darkeyedragon.randomtp.sponge.logging;
 
-import me.darkeyedragon.randomtp.common.logging.PluginLogger;
+import me.darkeyedragon.randomtp.api.logging.PluginLogger;
+import net.kyori.adventure.text.Component;
 import org.slf4j.Logger;
 
 public class SpongeLogger implements PluginLogger {
@@ -17,12 +18,27 @@ public class SpongeLogger implements PluginLogger {
     }
 
     @Override
+    public void info(Component component) {
+
+    }
+
+    @Override
     public void warn(String s) {
         logger.warn(s);
     }
 
     @Override
+    public void warn(Component component) {
+
+    }
+
+    @Override
     public void severe(String s) {
         logger.error(s);
+    }
+
+    @Override
+    public void severe(Component component) {
+
     }
 }

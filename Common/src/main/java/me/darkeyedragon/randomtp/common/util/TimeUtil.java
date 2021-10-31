@@ -4,10 +4,10 @@ public class TimeUtil {
     /**
      * provides a String representation of the given time
      *
-     * @return {@code millis} in hh:mm:ss format
+     * @return {@code ticks} in hh:mm:ss format
      */
-    public static CustomTime formatTime(long millis) {
-        long secs = millis / 1000;
+    public static CustomTime formatTime(long ticks) {
+        long secs = ticks / 20;
         return new CustomTime(secs, secs / 60, secs / 3600);
     }
 
@@ -28,24 +28,6 @@ public class TimeUtil {
                 break;
             case "m":
                 time *= 60000;
-                break;
-            default:
-                throw new NumberFormatException("Not a valid format");
-        }
-        return time;
-    }
-    public static long stringToTicks(String message){
-        if(message == null || message.isEmpty())
-            throw new IllegalArgumentException("String can not be null or empty");
-        String suffix = message.substring(message.length() - 1);
-        String timeStr = message.replace(suffix, "");
-        long time = Integer.parseInt(timeStr);
-        switch (suffix) {
-            case "s":
-                time *= 20;
-                break;
-            case "m":
-                time *= 120;
                 break;
             default:
                 throw new NumberFormatException("Not a valid format");

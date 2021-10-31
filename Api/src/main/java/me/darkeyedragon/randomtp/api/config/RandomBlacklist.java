@@ -3,9 +3,9 @@ package me.darkeyedragon.randomtp.api.config;
 import java.util.Map;
 
 public interface RandomBlacklist {
-    Map<Dimension, DimensionData> getDimensions();
+    Map<Dimension, RandomDimensionData> getDimensions();
 
-    DimensionData getDimensionData(Dimension dimension);
+    RandomDimensionData getDimensionData(Dimension dimension);
 
-    void addDimensionData(Dimension dimension, DimensionData dimensionData);
+    void addDimensionData(Dimension dimension, RandomDimensionData dimensionData);
 }

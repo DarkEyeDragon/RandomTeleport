@@ -19,14 +19,20 @@ public interface RandomWorld {
     String getName();
 
     RandomBlock getBlockAt(int x, int y, int z);
-    
+
     RandomWorldBorder getWorldBorder();
 
     RandomEnvironment getEnvironment();
+
     /**
      * This method is required to be overridden to prevent duplicate worlds
+     *
      * @param object the object you want to compare to
      * @return true if the world is the same
      */
     boolean equals(Object object);
+
+    boolean isChunkLoaded(int x, int z);
+
+    void spawnParticle(String particleId, RandomLocation spawnLoc, int amount);
 }

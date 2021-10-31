@@ -15,9 +15,7 @@ public interface SectionMessage {
 
     Component getTeleport(RandomLocation location);
 
-    Component getDepletedQueue();
-
-    Component getCountdown(long remaining);
+    Component getCountdown(long remainingTicks);
 
     Component getNoWorldPermission(RandomWorld world);
 
@@ -26,4 +24,6 @@ public interface SectionMessage {
     SubSectionEconomy getSubSectionEconomy();
 
     SubSectionSign getSubSectionSign();
+
+    Component getInvalidDefaultWorld(String worldName);
 }

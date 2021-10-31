@@ -1,11 +1,13 @@
 package me.darkeyedragon.randomtp.sponge;
 
 import com.google.inject.Inject;
-import me.darkeyedragon.randomtp.api.addon.PluginLocationValidator;
+import me.darkeyedragon.randomtp.api.addon.AddonPlugin;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
+import me.darkeyedragon.randomtp.api.eco.EcoHandler;
+import me.darkeyedragon.randomtp.api.logging.PluginLogger;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
-import me.darkeyedragon.randomtp.common.eco.EcoHandler;
-import me.darkeyedragon.randomtp.common.logging.PluginLogger;
+import me.darkeyedragon.randomtp.api.world.RandomWorldHandler;
+import me.darkeyedragon.randomtp.common.addon.AddonManager;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
 import me.darkeyedragon.randomtp.common.world.location.LocationFactory;
 import me.darkeyedragon.randomtp.sponge.config.SpongeConfigHandler;
@@ -19,8 +21,8 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.economy.EconomyService;
 
+import java.io.File;
 import java.util.Optional;
-import java.util.Set;
 
 @Plugin(
         id = "sponge",
@@ -42,11 +44,17 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
 
     @Listener
     public void onServerStart(GameStartedServerEvent event) {
-        super.init();
+        //super.init();
         configHandler = new SpongeConfigHandler();
         worldQueue = new WorldQueue();
         pluginLogger = new SpongeLogger(logger);
         locationFactory = new LocationFactory(configHandler);
+    }
+
+    @Override
+    public AddonPlugin getPlugin(String name) {
+        //TODO implement
+        return null;
     }
 
     @Override
@@ -59,10 +67,6 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
         return ecoHandler;
     }
 
-    @Override
-    public Set<PluginLocationValidator> getValidatorSet() {
-        return null;
-    }
 
     @Override
     public boolean setupEconomy() {
@@ -81,6 +85,11 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
     }
 
     @Override
+    public RandomWorldHandler getWorldHandler() {
+        return world;
+    }
+
+    @Override
     public WorldQueue getWorldQueue() {
         return worldQueue;
     }
@@ -93,5 +102,22 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
     @Override
     public RandomTeleportPluginImpl getInstance() {
         return this;
+    }
+
+    @Override
+    public File getDataFolder() {
+        return null;
+    }
+
+    @Override
+    public boolean isPluginLoaded(String name) {
+        //TODO implement
+        return false;
+    }
+
+    @Override
+    public AddonManager getAddonManager() {
+        //TODO Implement
+        return null;
     }
 }
