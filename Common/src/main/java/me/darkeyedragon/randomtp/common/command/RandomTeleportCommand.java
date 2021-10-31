@@ -170,7 +170,7 @@ public class RandomTeleportCommand extends BaseCommand {
         }
         boolean bypassDelay = player.hasPermission("rtp.teleportdelay.bypass") || sender.hasPermission("rtp.teleportdelay.bypass");
         boolean bypassCooldown = player.hasPermission("rtp.teleport.bypass") || sender.hasPermission("rtp.teleport.bypass");
-        boolean bypassEco = player.hasPermission("rtp.eco.bypass") || sender.hasPermission("rtp.eco.bypass");
+        boolean bypassEco = player.hasPermission("rtp.eco.bypass");
         RandomLocation location = worldQueue.popLocation(world);
         TeleportProperty teleportProperty = new CommonTeleportProperty(location, sender, player, price, bypassEco, bypassDelay, bypassCooldown, configTeleport.getParticle(), timeSpan);
         BasicTeleportHandler teleportHandler = new BasicTeleportHandler(plugin, teleportProperty);
