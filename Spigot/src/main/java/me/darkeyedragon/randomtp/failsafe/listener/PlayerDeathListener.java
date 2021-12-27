@@ -1,7 +1,7 @@
 package me.darkeyedragon.randomtp.failsafe.listener;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
-import me.darkeyedragon.randomtp.api.world.RandomPlayer;
+import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
 import me.darkeyedragon.randomtp.failsafe.SpigotDeathTracker;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;

@@ -2,7 +2,7 @@ package me.darkeyedragon.randomtp.common.teleport;
 
 import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
 import me.darkeyedragon.randomtp.api.teleport.RandomCooldown;
-import me.darkeyedragon.randomtp.api.world.RandomPlayer;
+import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
 
 import java.util.HashMap;
 import java.util.UUID;

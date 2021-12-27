@@ -3,7 +3,7 @@ package me.darkeyedragon.randomtp.common.message;
 import co.aikar.commands.CommandIssuer;
 import me.darkeyedragon.randomtp.api.message.MessageHandler;
 import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
-import me.darkeyedragon.randomtp.api.world.RandomPlayer;
+import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.apache.commons.lang3.Validate;

@@ -1,8 +1,8 @@
-package me.darkeyedragon.randomtp.api.world;
+package me.darkeyedragon.randomtp.api.world.player;
 
 import me.darkeyedragon.randomtp.api.teleport.RandomCooldown;
-import me.darkeyedragon.randomtp.api.teleport.TeleportProperty;
 import me.darkeyedragon.randomtp.api.teleport.TeleportResponse;
+import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 
 import java.util.UUID;
@@ -20,7 +20,7 @@ public interface RandomPlayer {
 
     RandomLocation getEyeLocation();
 
-    Future<TeleportResponse> teleportAsync(TeleportProperty teleportProperty);
+    Future<TeleportResponse> teleportAsync(RandomLocation location);
 
     RandomCooldown getCooldown();
 
