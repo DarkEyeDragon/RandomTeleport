@@ -2,7 +2,7 @@ package me.darkeyedragon.randomtp.failsafe;
 
 import me.darkeyedragon.randomtp.api.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
-import me.darkeyedragon.randomtp.api.world.RandomPlayer;
+import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -19,6 +19,9 @@ import java.io.File;
 
 public interface RandomTeleportPlugin<T> {
 
+
+    Scheduler scheduler = null;
+
     AddonPlugin getPlugin(String name);
 
     PluginLogger getLogger();

@@ -2,17 +2,12 @@ package me.darkeyedragon.randomtp.api.teleport;
 
 import co.aikar.commands.CommandIssuer;
 import me.darkeyedragon.randomtp.api.world.RandomParticle;
-import me.darkeyedragon.randomtp.api.world.RandomPlayer;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
-import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
 
 public interface TeleportProperty {
 
     long getInitTime();
-
-    RandomLocation getLocation();
-
-    void setLocation(RandomLocation location);
 
     CommandIssuer getCommandIssuer();
 
@@ -29,4 +24,8 @@ public interface TeleportProperty {
     RandomWorld getWorld();
 
     double getPrice();
+
+    long getDelay();
+
+    boolean getCancelOnMove();
 }

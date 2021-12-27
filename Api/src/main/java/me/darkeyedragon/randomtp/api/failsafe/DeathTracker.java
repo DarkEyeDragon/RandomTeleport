@@ -1,6 +1,6 @@
 package me.darkeyedragon.randomtp.api.failsafe;
 
-import me.darkeyedragon.randomtp.api.world.RandomPlayer;
+import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
 
 public interface DeathTracker {
 

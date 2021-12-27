@@ -22,13 +22,16 @@ import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
+import me.darkeyedragon.randomtp.api.teleport.RandomCooldown;
 import me.darkeyedragon.randomtp.api.teleport.TeleportProperty;
-import me.darkeyedragon.randomtp.api.world.RandomPlayer;
+import me.darkeyedragon.randomtp.api.teleport.TeleportResponse;
+import me.darkeyedragon.randomtp.api.teleport.TeleportType;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
-import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
 import me.darkeyedragon.randomtp.common.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.common.teleport.BasicTeleportHandler;
-import me.darkeyedragon.randomtp.common.teleport.CommonTeleportProperty;
+import me.darkeyedragon.randomtp.common.teleport.BasicTeleportResponse;
+import me.darkeyedragon.randomtp.common.teleport.CommonTeleportPropertyBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -153,7 +156,7 @@ public class RandomTeleportCommand extends BaseCommand {
         }
     }
 
-    private void teleport(CommandIssuer sender, RandomPlayer player, RandomWorld world) {
+    private TeleportResponse teleport(CommandIssuer sender, RandomPlayer player, RandomWorld world) {
         setConfigs();
         final ConfigWorld worldDetail = plugin.getConfigHandler().getSectionWorld().getConfigWorld(world.getName());
         double price = 0;
@@ -171,14 +174,34 @@ public class RandomTeleportCommand extends BaseCommand {
         boolean bypassDelay = player.hasPermission("rtp.teleportdelay.bypass") || sender.hasPermission("rtp.teleportdelay.bypass");
         boolean bypassCooldown = player.hasPermission("rtp.teleport.bypass") || sender.hasPermission("rtp.teleport.bypass");
         boolean bypassEco = player.hasPermission("rtp.eco.bypass") || sender.hasPermission("rtp.eco.bypass");
-        RandomLocation location = worldQueue.popLocation(world);
-        TeleportProperty teleportProperty = new CommonTeleportProperty(location, sender, player, price, bypassEco, bypassDelay, bypassCooldown, configTeleport.getParticle(), timeSpan);
-        BasicTeleportHandler teleportHandler = new BasicTeleportHandler(plugin, teleportProperty);
-        teleportHandler.toRandomLocation(player);
+        boolean cancelOnMove = configTeleport.isCancelOnMove();
+        long delay = bypassDelay ? 0 : configHandler.getSectionTeleport().getDelay();
+
+        CooldownHandler cooldownHandler = plugin.getCooldownHandler();
+        RandomCooldown cooldown = cooldownHandler.getCooldown(player);
+        if (cooldown != null && cooldown.getRemainingTime() > 0) {
+            plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getCountdown(cooldown.getRemainingTime() / 50));
+            return new BasicTeleportResponse(TeleportType.COOLDOWN);
+        }
+        TeleportProperty teleportProperty = new CommonTeleportPropertyBuilder()
+                .commandIssuer(sender)
+                .target(player)
+                .price(price)
+                .bypassEco(bypassEco)
+                .bypassTeleportDelay(bypassDelay)
+                .bypassCooldown(bypassCooldown)
+                .particle(configTeleport.getParticle())
+                .initTime(timeSpan)
+                .delay(delay)
+                .cancelOnMove(cancelOnMove)
+                .build();
+        BasicTeleportHandler teleportHandler = new BasicTeleportHandler(plugin);
+        TeleportResponse response = teleportHandler.toRandomLocation(teleportProperty);
         if (timeSpan != 0 && configHandler.getSectionDebug().isShowExecutionTimes()) {
             long totalTime = System.currentTimeMillis() - timeSpan;
             plugin.getLogger().info("Debug: Teleport request took: " + totalTime + "ms");
         }
+        return response;
     }
 
     @Subcommand("reload")

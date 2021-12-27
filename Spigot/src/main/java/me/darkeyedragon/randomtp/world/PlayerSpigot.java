@@ -2,20 +2,17 @@ package me.darkeyedragon.randomtp.world;
 
 import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.api.teleport.RandomCooldown;
-import me.darkeyedragon.randomtp.api.teleport.TeleportProperty;
 import me.darkeyedragon.randomtp.api.teleport.TeleportResponse;
 import me.darkeyedragon.randomtp.api.teleport.TeleportType;
-import me.darkeyedragon.randomtp.api.world.RandomPlayer;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
 import me.darkeyedragon.randomtp.common.teleport.BasicTeleportResponse;
 import me.darkeyedragon.randomtp.util.WorldUtil;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
 
 public class PlayerSpigot implements RandomPlayer {
 
@@ -57,15 +54,10 @@ public class PlayerSpigot implements RandomPlayer {
     }
 
     @Override
-    public CompletableFuture<TeleportResponse> teleportAsync(TeleportProperty teleportProperty) {
-        RandomLocation randomLocation = teleportProperty.getLocation();
+    public CompletableFuture<TeleportResponse> teleportAsync(RandomLocation location) {
         //Teleport the player async if possible
-        return PaperLib.teleportAsync(player, WorldUtil.toLocation(randomLocation)).thenApply(aBoolean -> {
-            if (teleportProperty.getInitTime() != 0) {
-                Logger logger = LogManager.getLogManager().getLogger("RandomTeleport");
-                logger.info("Debug: total teleport time took: " + (System.currentTimeMillis() - teleportProperty.getInitTime()) + "ms");
-            }
-            if (aBoolean) {
+        return PaperLib.teleportAsync(player, WorldUtil.toLocation(location)).thenApply(success -> {
+            if (success) {
                 return new BasicTeleportResponse(TeleportType.SUCCESS);
             } else {
                 return new BasicTeleportResponse(TeleportType.FAIL);

@@ -1,7 +1,7 @@
 package me.darkeyedragon.randomtp.world;
 
 import me.darkeyedragon.randomtp.api.world.PlayerHandler;
-import me.darkeyedragon.randomtp.api.world.RandomPlayer;
+import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
 import org.bukkit.Bukkit;
 
 import java.util.UUID;
