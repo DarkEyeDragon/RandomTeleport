@@ -93,7 +93,7 @@ public class AddonManager implements RandomAddonManager {
                 .filter(addonResponse -> {
                     RandomAddon randomAddon = addonResponse.getAddon();
                     if (addonResponse.getResponseType() == AddonResponseType.SUCCESS) return true;
-                    logger.info(MiniMessage.get().parse("<gray>" + "[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " missing required plugins."));
+                    logger.info(MiniMessage.get().parse("<gray>[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " missing required plugins."));
                     for (RequiredPlugin plugin : addonResponse.getAddon().getRequiredPlugins()) {
                         if (!plugin.isLoaded()) {
                             logger.info(MiniMessage.get().parse("    └─ " + plugin.getName() + " is not loaded."));
@@ -106,7 +106,7 @@ public class AddonManager implements RandomAddonManager {
                 .filter(addonResponse -> {
                     RandomAddon randomAddon = addonResponse.getAddon();
                     if (addonResponse.getResponseType() == AddonResponseType.SUCCESS) return true;
-                    logger.info(MiniMessage.get().parse("<gray>" + "[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " version mismatch."));
+                    logger.info(MiniMessage.get().parse("<gray>[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " version mismatch."));
                     for (RequiredPlugin plugin : addonResponse.getAddon().getRequiredPlugins()) {
                         if (!plugin.isLoaded()) {
                             logger.info(MiniMessage.get().parse("    └─ " + plugin.getName() + " with version " + plugin.getMinVersion() + " or newer is not loaded."));
@@ -115,7 +115,7 @@ public class AddonManager implements RandomAddonManager {
                     return false;
                 })
                 .map(AddonResponse::getAddon)
-                .peek(randomAddon -> logger.info(MiniMessage.get().parse("<gray>" + "[<green>+<gray>] <light_purple>" + randomAddon.getIdentifier() + " has been loaded.")))
+                .peek(randomAddon -> logger.info(MiniMessage.get().parse("<gray>[<green>+<gray>] <light_purple>" + randomAddon.getIdentifier() + " has been loaded.")))
                 .collect(Collectors.toMap(RandomLocationValidator::getIdentifier, randomAddon -> randomAddon));
     }
 
