@@ -45,12 +45,20 @@ public class AddonManager implements RandomAddonManager {
         this.folder = new File(instance.getDataFolder(), ADDON_FOLDER_NAME);
     }
 
+    /**
+     * Instantiate all local {@link RandomAddon}s through the {@link AddonClassLoader}
+     */
     public void instantiateAllLocal() {
         for (URL uri : getJarURLs()) {
             instantiateLocal(new AddonClassLoader(uri, instance.getClass().getClassLoader()));
         }
     }
 
+    /**
+     * Instantiate an addon from a local source.
+     *
+     * @param addonClassLoader the {@link AddonClassLoader}.
+     */
     private void instantiateLocal(AddonClassLoader addonClassLoader) {
         try (ScanResult scanResult = new ClassGraph()
                 .overrideClassLoaders(addonClassLoader)
@@ -126,6 +134,12 @@ public class AddonManager implements RandomAddonManager {
         }
     }
 
+    /**
+     * Check if a {@link RandomAddon} has all required plugins.
+     *
+     * @param randomAddon the {@link RandomAddon} to validate.
+     * @return the {@link AddonResponse} holding the addon and its current state.
+     */
     protected final AddonResponse areRequiredPluginsPresent(RandomAddon randomAddon) {
         AddonResponse addonResponse = new AddonResponse(randomAddon);
         List<RequiredPlugin> requiredPlugins = randomAddon.getRequiredPlugins();
@@ -144,6 +158,12 @@ public class AddonManager implements RandomAddonManager {
         return addonResponse;
     }
 
+    /**
+     * Check if a {@link RandomAddon} has all required versions.
+     *
+     * @param randomAddon the {@link RandomAddon} to validate.
+     * @return the {@link AddonResponse} holding the addon and its current state.
+     */
     protected final AddonResponse areRequiredVersionsPresent(RandomAddon randomAddon) {
         AddonResponse addonResponse = new AddonResponse(randomAddon);
         List<RequiredPlugin> requiredPlugins = randomAddon.getRequiredPlugins();
@@ -181,7 +201,10 @@ public class AddonManager implements RandomAddonManager {
         }
         return addonResponse;
     }
-    
+
+    /**
+     * @return an array of {@link String} holding the names of the addons
+     */
     public String[] getFileNames() {
         return Arrays.stream(
                         Objects.requireNonNull(folder.listFiles())
@@ -217,7 +240,7 @@ public class AddonManager implements RandomAddonManager {
 
     /**
      * @param name the {@link File}'s name.
-     * @return the {@link RandomAddon} instance. Null if it doesnt exist
+     * @return the {@link RandomAddon} instance. Null if it doesn't exist
      */
     @Override
     public RandomAddon register(String name) {
