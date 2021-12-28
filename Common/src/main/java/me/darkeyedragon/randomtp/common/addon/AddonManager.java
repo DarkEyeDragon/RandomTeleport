@@ -101,7 +101,7 @@ public class AddonManager implements RandomAddonManager {
                     logger.info(MiniMessage.get().parse("<gray>" + "[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " version mismatch."));
                     for (RequiredPlugin plugin : addonResponse.getAddon().getRequiredPlugins()) {
                         if (!plugin.isLoaded()) {
-                            logger.info(MiniMessage.get().parse("    └─ " + plugin.getName() + " with version " + plugin.getMinVersion() + " is not loaded."));
+                            logger.info(MiniMessage.get().parse("    └─ " + plugin.getName() + " with version " + plugin.getMinVersion() + " or newer is not loaded."));
                         }
                     }
                     return false;
