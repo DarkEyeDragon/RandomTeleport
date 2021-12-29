@@ -2,6 +2,7 @@ package me.darkeyedragon.randomtp.api.teleport;
 
 import co.aikar.commands.CommandIssuer;
 import me.darkeyedragon.randomtp.api.world.RandomParticle;
+import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
 
 public interface TeleportPropertyBuilder {
@@ -25,6 +26,8 @@ public interface TeleportPropertyBuilder {
     TeleportPropertyBuilder delay(long delay);
 
     TeleportPropertyBuilder cancelOnMove(boolean cancelOnMove);
+
+    TeleportPropertyBuilder world(RandomWorld world);
 
     TeleportProperty build();
 }

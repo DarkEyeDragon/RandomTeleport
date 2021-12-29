@@ -194,6 +194,7 @@ public class RandomTeleportCommand extends BaseCommand {
                 .initTime(timeSpan)
                 .delay(delay)
                 .cancelOnMove(cancelOnMove)
+                .world(world)
                 .build();
         BasicTeleportHandler teleportHandler = new BasicTeleportHandler(plugin);
         TeleportResponse response = teleportHandler.toRandomLocation(teleportProperty);
