@@ -8,7 +8,7 @@ import java.util.Map;
 public interface RandomAddonManager {
     RandomAddon unregister(String name);
 
-    RandomAddon register(String name);
+    RandomAddon register(String name) throws ReflectiveOperationException;
 
     Map<String, RandomAddon> getAddons();
 
