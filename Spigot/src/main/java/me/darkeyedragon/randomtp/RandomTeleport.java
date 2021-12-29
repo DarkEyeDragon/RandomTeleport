@@ -30,6 +30,7 @@ import me.darkeyedragon.randomtp.listener.WorldBorderChangeListener;
 import me.darkeyedragon.randomtp.listener.WorldListener;
 import me.darkeyedragon.randomtp.log.BukkitLogger;
 import me.darkeyedragon.randomtp.scheduler.SpigotScheduler;
+import me.darkeyedragon.randomtp.stat.BStats;
 import me.darkeyedragon.randomtp.world.SpigotBiomeHandler;
 import me.darkeyedragon.randomtp.world.SpigotMaterialHandler;
 import me.darkeyedragon.randomtp.world.SpigotPlayerHandler;
@@ -118,6 +119,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         }
         pluginManager = Bukkit.getPluginManager();
         cooldownHandler = new CommonCooldownHandler();
+        metric = new BStats();
         registerListeners();
     }
 
