@@ -27,4 +27,6 @@ public interface RandomPlayer {
     void setCooldown(RandomCooldown cooldown);
 
     boolean hasPermission(String permission);
+
+    void teleport(RandomLocation location);
 }

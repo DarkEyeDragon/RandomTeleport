@@ -179,7 +179,7 @@ public class RandomTeleportCommand extends BaseCommand {
 
         CooldownHandler cooldownHandler = plugin.getCooldownHandler();
         RandomCooldown cooldown = cooldownHandler.getCooldown(player);
-        if (cooldown != null && cooldown.getRemainingTime() > 0) {
+        if (!bypassCooldown && cooldown != null && cooldown.getRemainingTime() > 0) {
             plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getCountdown(cooldown.getRemainingTime() / 50));
             return new BasicTeleportResponse(TeleportType.COOLDOWN);
         }

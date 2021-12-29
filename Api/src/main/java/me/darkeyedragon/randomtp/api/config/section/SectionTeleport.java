@@ -18,8 +18,14 @@ public interface SectionTeleport {
     void setParticle(RandomParticle teleportParticle);
 
     boolean getUseDefaultWorld();
+
     void setUseDefaultWorld(boolean useDefaultWorld);
+
     String getDefaultWorld();
+
     void setDefaultWorld(String defaultWorld);
 
+    boolean isUseAsyncChunkTeleport();
+
+    void setUseAsyncChunkTeleport(boolean useAsyncChunkTeleport);
 }

@@ -14,6 +14,7 @@ public class CommonSectionTeleport implements SectionTeleport {
     private RandomParticle particle;
     private boolean useDefaultWorld;
     private String defaultWorld;
+    private boolean useAsyncChunkTeleport;
 
     @Override
     public long getCooldown() {
@@ -83,5 +84,15 @@ public class CommonSectionTeleport implements SectionTeleport {
     @Override
     public void setDefaultWorld(String defaultWorld) {
         this.defaultWorld = defaultWorld;
+    }
+
+    @Override
+    public boolean isUseAsyncChunkTeleport() {
+        return useAsyncChunkTeleport;
+    }
+
+    @Override
+    public void setUseAsyncChunkTeleport(boolean useAsyncChunkTeleport) {
+        this.useAsyncChunkTeleport = useAsyncChunkTeleport;
     }
 }

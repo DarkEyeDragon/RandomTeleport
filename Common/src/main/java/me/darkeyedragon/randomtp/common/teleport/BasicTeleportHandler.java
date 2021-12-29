@@ -99,9 +99,7 @@ public class BasicTeleportHandler implements TeleportHandler {
     }
 
     private void teleport(TeleportProperty property) {
-        RandomPlayer player = property.getTarget();
-        double price = property.getPrice();
-        RandomParticle particle = property.getParticle();
+
 
         if (configHandler.getSectionDebug().isShowExecutionTimes()) {
             plugin.getLogger().info("Debug: teleport setup took " + (System.currentTimeMillis() - property.getInitTime()) + "ms");
@@ -111,52 +109,67 @@ public class BasicTeleportHandler implements TeleportHandler {
             plugin.getMessageHandler().sendMessage(property.getCommandIssuer(), configHandler.getSectionMessage().getEmptyQueue());
             return;
         }
-        location.getWorld().getChunkAtAsync(location.getWorld(), location.getBlockX(), location.getBlockZ()).thenAccept(chunk -> {
-            LocationSearcher baseLocationSearcher = LocationSearcherFactory.getLocationSearcher(property.getWorld(), plugin);
-            if (!baseLocationSearcher.isSafe(location)) {
-                toRandomLocation(property);
-                return;
-            }
-            plugin.getCooldownHandler().addCooldown(player, new BasicCooldown(player.getUniqueId(), System.currentTimeMillis(), configHandler.getSectionTeleport().getCooldown() * 50));
-            drawWarpParticles(player, particle);
-            if (!property.isBypassEco() && price > 0) {
-                if (ecoHandler != null) {
-                    if (!ecoHandler.hasEnough(player.getUniqueId(), price)) {
-                        plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getSubSectionEconomy().getInsufficientFunds());
-                        return;
-                    } else {
-                        String currency;
-                        if (price > 1) {
-                            currency = ecoHandler.getCurrencyPlural();
-                        } else {
-                            currency = ecoHandler.getCurrencySingular();
-                        }
-                        if (ecoHandler.makePayment(player.getUniqueId(), price)) {
-                            plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getSubSectionEconomy().getPayment(price, currency));
-                        }
-                    }
+
+        //Minecraft 1.18 seems to have issues with large (chunk) locations causing it to crash.
+        // Setting this to false will teleport on the main thread preventing this issue
+        if (plugin.getConfigHandler().getSectionTeleport().isUseAsyncChunkTeleport()) {
+            location.getWorld().getChunkAtAsync(location.getWorld(), location.getBlockX(), location.getBlockZ()).thenAcceptAsync(chunkSnapshot -> teleportLogic(property, location));
+        } else {
+            teleportLogic(property, location);
+        }
+
+    }
+
+    private void teleportLogic(TeleportProperty property, RandomLocation location) {
+        RandomPlayer player = property.getTarget();
+        double price = property.getPrice();
+        RandomParticle particle = property.getParticle();
+
+        LocationSearcher baseLocationSearcher = LocationSearcherFactory.getLocationSearcher(property.getWorld(), plugin);
+        if (!baseLocationSearcher.isSafe(location)) {
+            toRandomLocation(property);
+            return;
+        }
+        plugin.getCooldownHandler().addCooldown(player, new BasicCooldown(player.getUniqueId(), System.currentTimeMillis(), configHandler.getSectionTeleport().getCooldown() * 50));
+        drawWarpParticles(player, particle);
+        if (!property.isBypassEco() && price > 0) {
+            if (ecoHandler != null) {
+                if (!ecoHandler.hasEnough(player.getUniqueId(), price)) {
+                    plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getSubSectionEconomy().getInsufficientFunds());
+                    return;
                 } else {
-                    plugin.getMessageHandler().sendMessage(property.getCommandIssuer(), "<red>Economy based features are disabled. Vault not found. Set the rtp cost to 0 or install vault.");
-                    plugin.getLogger().severe("Economy based features are disabled. Vault not found. Set the rtp cost to 0 or install vault.");
+                    String currency;
+                    if (price > 1) {
+                        currency = ecoHandler.getCurrencyPlural();
+                    } else {
+                        currency = ecoHandler.getCurrencySingular();
+                    }
+                    if (ecoHandler.makePayment(player.getUniqueId(), price)) {
+                        plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getSubSectionEconomy().getPayment(price, currency));
+                    }
                 }
+            } else {
+                plugin.getMessageHandler().sendMessage(property.getCommandIssuer(), "<red>Economy based features are disabled. Vault not found. Set the rtp cost to 0 or install vault.");
+                plugin.getLogger().severe("Economy based features are disabled. Vault not found. Set the rtp cost to 0 or install vault.");
             }
-            player.teleportAsync(location.clone().add(0.5, 1.5, 0.5));
-            //If deathtimer is enabled add it to the collection
-            if (configHandler.getSectionTeleport().getDeathTimer() > 0) {
-                addToDeathTimer(player);
-            }
-            if (configHandler.getSectionEconomy().getPrice() > 0 && !property.isBypassEco() && plugin.getEcoHandler() != null) {
-                ecoHandler.makePayment(player.getUniqueId(), property.getPrice());
-                String currency = property.getPrice() == 1 ? ecoHandler.getCurrencySingular() : ecoHandler.getCurrencyPlural();
-                plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getSubSectionEconomy().getPayment(property.getPrice(), currency));
-            }
-            drawWarpParticles(player, particle);
-            plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getTeleport(location));
-            plugin.getStats().addTeleportStat();
-            //TODO implement event pipeline
+        }
+        player.teleport(location.clone().add(0.5, 1.5, 0.5));
+        //If deathtimer is enabled add it to the collection
+        if (configHandler.getSectionTeleport().getDeathTimer() > 0) {
+            addToDeathTimer(player);
+        }
+        if (configHandler.getSectionEconomy().getPrice() > 0 && !property.isBypassEco() && plugin.getEcoHandler() != null) {
+            ecoHandler.makePayment(player.getUniqueId(), property.getPrice());
+            String currency = property.getPrice() == 1 ? ecoHandler.getCurrencySingular() : ecoHandler.getCurrencyPlural();
+            plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getSubSectionEconomy().getPayment(property.getPrice(), currency));
+        }
+        drawWarpParticles(player, particle);
+        plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getTeleport(location));
+        plugin.getStats().addTeleportStat();
+        //TODO implement event pipeline
             /*RandomTeleportCompletedEvent event = new RandomTeleportCompletedEvent(player, property);
             Bukkit.getServer().getPluginManager().callEvent(event);*/
-            //Generate a new location after the init delay
+        //Generate a new location after the init delay
             /*plugin.getScheduler().runTaskLater(() -> {
                 RandomWorld randomWorld = property.getLocation().getWorld();
                 ConfigWorld configWorld = configHandler.getSectionWorld().getConfigWorld(randomWorld.getName());
@@ -166,7 +179,6 @@ public class BasicTeleportHandler implements TeleportHandler {
                     plugin.getLogger().warn(ex.getMessage());
                 }
             }, configHandler.getSectionQueue().getInitDelay());*/
-        });
     }
 }
 

@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
 public class SpigotScheduler implements Scheduler {
@@ -82,5 +83,14 @@ public class SpigotScheduler implements Scheduler {
     @Override
     public void cancelTask(int taskId) {
         Bukkit.getScheduler().cancelTask(taskId);
+    }
+
+    @Override
+    public Executor getMainThreadExecutor() {
+        return this::runTask;
+    }
+
+    public void runTask(Runnable command) {
+        instance.getScheduler().runTaskLater(command, 0L);
     }
 }
