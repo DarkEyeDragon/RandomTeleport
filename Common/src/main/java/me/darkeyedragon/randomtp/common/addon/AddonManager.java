@@ -6,7 +6,6 @@ import io.github.classgraph.ScanResult;
 import me.darkeyedragon.randomtp.api.addon.AddonPlugin;
 import me.darkeyedragon.randomtp.api.addon.RandomAddon;
 import me.darkeyedragon.randomtp.api.addon.RandomAddonManager;
-import me.darkeyedragon.randomtp.api.addon.RandomLocationValidator;
 import me.darkeyedragon.randomtp.api.addon.RequiredPlugin;
 import me.darkeyedragon.randomtp.api.logging.PluginLogger;
 import me.darkeyedragon.randomtp.common.addon.response.AddonResponse;
@@ -18,7 +17,6 @@ import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
@@ -26,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class AddonManager implements RandomAddonManager {
 
@@ -45,13 +42,21 @@ public class AddonManager implements RandomAddonManager {
         this.folder = new File(instance.getDataFolder(), ADDON_FOLDER_NAME);
     }
 
-    public void instantiateAllLocal() {
+    /**
+     * Instantiate all local {@link RandomAddon}s through the {@link AddonClassLoader}
+     */
+    public void instantiateAllLocal() throws ReflectiveOperationException {
         for (URL uri : getJarURLs()) {
             instantiateLocal(new AddonClassLoader(uri, instance.getClass().getClassLoader()));
         }
     }
 
-    private void instantiateLocal(AddonClassLoader addonClassLoader) {
+    /**
+     * Instantiate an addon from a local source.
+     *
+     * @param addonClassLoader the {@link AddonClassLoader}.
+     */
+    private void instantiateLocal(AddonClassLoader addonClassLoader) throws ReflectiveOperationException {
         try (ScanResult scanResult = new ClassGraph()
                 .overrideClassLoaders(addonClassLoader)
                 .acceptPackages("*.addon*")
@@ -73,59 +78,57 @@ public class AddonManager implements RandomAddonManager {
 
     /**
      * @param addonClasses the {@link ClassInfoList} instance. Obtained from the {@link ScanResult}.
-     * @return a collection of {@link RandomAddon} classes. This is a list since a classloader can contain multiple
-     * classes which derive from {@link RandomAddon}
+     * @return a collection of {@link RandomAddon} classes.
      */
-    private Map<String, RandomAddon> loadAddons(ClassInfoList addonClasses) {
-        return addonClasses.loadClasses(RandomAddon.class)
-                .stream()
-                .map(this::createAddonInstance)
-                .filter(Objects::nonNull)
-                .map(this::areRequiredPluginsPresent)
-                .filter(addonResponse -> {
-                    RandomAddon randomAddon = addonResponse.getAddon();
-                    if (addonResponse.getResponseType() == AddonResponseType.SUCCESS) return true;
-                    logger.info(MiniMessage.get().parse("<gray>" + "[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " missing required plugins."));
-                    for (RequiredPlugin plugin : addonResponse.getAddon().getRequiredPlugins()) {
-                        if (!plugin.isLoaded()) {
-                            logger.info(MiniMessage.get().parse("    └─ " + plugin.getName() + " is not loaded."));
-                        }
+    private Map<String, RandomAddon> loadAddons(ClassInfoList addonClasses) throws ReflectiveOperationException {
+        Map<String, RandomAddon> map = new HashMap<>();
+        for (Class<RandomAddon> randomAddonClass : addonClasses.loadClasses(RandomAddon.class)) {
+            RandomAddon randomAddon;
+            randomAddon = createAddonInstance(randomAddonClass);
+            AddonResponse areRequiredPluginsPresent = areRequiredPluginsPresent(randomAddon);
+            if (areRequiredPluginsPresent.getResponseType() != AddonResponseType.SUCCESS) {
+                logger.info(MiniMessage.get().parse("<gray>[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " missing required plugins."));
+                for (RequiredPlugin plugin : areRequiredPluginsPresent.getAddon().getRequiredPlugins()) {
+                    if (!plugin.isLoaded()) {
+                        logger.info(MiniMessage.get().parse("    └─ " + plugin.getName() + " is not loaded."));
                     }
-                    return false;
-                })
-                .map(AddonResponse::getAddon)
-                .map(this::areRequiredVersionsPresent)
-                .filter(addonResponse -> {
-                    RandomAddon randomAddon = addonResponse.getAddon();
-                    if (addonResponse.getResponseType() == AddonResponseType.SUCCESS) return true;
-                    logger.info(MiniMessage.get().parse("<gray>" + "[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " version mismatch."));
-                    for (RequiredPlugin plugin : addonResponse.getAddon().getRequiredPlugins()) {
-                        if (!plugin.isLoaded()) {
-                            logger.info(MiniMessage.get().parse("    └─ " + plugin.getName() + " with version " + plugin.getMinVersion() + " or newer is not loaded."));
-                        }
+                }
+                continue;
+            }
+            AddonResponse areRequiredVersionsPresent = areRequiredVersionsPresent(randomAddon);
+            if (areRequiredVersionsPresent.getResponseType() != AddonResponseType.SUCCESS) {
+                logger.info(MiniMessage.get().parse("<gray>[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " version mismatch."));
+                for (RequiredPlugin plugin : areRequiredVersionsPresent.getAddon().getRequiredPlugins()) {
+                    if (!plugin.isLoaded()) {
+                        logger.info(MiniMessage.get().parse("    └─ " + plugin.getName() + " with version " + plugin.getMinVersion() + " or newer is not loaded."));
                     }
-                    return false;
-                })
-                .map(AddonResponse::getAddon)
-                .peek(randomAddon -> logger.info(MiniMessage.get().parse("<gray>" + "[<green>+<gray>] <light_purple>" + randomAddon.getIdentifier() + " has been loaded.")))
-                .collect(Collectors.toMap(RandomLocationValidator::getIdentifier, randomAddon -> randomAddon));
+                }
+                continue;
+            }
+            logger.info(MiniMessage.get().parse("<gray>[<green>+<gray>] <light_purple>" + randomAddon.getIdentifier() + " has been loaded."));
+            if (map.put(randomAddon.getIdentifier(), randomAddon) != null) {
+                throw new IllegalStateException("Duplicate key");
+            }
+        }
+        return map;
     }
 
     /**
      * @param clazz the {@link Class} to instantiate. Must extend {@link RandomAddon}
      * @return the {@link } {@link RandomAddon} instance.
      */
-    protected final RandomAddon createAddonInstance(Class<? extends RandomAddon> clazz) {
-        try {
-            RandomAddon randomAddon = clazz.getConstructor().newInstance();
-            randomAddon.setAddonManager(this);
-            return randomAddon;
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
-            return null;
-        }
+    protected final RandomAddon createAddonInstance(Class<? extends RandomAddon> clazz) throws ReflectiveOperationException {
+        RandomAddon randomAddon = clazz.getConstructor().newInstance();
+        randomAddon.setAddonManager(this);
+        return randomAddon;
     }
 
+    /**
+     * Check if a {@link RandomAddon} has all required plugins.
+     *
+     * @param randomAddon the {@link RandomAddon} to validate.
+     * @return the {@link AddonResponse} holding the addon and its current state.
+     */
     protected final AddonResponse areRequiredPluginsPresent(RandomAddon randomAddon) {
         AddonResponse addonResponse = new AddonResponse(randomAddon);
         List<RequiredPlugin> requiredPlugins = randomAddon.getRequiredPlugins();
@@ -144,6 +147,12 @@ public class AddonManager implements RandomAddonManager {
         return addonResponse;
     }
 
+    /**
+     * Check if a {@link RandomAddon} has all required versions.
+     *
+     * @param randomAddon the {@link RandomAddon} to validate.
+     * @return the {@link AddonResponse} holding the addon and its current state.
+     */
     protected final AddonResponse areRequiredVersionsPresent(RandomAddon randomAddon) {
         AddonResponse addonResponse = new AddonResponse(randomAddon);
         List<RequiredPlugin> requiredPlugins = randomAddon.getRequiredPlugins();
@@ -181,7 +190,10 @@ public class AddonManager implements RandomAddonManager {
         }
         return addonResponse;
     }
-    
+
+    /**
+     * @return an array of {@link String} holding the names of the addons
+     */
     public String[] getFileNames() {
         return Arrays.stream(
                         Objects.requireNonNull(folder.listFiles())
@@ -217,10 +229,10 @@ public class AddonManager implements RandomAddonManager {
 
     /**
      * @param name the {@link File}'s name.
-     * @return the {@link RandomAddon} instance. Null if it doesnt exist
+     * @return the {@link RandomAddon} instance. Null if it doesn't exist
      */
     @Override
-    public RandomAddon register(String name) {
+    public RandomAddon register(String name) throws ReflectiveOperationException {
         String finalName = name;
         if (!name.endsWith(".jar")) {
             finalName = name + ".jar";

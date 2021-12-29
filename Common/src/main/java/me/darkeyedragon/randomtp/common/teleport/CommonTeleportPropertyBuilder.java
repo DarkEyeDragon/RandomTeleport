@@ -22,7 +22,7 @@ public class CommonTeleportPropertyBuilder implements TeleportPropertyBuilder {
     private boolean cancelOnMove;
     private RandomWorld world;
 
-    public TeleportPropertyBuilder commandIssuer(RandomWorld world) {
+    public TeleportPropertyBuilder world(RandomWorld world) {
         this.world = world;
         return this;
     }
@@ -82,5 +82,4 @@ public class CommonTeleportPropertyBuilder implements TeleportPropertyBuilder {
     public TeleportProperty build() {
         return new CommonTeleportProperty(commandIssuer, target, world, price, bypassEco, bypassTeleportDelay, bypassCooldown, particle, initTime, delay, cancelOnMove);
     }
-
 }
