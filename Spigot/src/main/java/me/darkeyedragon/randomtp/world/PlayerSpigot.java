@@ -66,6 +66,11 @@ public class PlayerSpigot implements RandomPlayer {
     }
 
     @Override
+    public void teleport(RandomLocation location) {
+        player.teleport(WorldUtil.toLocation(location));
+    }
+
+    @Override
     public RandomCooldown getCooldown() {
         return cooldown;
     }

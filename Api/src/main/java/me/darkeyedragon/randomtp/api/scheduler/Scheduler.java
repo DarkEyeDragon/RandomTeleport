@@ -1,5 +1,6 @@
 package me.darkeyedragon.randomtp.api.scheduler;
 
+import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
 public interface Scheduler {
@@ -10,4 +11,6 @@ public interface Scheduler {
     void runTaskTimer(Consumer<Task> taskConsumer, long delay, long interval);
 
     void cancelTask(int taskId);
+
+    Executor getMainThreadExecutor();
 }
