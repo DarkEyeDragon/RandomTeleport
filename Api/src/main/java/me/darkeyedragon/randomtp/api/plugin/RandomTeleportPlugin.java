@@ -16,6 +16,7 @@ import me.darkeyedragon.randomtp.api.world.RandomWorldHandler;
 import net.kyori.adventure.platform.AudienceProvider;
 
 import java.io.File;
+import java.nio.file.Path;
 
 public interface RandomTeleportPlugin<T> {
 
@@ -41,6 +42,8 @@ public interface RandomTeleportPlugin<T> {
     T getInstance();
 
     File getDataFolder();
+
+    Path getConfigPath();
 
     boolean isPluginLoaded(String name);
 

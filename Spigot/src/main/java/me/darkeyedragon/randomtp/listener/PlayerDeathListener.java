@@ -1,8 +1,8 @@
-package me.darkeyedragon.randomtp.failsafe.listener;
+package me.darkeyedragon.randomtp.listener;
 
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
-import me.darkeyedragon.randomtp.failsafe.SpigotDeathTracker;
+import me.darkeyedragon.randomtp.common.failsafe.CommonDeathTracker;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,7 +18,7 @@ public class PlayerDeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        SpigotDeathTracker deathTracker = (SpigotDeathTracker) randomTeleport.getDeathTracker();
+        CommonDeathTracker deathTracker = (CommonDeathTracker) randomTeleport.getDeathTracker();
         RandomPlayer player = randomTeleport.getPlayerHandler().getPlayer(event.getEntity().getUniqueId());
         if (deathTracker.contains(player)) {
             event.setKeepInventory(true);

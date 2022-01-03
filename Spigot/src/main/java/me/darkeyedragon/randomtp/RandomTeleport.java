@@ -19,18 +19,19 @@ import me.darkeyedragon.randomtp.common.addon.AddonManager;
 import me.darkeyedragon.randomtp.common.command.DebugCommand;
 import me.darkeyedragon.randomtp.common.command.RandomTeleportCommand;
 import me.darkeyedragon.randomtp.common.config.CommonConfigHandler;
+import me.darkeyedragon.randomtp.common.config.serializer.ConfigTypeSerializerCollection;
+import me.darkeyedragon.randomtp.common.failsafe.CommonDeathTracker;
 import me.darkeyedragon.randomtp.common.message.CommonMessageHandler;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
+import me.darkeyedragon.randomtp.common.stat.BStats;
 import me.darkeyedragon.randomtp.common.teleport.CommonCooldownHandler;
 import me.darkeyedragon.randomtp.eco.BukkitEcoHandler;
-import me.darkeyedragon.randomtp.failsafe.SpigotDeathTracker;
-import me.darkeyedragon.randomtp.failsafe.listener.PlayerDeathListener;
+import me.darkeyedragon.randomtp.listener.PlayerDeathListener;
 import me.darkeyedragon.randomtp.listener.ServerLoadListener;
 import me.darkeyedragon.randomtp.listener.WorldBorderChangeListener;
 import me.darkeyedragon.randomtp.listener.WorldListener;
 import me.darkeyedragon.randomtp.log.BukkitLogger;
 import me.darkeyedragon.randomtp.scheduler.SpigotScheduler;
-import me.darkeyedragon.randomtp.stat.BStats;
 import me.darkeyedragon.randomtp.world.SpigotBiomeHandler;
 import me.darkeyedragon.randomtp.world.SpigotMaterialHandler;
 import me.darkeyedragon.randomtp.world.SpigotPlayerHandler;
@@ -40,8 +41,11 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public final class RandomTeleport extends RandomTeleportPluginImpl {
 
@@ -91,7 +95,14 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         // Plugin startup logic
         materialHandler = new SpigotMaterialHandler();
         worldHandler = new SpigotWorldHandler(this, new SpigotBiomeHandler());
-        configHandler = new CommonConfigHandler(this);
+        YamlConfigurationLoader configLoader = YamlConfigurationLoader
+                .builder()
+                .path(Paths.get(getDataFolder().getPath(), "config.yml"))
+                .defaultOptions(
+                        configurationOptions -> configurationOptions.serializers(new ConfigTypeSerializerCollection(this).build())
+                )
+                .build();
+        configHandler = new CommonConfigHandler(this, configLoader);
         configHandler.reload();
         scheduler = new SpigotScheduler(this);
         playerHandler = new SpigotPlayerHandler();
@@ -103,7 +114,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         }
         bukkitAudience = BukkitAudiences.create(plugin);
         commandManager = new PaperCommandManager(plugin);
-        deathTracker = new SpigotDeathTracker(this);
+        deathTracker = new CommonDeathTracker(this);
         commandManager.enableUnstableAPI("help");
         commandManager.enableUnstableAPI("brigadier");
         //Register all completions and contexts for ACF
@@ -179,6 +190,11 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
     @Override
     public File getDataFolder() {
         return plugin.getDataFolder();
+    }
+
+    @Override
+    public Path getConfigPath() {
+        return Paths.get(getDataFolder().getPath(), "config.yml");
     }
 
     @Override

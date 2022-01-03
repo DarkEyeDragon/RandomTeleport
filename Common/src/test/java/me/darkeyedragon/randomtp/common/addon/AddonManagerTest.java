@@ -24,6 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
 
@@ -90,6 +91,11 @@ class AddonManagerTest {
 
             @Override
             public File getDataFolder() {
+                return null;
+            }
+
+            @Override
+            public Path getConfigPath() {
                 return null;
             }
 

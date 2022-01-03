@@ -1,8 +1,6 @@
 package me.darkeyedragon.randomtp.common.config;
 
-import io.leangen.geantyref.TypeToken;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
-import me.darkeyedragon.randomtp.api.config.RandomDimensionData;
 import me.darkeyedragon.randomtp.api.config.section.SectionBlacklist;
 import me.darkeyedragon.randomtp.api.config.section.SectionDebug;
 import me.darkeyedragon.randomtp.api.config.section.SectionEconomy;
@@ -10,47 +8,22 @@ import me.darkeyedragon.randomtp.api.config.section.SectionMessage;
 import me.darkeyedragon.randomtp.api.config.section.SectionQueue;
 import me.darkeyedragon.randomtp.api.config.section.SectionTeleport;
 import me.darkeyedragon.randomtp.api.config.section.SectionWorld;
-import me.darkeyedragon.randomtp.api.world.RandomMaterial;
-import me.darkeyedragon.randomtp.api.world.RandomParticle;
-import me.darkeyedragon.randomtp.common.config.serializer.RandomDimensionDataSerializer;
-import me.darkeyedragon.randomtp.common.config.serializer.RandomMaterialSerializer;
-import me.darkeyedragon.randomtp.common.config.serializer.RandomParticleSerializer;
-import me.darkeyedragon.randomtp.common.config.serializer.SectionBlacklistSerializer;
-import me.darkeyedragon.randomtp.common.config.serializer.SectionWorldSerializer;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
-import net.kyori.adventure.serializer.configurate4.ConfigurateComponentSerializer;
+import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
-import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
-
-import java.nio.file.Paths;
-import java.util.Set;
+import org.spongepowered.configurate.loader.AbstractConfigurationLoader;
 
 public class CommonConfigHandler implements RandomConfigHandler {
 
-    protected final YamlConfigurationLoader loader;
+    protected final AbstractConfigurationLoader<CommentedConfigurationNode> loader;
     protected final RandomTeleportPluginImpl randomTeleportPlugin;
     protected ConfigurationNode root;
     protected Configuration configuration;
 
-    public CommonConfigHandler(RandomTeleportPluginImpl randomTeleportPlugin) {
+    public CommonConfigHandler(RandomTeleportPluginImpl randomTeleportPlugin, AbstractConfigurationLoader<CommentedConfigurationNode> configurationLoader) {
         this.randomTeleportPlugin = randomTeleportPlugin;
-        loader = YamlConfigurationLoader
-                .builder()
-                .path(Paths.get(this.randomTeleportPlugin.getDataFolder().getPath(), "config.yml"))
-                .defaultOptions(
-                        configurationOptions -> configurationOptions.serializers(builder -> {
-                                    builder.registerExact(RandomDimensionData.class, RandomDimensionDataSerializer.INSTANCE);
-                                    builder.register(RandomParticle.class, RandomParticleSerializer.INSTANCE);
-                                    builder.register(SectionWorld.class, SectionWorldSerializer.INSTANCE);
-                                    builder.register(SectionBlacklist.class, new SectionBlacklistSerializer(randomTeleportPlugin));
-                                    builder.register(new TypeToken<Set<RandomMaterial>>() {
-                                    }, new RandomMaterialSerializer(randomTeleportPlugin));
-                                    builder.registerAll(ConfigurateComponentSerializer.configurate().serializers());
-                                }
-                        )
-                )
-                .build();
+        loader = configurationLoader;
     }
 
     public void load() throws ConfigurateException {
@@ -70,6 +43,7 @@ public class CommonConfigHandler implements RandomConfigHandler {
 
     @Override
     public SectionMessage getSectionMessage() {
+        Thread.dumpStack();
         return configuration.getMessages();
     }
 

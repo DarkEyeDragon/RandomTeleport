@@ -1,4 +1,4 @@
-package me.darkeyedragon.randomtp.failsafe;
+package me.darkeyedragon.randomtp.common.failsafe;
 
 import me.darkeyedragon.randomtp.api.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
@@ -7,12 +7,12 @@ import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SpigotDeathTracker implements DeathTracker {
+public class CommonDeathTracker implements DeathTracker {
 
     RandomTeleportPlugin<?> randomTeleport;
     Map<RandomPlayer, Long> trackedPlayers;
 
-    public SpigotDeathTracker(RandomTeleportPlugin<?> plugin) {
+    public CommonDeathTracker(RandomTeleportPlugin<?> plugin) {
         this.randomTeleport = plugin;
         trackedPlayers = new HashMap<>();
     }
