@@ -105,7 +105,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         commandManager = new PaperCommandManager(plugin);
         deathTracker = new SpigotDeathTracker(this);
         commandManager.enableUnstableAPI("help");
-        commandManager.enableUnstableAPI("brigadier");
+        //commandManager.enableUnstableAPI("brigadier");
         //Register all completions and contexts for ACF
         Registrar.registerCompletions(commandManager, addonManager, configHandler);
         Registrar.registerContexts(commandManager, worldHandler, playerHandler);
