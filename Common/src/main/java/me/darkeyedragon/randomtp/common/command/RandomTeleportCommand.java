@@ -117,6 +117,9 @@ public class RandomTeleportCommand extends BaseCommand {
                     } else {
                         newWorld = world;
                     }
+                    if (newWorld == null) {
+                        throw new InvalidCommandArgument("World with that name does not exist!");
+                    }
                     if (!configWorld.contains(newWorld.getName())) {
                         plugin.getMessageHandler().sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
                         return;
