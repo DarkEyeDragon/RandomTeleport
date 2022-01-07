@@ -133,4 +133,16 @@ public class CommonLocation implements RandomLocation {
     public final int hashCode() {
         return Objects.hash(randomWorld, x, y, z);
     }
+
+    @Override
+    public String toString() {
+        return "CommonLocation{" +
+                "randomWorld=" + randomWorld +
+                ", yaw=" + yaw +
+                ", pitch=" + pitch +
+                ", x=" + x +
+                ", y=" + y +
+                ", z=" + z +
+                '}';
+    }
 }

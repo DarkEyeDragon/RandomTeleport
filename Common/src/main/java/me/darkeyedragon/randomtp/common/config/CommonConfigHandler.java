@@ -43,7 +43,6 @@ public class CommonConfigHandler implements RandomConfigHandler {
 
     @Override
     public SectionMessage getSectionMessage() {
-        Thread.dumpStack();
         return configuration.getMessages();
     }
 

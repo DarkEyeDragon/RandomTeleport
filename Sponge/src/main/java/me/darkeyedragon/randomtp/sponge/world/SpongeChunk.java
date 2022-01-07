@@ -1,26 +1,24 @@
 package me.darkeyedragon.randomtp.sponge.world;
 
+import com.flowpowered.math.vector.Vector3i;
 import me.darkeyedragon.randomtp.api.world.RandomBiome;
 import me.darkeyedragon.randomtp.api.world.RandomChunkSnapshot;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 public class SpongeChunk implements RandomChunkSnapshot {
     private final Chunk chunk;
-    private final Location<World> location;
+    private final Location<Chunk> location;
 
-    public SpongeChunk(Location<World> location) {
+    public SpongeChunk(Location<Chunk> location) {
         this.location = location;
-        chunk = location.getExtent()
-                .getChunk(location.getChunkPosition())
-                .orElseThrow(() -> new IllegalArgumentException("No chunk associated with location " + location));
+        chunk = location.getExtent();
     }
 
     @Override
     public RandomWorld getWorld() {
-        return new SpongeWorld(location.getExtent());
+        return new SpongeWorld(chunk.getWorld());
     }
 
     @Override
@@ -40,6 +38,7 @@ public class SpongeChunk implements RandomChunkSnapshot {
 
     @Override
     public RandomBiome getBiome(int x, int y, int z) {
-        return new SpongeBiome(chunk.getBiome(x, y, z));
+        Vector3i biomeMin = chunk.getBiomeMin();
+        return new SpongeBiome(chunk.getBiome(biomeMin.getX() + x, biomeMin.getY() + y, biomeMin.getZ() + z));
     }
 }

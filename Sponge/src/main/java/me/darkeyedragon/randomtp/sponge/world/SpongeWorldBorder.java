@@ -12,9 +12,9 @@ public class SpongeWorldBorder implements RandomWorldBorder {
     private final World world;
     private final WorldBorder worldBorder;
 
-    public SpongeWorldBorder(World world, WorldBorder worldBorder) {
+    public SpongeWorldBorder(World world) {
         this.world = world;
-        this.worldBorder = worldBorder;
+        this.worldBorder = world.getWorldBorder();
     }
 
     @Override

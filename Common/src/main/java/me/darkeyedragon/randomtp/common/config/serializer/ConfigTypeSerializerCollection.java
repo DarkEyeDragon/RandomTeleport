@@ -21,7 +21,7 @@ public class ConfigTypeSerializerCollection {
     }
 
     public TypeSerializerCollection build() {
-        TypeSerializerCollection.Builder builder = TypeSerializerCollection.builder();
+        TypeSerializerCollection.Builder builder = TypeSerializerCollection.defaults().childBuilder();
         builder.registerExact(RandomDimensionData.class, RandomDimensionDataSerializer.INSTANCE);
         builder.register(RandomParticle.class, RandomParticleSerializer.INSTANCE);
         builder.register(SectionWorld.class, SectionWorldSerializer.INSTANCE);

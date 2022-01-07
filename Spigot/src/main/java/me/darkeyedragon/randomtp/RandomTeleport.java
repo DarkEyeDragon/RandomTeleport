@@ -12,6 +12,7 @@ import me.darkeyedragon.randomtp.api.metric.Metric;
 import me.darkeyedragon.randomtp.api.scheduler.Scheduler;
 import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
 import me.darkeyedragon.randomtp.api.world.PlayerHandler;
+import me.darkeyedragon.randomtp.api.world.RandomEnvironment;
 import me.darkeyedragon.randomtp.api.world.RandomMaterialHandler;
 import me.darkeyedragon.randomtp.api.world.RandomWorldHandler;
 import me.darkeyedragon.randomtp.command.completion.Registrar;
@@ -25,6 +26,10 @@ import me.darkeyedragon.randomtp.common.message.CommonMessageHandler;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
 import me.darkeyedragon.randomtp.common.stat.BStats;
 import me.darkeyedragon.randomtp.common.teleport.CommonCooldownHandler;
+import me.darkeyedragon.randomtp.common.world.WorldHandler;
+import me.darkeyedragon.randomtp.common.world.location.search.EndLocationSearcher;
+import me.darkeyedragon.randomtp.common.world.location.search.NetherLocationSearcher;
+import me.darkeyedragon.randomtp.common.world.location.search.OverworldLocationSearcher;
 import me.darkeyedragon.randomtp.eco.BukkitEcoHandler;
 import me.darkeyedragon.randomtp.listener.PlayerDeathListener;
 import me.darkeyedragon.randomtp.listener.ServerLoadListener;
@@ -93,6 +98,9 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
 
     public void init() {
         // Plugin startup logic
+        WorldHandler.registerLocationSearcher(RandomEnvironment.OVERWORLD, new OverworldLocationSearcher(this));
+        WorldHandler.registerLocationSearcher(RandomEnvironment.NETHER, new NetherLocationSearcher(this));
+        WorldHandler.registerLocationSearcher(RandomEnvironment.THE_END, new EndLocationSearcher(this));
         materialHandler = new SpigotMaterialHandler();
         worldHandler = new SpigotWorldHandler(this, new SpigotBiomeHandler());
         YamlConfigurationLoader configLoader = YamlConfigurationLoader

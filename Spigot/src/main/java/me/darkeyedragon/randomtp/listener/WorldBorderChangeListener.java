@@ -7,7 +7,7 @@ import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorld;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
-import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
+import me.darkeyedragon.randomtp.common.world.WorldHandler;
 import me.darkeyedragon.randomtp.util.WorldUtil;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -37,7 +37,7 @@ public class WorldBorderChangeListener implements Listener {
             worldQueue.put(
                     world, new LocationQueue(
                             plugin, configHandler.getSectionQueue().getSize(),
-                            LocationSearcherFactory.getLocationSearcher(world, plugin)
+                            WorldHandler.getLocationSearcher(world.getEnvironment())
                     )
             );
             plugin.getWorldHandler().populateWorld(configWorld);

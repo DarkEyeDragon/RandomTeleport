@@ -11,13 +11,16 @@ import java.util.Optional;
 
 public class SpongeWorldHandler extends WorldHandler {
 
-    public SpongeWorldHandler(RandomTeleportPlugin<?> plugin) {
+    private final RandomBiomeHandler biomeHandler;
+
+    public SpongeWorldHandler(RandomTeleportPlugin<?> plugin, RandomBiomeHandler biomeHandler) {
         super(plugin);
+        this.biomeHandler = biomeHandler;
     }
 
     @Override
     public RandomBiomeHandler getBiomeHandler() {
-        return null;
+        return biomeHandler;
     }
 
     @Override

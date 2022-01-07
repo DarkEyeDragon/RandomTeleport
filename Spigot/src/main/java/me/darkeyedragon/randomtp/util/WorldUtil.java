@@ -1,6 +1,10 @@
 package me.darkeyedragon.randomtp.util;
 
-import me.darkeyedragon.randomtp.api.world.*;
+import me.darkeyedragon.randomtp.api.world.RandomBiome;
+import me.darkeyedragon.randomtp.api.world.RandomChunkSnapshot;
+import me.darkeyedragon.randomtp.api.world.RandomEnvironment;
+import me.darkeyedragon.randomtp.api.world.RandomWorld;
+import me.darkeyedragon.randomtp.api.world.RandomWorldBorder;
 import me.darkeyedragon.randomtp.api.world.block.BlockFace;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
@@ -10,7 +14,11 @@ import me.darkeyedragon.randomtp.world.SpigotChunkSnapshot;
 import me.darkeyedragon.randomtp.world.SpigotWorld;
 import me.darkeyedragon.randomtp.world.SpigotWorldBorder;
 import me.darkeyedragon.randomtp.world.block.SpigotBlock;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChunkSnapshot;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.WorldBorder;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 
@@ -42,6 +50,9 @@ public class WorldUtil {
     }
 
     public static RandomEnvironment toRandomEnvironment(World.Environment environment) {
+        if (environment == World.Environment.NORMAL) {
+            return RandomEnvironment.OVERWORLD;
+        }
         return RandomEnvironment.valueOf(environment.name());
     }
 

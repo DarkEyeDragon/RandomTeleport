@@ -14,9 +14,9 @@ import me.darkeyedragon.randomtp.sponge.world.SpongeWorld;
 import me.darkeyedragon.randomtp.sponge.world.SpongeWorldBorder;
 import me.darkeyedragon.randomtp.sponge.world.block.SpongeBlock;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.WorldBorder;
 import org.spongepowered.api.world.biome.BiomeType;
 
 public class WorldUtil {
@@ -37,11 +37,11 @@ public class WorldUtil {
         return org.bukkit.block.BlockFace.valueOf(blockFace.name());
     }*/
 
-    public static RandomWorldBorder toRandomWorldBorder(World world, WorldBorder worldBorder) {
-        return new SpongeWorldBorder(world, worldBorder);
+    public static RandomWorldBorder toRandomWorldBorder(World world) {
+        return new SpongeWorldBorder(world);
     }
 
-    public static RandomChunkSnapshot toRandomChunk(Location<World> location) {
+    public static RandomChunkSnapshot toRandomChunk(Location<Chunk> location) {
         return new SpongeChunk(location);
     }
 
@@ -63,5 +63,9 @@ public class WorldUtil {
 
     public static Location<World> toLocation(RandomLocation location) {
         return new Location<>(WorldUtil.toWorld(location.getWorld()), location.getX(), location.getY(), location.getZ());
+    }
+
+    public static Vector3d toVector3d(RandomLocation location) {
+        return new Vector3d(location.getX(), location.getY(), location.getZ());
     }
 }

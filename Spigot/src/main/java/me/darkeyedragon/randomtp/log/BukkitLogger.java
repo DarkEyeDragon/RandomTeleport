@@ -30,18 +30,7 @@ public class BukkitLogger implements PluginLogger {
     }
 
     @Override
-    public void warn(Component component) {
-        Component finalComponent = Component.text(PREFIX).append(component);
-        plugin.getBukkitAudience().console().sendMessage(Identity.nil(), finalComponent);    }
-
-    @Override
     public void severe(String s) {
         plugin.getPlugin().getLogger().severe(s);
-    }
-
-    @Override
-    public void severe(Component component) {
-        Component finalComponent = Component.text(PREFIX).append(component);
-        plugin.getBukkitAudience().console().sendMessage(Identity.nil(), finalComponent);
     }
 }

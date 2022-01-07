@@ -14,7 +14,7 @@ import me.darkeyedragon.randomtp.api.world.RandomParticle;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
 import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
-import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
+import me.darkeyedragon.randomtp.common.world.WorldHandler;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -125,7 +125,7 @@ public class BasicTeleportHandler implements TeleportHandler {
         double price = property.getPrice();
         RandomParticle particle = property.getParticle();
 
-        LocationSearcher baseLocationSearcher = LocationSearcherFactory.getLocationSearcher(property.getWorld(), plugin);
+        LocationSearcher baseLocationSearcher = WorldHandler.getLocationSearcher(property.getWorld().getEnvironment());
         if (!baseLocationSearcher.isSafe(location)) {
             toRandomLocation(property);
             return;

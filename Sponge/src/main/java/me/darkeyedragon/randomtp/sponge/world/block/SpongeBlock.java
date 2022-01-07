@@ -6,13 +6,13 @@ import me.darkeyedragon.randomtp.api.world.block.BlockFace;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.common.world.CommonBlockType;
-import me.darkeyedragon.randomtp.common.world.CommonMaterial;
 import me.darkeyedragon.randomtp.common.world.location.CommonLocation;
 import me.darkeyedragon.randomtp.sponge.world.SpongeBiome;
 import me.darkeyedragon.randomtp.sponge.world.SpongeWorld;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.property.block.MatterProperty;
 import org.spongepowered.api.data.property.block.PassableProperty;
+import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -48,7 +48,7 @@ public class SpongeBlock implements RandomBlock {
 
     @Override
     public RandomBlock getRelative(BlockFace blockFace) {
-        return null;
+        return new SpongeBlock(location.getRelative(Direction.valueOf(blockFace.name().replace("_", ""))));
     }
 
     @Override
@@ -63,6 +63,6 @@ public class SpongeBlock implements RandomBlock {
 
     @Override
     public RandomBlockType getBlockType() {
-        return new CommonBlockType(new CommonMaterial());
+        return new CommonBlockType(new SpongeMaterial(world.getBlockType(location.getBlockPosition())));
     }
 }
