@@ -111,4 +111,20 @@ public class SpongeWorld implements RandomWorld {
                 "world=" + world.getName() +
                 '}';
     }
+
+    @Override
+    public int hashCode() {
+        return world.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (world == obj) return true;
+        if (obj instanceof RandomWorld) {
+            RandomWorld world = (RandomWorld) obj;
+            return this.getUUID().equals(world.getUUID());
+        }
+        return false;
+    }
 }

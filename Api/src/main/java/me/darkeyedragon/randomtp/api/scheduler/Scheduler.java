@@ -10,7 +10,7 @@ public interface Scheduler {
 
     void runTaskTimer(Consumer<Task> taskConsumer, long delay, long interval);
 
-    void cancelTask(int taskId);
+    void cancelTask(TaskIdentifier<?> taskIdentifier);
 
     Executor getMainThreadExecutor();
 }

@@ -32,6 +32,7 @@ import me.darkeyedragon.randomtp.sponge.config.SpongeConfigHandler;
 import me.darkeyedragon.randomtp.sponge.eco.SpongeEcoHandler;
 import me.darkeyedragon.randomtp.sponge.listener.PlayerDeathListener;
 import me.darkeyedragon.randomtp.sponge.logging.SpongeLogger;
+import me.darkeyedragon.randomtp.sponge.scheduler.SpongeScheduler;
 import me.darkeyedragon.randomtp.sponge.world.SpongeBiomeHandler;
 import me.darkeyedragon.randomtp.sponge.world.SpongeMaterialHandler;
 import me.darkeyedragon.randomtp.sponge.world.SpongePlayerHandler;
@@ -103,11 +104,13 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
     private RandomWorldHandler worldHandler;
     private PlayerHandler playerHandler;
     private SpongeCommandManager commandManager;
+    private Scheduler scheduler;
 
     @Listener
     public void onServerStart(GameInitializationEvent event) {
         audience = SpongeAudiences.create(this.plugin, game);
         pluginLogger = new SpongeLogger(audience, logger);
+        scheduler = new SpongeScheduler(plugin, Sponge.getScheduler());
         HoconConfigurationLoader configLoader = HoconConfigurationLoader
                 .builder()
                 .path(defaultConfig)

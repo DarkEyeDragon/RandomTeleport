@@ -4,6 +4,7 @@ import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.eco.EcoHandler;
 import me.darkeyedragon.randomtp.api.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
+import me.darkeyedragon.randomtp.api.scheduler.TaskIdentifier;
 import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
 import me.darkeyedragon.randomtp.api.teleport.RandomCooldown;
 import me.darkeyedragon.randomtp.api.teleport.TeleportHandler;
@@ -62,7 +63,7 @@ public class BasicTeleportHandler implements TeleportHandler {
         if (delay > 0) {
             plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getInitTeleportDelay(delay));
             AtomicBoolean complete = new AtomicBoolean(false);
-            int taskId = plugin.getScheduler().runTaskLater(() -> {
+            TaskIdentifier<?> taskId = plugin.getScheduler().runTaskLater(() -> {
                 complete.set(true);
                 teleport(property);
             }, delay).getTaskId();

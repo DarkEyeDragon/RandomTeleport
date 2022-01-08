@@ -21,8 +21,6 @@ import java.nio.file.Path;
 public interface RandomTeleportPlugin<T> {
 
 
-    Scheduler scheduler = null;
-
     AddonPlugin getPlugin(String name);
 
     PluginLogger getLogger();

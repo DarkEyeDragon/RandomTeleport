@@ -98,9 +98,11 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
 
     public void init() {
         // Plugin startup logic
-        WorldHandler.registerLocationSearcher(RandomEnvironment.OVERWORLD, new OverworldLocationSearcher(this));
-        WorldHandler.registerLocationSearcher(RandomEnvironment.NETHER, new NetherLocationSearcher(this));
-        WorldHandler.registerLocationSearcher(RandomEnvironment.THE_END, new EndLocationSearcher(this));
+        addonManager = new AddonManager(this, logger);
+        if (addonManager.createAddonDir()) {
+            logger.info("No addon folder. Creating one...");
+        }
+
         materialHandler = new SpigotMaterialHandler();
         worldHandler = new SpigotWorldHandler(this, new SpigotBiomeHandler());
         YamlConfigurationLoader configLoader = YamlConfigurationLoader
@@ -116,10 +118,6 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         playerHandler = new SpigotPlayerHandler();
         messageHandler = new CommonMessageHandler(this);
         logger = new BukkitLogger(this);
-        addonManager = new AddonManager(this, logger);
-        if (addonManager.createAddonDir()) {
-            logger.info("No addon folder. Creating one...");
-        }
         bukkitAudience = BukkitAudiences.create(plugin);
         commandManager = new PaperCommandManager(plugin);
         deathTracker = new CommonDeathTracker(this);
@@ -139,6 +137,9 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         pluginManager = Bukkit.getPluginManager();
         cooldownHandler = new CommonCooldownHandler();
         metric = new BStats();
+        WorldHandler.registerLocationSearcher(RandomEnvironment.OVERWORLD, new OverworldLocationSearcher(this));
+        WorldHandler.registerLocationSearcher(RandomEnvironment.NETHER, new NetherLocationSearcher(this));
+        WorldHandler.registerLocationSearcher(RandomEnvironment.THE_END, new EndLocationSearcher(this));
         registerListeners();
     }
 
