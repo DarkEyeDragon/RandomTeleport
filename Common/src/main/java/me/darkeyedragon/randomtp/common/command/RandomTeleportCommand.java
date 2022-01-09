@@ -71,7 +71,7 @@ public class RandomTeleportCommand extends BaseCommand {
 
     @Default
     @CommandPermission("rtp.teleport.self")
-    @CommandCompletion(" @worlds")
+    @CommandCompletion("@playerFilteredWorlds @filteredWorlds")
     @Description("Teleport players to a random location.")
     @Syntax("[world/player] [world]")
     public void onTeleport(CommandIssuer sender, @Optional PlayerWorldContext target, @Optional @CommandPermission("rtp.teleport.world") RandomWorld world) {
@@ -116,6 +116,9 @@ public class RandomTeleportCommand extends BaseCommand {
                         newWorld = plugin.getWorldHandler().getWorld(configTeleport.getDefaultWorld());
                     } else {
                         newWorld = world;
+                    }
+                    if (newWorld == null) {
+                        throw new InvalidCommandArgument("World with that name does not exist!");
                     }
                     if (!configWorld.contains(newWorld.getName())) {
                         plugin.getMessageHandler().sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
