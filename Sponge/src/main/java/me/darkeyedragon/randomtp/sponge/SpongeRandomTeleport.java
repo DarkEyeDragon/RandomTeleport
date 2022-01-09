@@ -133,6 +133,8 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
         }
         if (hasConsent()) {
             metric = new BStats();
+        } else {
+            logger.warn("Please run \"/sponge metrics randomteleport enable\" to allow stat collection! It helps me keep track of important metrics.");
         }
         cooldownHandler = new CommonCooldownHandler();
         messageHandler = new CommonMessageHandler(this);
@@ -252,7 +254,7 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
     }
 
     @Override
-    public Metric getStats() {
+    public Metric getStats() throws NoConsentException {
         if (metric == null) {
             throw new NoConsentException("User did not give consent. No stats may be recorded.");
         }
@@ -279,6 +281,7 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
         return materialHandler;
     }
 
+    @Override
     public boolean hasConsent() {
         return this.metricsConfigManager.getCollectionState(this.plugin).asBoolean();
     }

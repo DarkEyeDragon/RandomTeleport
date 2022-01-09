@@ -166,7 +166,9 @@ public class BasicTeleportHandler implements TeleportHandler {
         }
         drawWarpParticles(player, particle);
         plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getTeleport(location));
-        plugin.getStats().addTeleportStat();
+        if (plugin.hasConsent()) {
+            plugin.getStats().addTeleportStat();
+        }
         //TODO implement event pipeline
             /*RandomTeleportCompletedEvent event = new RandomTeleportCompletedEvent(player, property);
             Bukkit.getServer().getPluginManager().callEvent(event);*/

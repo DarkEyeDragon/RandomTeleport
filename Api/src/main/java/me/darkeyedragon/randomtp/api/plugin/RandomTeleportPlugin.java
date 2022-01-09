@@ -62,4 +62,6 @@ public interface RandomTeleportPlugin<T> {
     RandomAddonManager getAddonManager();
 
     RandomMaterialHandler getMaterialHandler();
+
+    boolean hasConsent();
 }

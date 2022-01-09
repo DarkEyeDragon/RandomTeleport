@@ -50,6 +50,11 @@ class AddonManagerTest {
             }
 
             @Override
+            public boolean hasConsent() {
+                return false;
+            }
+
+            @Override
             public AddonPlugin getPlugin(String name) {
                 return addonPlugin;
             }

@@ -161,6 +161,12 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         return materialHandler;
     }
 
+    @Override
+    public boolean hasConsent() {
+        //Since BStats handles consent we don't have to worry about it
+        return true;
+    }
+
     public SpigotImpl getPlugin() {
         return plugin;
     }
