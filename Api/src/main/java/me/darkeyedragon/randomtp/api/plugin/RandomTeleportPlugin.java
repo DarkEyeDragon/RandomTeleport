@@ -64,4 +64,6 @@ public interface RandomTeleportPlugin<T> {
     RandomMaterialHandler getMaterialHandler();
 
     boolean hasConsent();
+
+    Platform getPlatform();
 }

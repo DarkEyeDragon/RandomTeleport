@@ -9,6 +9,7 @@ import me.darkeyedragon.randomtp.api.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.api.logging.PluginLogger;
 import me.darkeyedragon.randomtp.api.message.MessageHandler;
 import me.darkeyedragon.randomtp.api.metric.Metric;
+import me.darkeyedragon.randomtp.api.plugin.Platform;
 import me.darkeyedragon.randomtp.api.scheduler.Scheduler;
 import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
 import me.darkeyedragon.randomtp.api.world.PlayerHandler;
@@ -74,6 +75,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
 
     private PluginManager pluginManager;
     private MessageHandler messageHandler;
+    private Platform platform;
 
     public RandomTeleport(SpigotImpl plugin) {
         this.plugin = plugin;
@@ -98,6 +100,8 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
 
     public void init() {
         // Plugin startup logic
+        platform = Platform.of("bukkit", Bukkit.getMinecraftVersion(), Bukkit.getName(), Bukkit.getBukkitVersion());
+        logger.info(platform.toString());
         addonManager = new AddonManager(this, logger);
         if (addonManager.createAddonDir()) {
             logger.info("No addon folder. Creating one...");
@@ -165,6 +169,11 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
     public boolean hasConsent() {
         //Since BStats handles consent we don't have to worry about it
         return true;
+    }
+
+    @Override
+    public Platform getPlatform() {
+        return Platform.of("bukkit", Bukkit.getVersion(), Bukkit.getName(), Bukkit.getBukkitVersion());
     }
 
     public SpigotImpl getPlugin() {

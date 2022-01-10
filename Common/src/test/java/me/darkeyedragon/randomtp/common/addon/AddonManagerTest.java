@@ -9,6 +9,7 @@ import me.darkeyedragon.randomtp.api.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.api.logging.PluginLogger;
 import me.darkeyedragon.randomtp.api.message.MessageHandler;
 import me.darkeyedragon.randomtp.api.metric.Metric;
+import me.darkeyedragon.randomtp.api.plugin.Platform;
 import me.darkeyedragon.randomtp.api.scheduler.Scheduler;
 import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
 import me.darkeyedragon.randomtp.api.world.PlayerHandler;
@@ -52,6 +53,11 @@ class AddonManagerTest {
             @Override
             public boolean hasConsent() {
                 return false;
+            }
+
+            @Override
+            public Platform getPlatform() {
+                return null;
             }
 
             @Override

@@ -8,6 +8,7 @@ import me.darkeyedragon.randomtp.api.addon.RandomAddon;
 import me.darkeyedragon.randomtp.api.addon.RandomAddonManager;
 import me.darkeyedragon.randomtp.api.addon.RequiredPlugin;
 import me.darkeyedragon.randomtp.api.logging.PluginLogger;
+import me.darkeyedragon.randomtp.api.plugin.Platform;
 import me.darkeyedragon.randomtp.common.addon.response.AddonResponse;
 import me.darkeyedragon.randomtp.common.addon.response.AddonResponseType;
 import me.darkeyedragon.randomtp.common.classloader.AddonClassLoader;
@@ -41,6 +42,12 @@ public class AddonManager implements RandomAddonManager {
         this.addons = new HashMap<>();
         this.folder = new File(instance.getDataFolder(), ADDON_FOLDER_NAME);
     }
+
+    @Override
+    public Platform getPlatform() {
+        return instance.getPlatform();
+    }
+
 
     /**
      * Instantiate all local {@link RandomAddon}s through the {@link AddonClassLoader}

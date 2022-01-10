@@ -9,6 +9,7 @@ import me.darkeyedragon.randomtp.api.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.api.logging.PluginLogger;
 import me.darkeyedragon.randomtp.api.message.MessageHandler;
 import me.darkeyedragon.randomtp.api.metric.Metric;
+import me.darkeyedragon.randomtp.api.plugin.Platform;
 import me.darkeyedragon.randomtp.api.scheduler.Scheduler;
 import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
 import me.darkeyedragon.randomtp.api.world.PlayerHandler;
@@ -106,11 +107,16 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
     private SpongeCommandManager commandManager;
     private Scheduler scheduler;
 
+    private Platform platform;
+
     @Listener
     public void onServerStart(GameInitializationEvent event) {
         audience = SpongeAudiences.create(this.plugin, game);
         pluginLogger = new SpongeLogger(audience, logger);
         scheduler = new SpongeScheduler(plugin, Sponge.getScheduler());
+        PluginContainer container = Sponge.getPlatform().getContainer(org.spongepowered.api.Platform.Component.IMPLEMENTATION);
+        platform = Platform.of("sponge", Sponge.getPlatform().getMinecraftVersion().getName(), container.getName(), container.getVersion().orElse("UNKNOWN"));
+        logger.info(platform.toString());
         HoconConfigurationLoader configLoader = HoconConfigurationLoader
                 .builder()
                 .path(defaultConfig)
@@ -159,7 +165,7 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
         getLogger().info(Component.text("======== [Loading validators] ========").color(TextColor.color(Color.CYAN.getRgb())));
         try {
             getAddonManager().instantiateAllLocal();
-        } catch (ReflectiveOperationException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         getLogger().info(Component.text("======================================").color(TextColor.color(Color.CYAN.getRgb())));
@@ -284,5 +290,10 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
     @Override
     public boolean hasConsent() {
         return this.metricsConfigManager.getCollectionState(this.plugin).asBoolean();
+    }
+
+    @Override
+    public Platform getPlatform() {
+        return platform;
     }
 }
