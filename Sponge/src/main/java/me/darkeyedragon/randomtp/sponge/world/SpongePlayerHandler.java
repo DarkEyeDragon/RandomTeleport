@@ -14,6 +14,6 @@ public class SpongePlayerHandler implements PlayerHandler {
 
     @Override
     public RandomPlayer getPlayer(String name) {
-        return null;
+        return new SpongePlayer(Sponge.getServer().getPlayer(name).orElse(null));
     }
 }
