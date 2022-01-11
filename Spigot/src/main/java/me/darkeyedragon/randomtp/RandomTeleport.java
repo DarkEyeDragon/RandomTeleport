@@ -100,6 +100,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
 
     public void init() {
         // Plugin startup logic
+        logger = new BukkitLogger(this);
         platform = Platform.of("bukkit", Bukkit.getMinecraftVersion(), Bukkit.getName(), Bukkit.getBukkitVersion());
         logger.info(platform.toString());
         addonManager = new AddonManager(this, logger);
@@ -121,7 +122,6 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         scheduler = new SpigotScheduler(this);
         playerHandler = new SpigotPlayerHandler();
         messageHandler = new CommonMessageHandler(this);
-        logger = new BukkitLogger(this);
         bukkitAudience = BukkitAudiences.create(plugin);
         commandManager = new PaperCommandManager(plugin);
         deathTracker = new CommonDeathTracker(this);
