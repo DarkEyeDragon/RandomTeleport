@@ -152,10 +152,7 @@
                             <pattern>co.aikar.locales</pattern>
                             <shadedPattern>me.darkeyedragon.randomtp.shaded.locales</shadedPattern>
                         </relocation>
-                        <relocation>
-                            <pattern>io.papermc.lib</pattern>
-                            <shadedPattern>me.darkeyedragon.randomtp.shaded.paperlib</shadedPattern>
-                        </relocation>
+                        -->
                         <relocation>
                             <pattern>net.kyori</pattern>
                             <shadedPattern>me.darkeyedragon.randomtp.shaded.kyori</shadedPattern>
