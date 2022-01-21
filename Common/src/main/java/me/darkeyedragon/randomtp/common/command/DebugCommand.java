@@ -6,12 +6,14 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Subcommand;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
+import me.darkeyedragon.randomtp.api.config.section.subsection.SubSection;
 import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 
@@ -19,6 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -28,6 +31,8 @@ public class DebugCommand extends BaseCommand {
 
     private final RandomTeleportPlugin<?> plugin;
     private final RandomConfigHandler configHandler;
+    Style indexStyle = Style.style(TextColor.color(0xFFBA00));
+    Style errorStyle = Style.style(TextColor.color(0xB60A00));
 
     public DebugCommand(RandomTeleportPlugin<?> plugin) {
         this.plugin = plugin;
@@ -39,50 +44,78 @@ public class DebugCommand extends BaseCommand {
     public void showConfigMessages(CommandIssuer sender) {
         plugin.getMessageHandler().sendMessage(sender, Component.text("=============== [ Config Messages ] ==============").style(Style.style(TextColor.color(0x2DABBB))));
         Method[] declaredMethods = configHandler.getSectionMessage().getClass().getDeclaredMethods();
-        int index = 0;
+        try {
+            int index = 1;
+            for (Component component : methodsToComponents(configHandler.getSectionMessage(), declaredMethods)) {
+                Component indexComp = Component.text(index++ + ". ").style(indexStyle);
+                plugin.getMessageHandler().sendMessage(sender, indexComp.append(component));
+            }
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        plugin.getMessageHandler().sendMessage(sender, Component.text("==================================================").style(Style.style(TextColor.color(0x2DABBB))));
+    }
+
+    private List<Component> methodsToComponents(Object object, Method[] declaredMethods) throws InvocationTargetException, IllegalAccessException {
+        List<Component> components = new ArrayList<>(declaredMethods.length);
         for (Method declaredMethod : declaredMethods) {
-            if (Modifier.isPublic(declaredMethod.getModifiers())) {
-                index++;
-                Class<?>[] parameterTypes = declaredMethod.getParameterTypes();
-                List<Object> args = new ArrayList<>();
-                for (Class<?> type : parameterTypes) {
-                    System.out.println(type.getTypeName());
-                    if (type.isPrimitive()) {
-                        args.add(100000);
-                    } else if (type.isAssignableFrom(String.class)) {
-                        args.add("testStr");
-                    } else if (type.isAssignableFrom(RandomWorld.class)) {
-                        //Grab the first world from the world queue. If non exists... well then it dies.
-                        Set<RandomWorld> worldQueue = plugin.getWorldHandler().getWorldQueue().getWorldQueueMap().keySet();
-                        Iterator<RandomWorld> worldIterator = worldQueue.iterator();
-                        args.add(worldIterator.next());
-                    } else if (type.isAssignableFrom(RandomLocation.class)) {
-                        args.add(plugin.getWorldHandler().getWorld("world").getBlockAt(150, 10, 200).getLocation());
-                    }
-                }
-                try {
-                    Object obj;
-                    if (args.size() > 0) {
-                        obj = declaredMethod.invoke(configHandler.getSectionMessage(), args.toArray());
+            if (declaredMethod != null) {
+                Object result = instantiateObject(object, declaredMethod);
+                if (result instanceof Component) {
+                    Component hoverMessage = Component.text("Class: ")
+                            .color(TextColor.color(0x2DABBB)
+                            )
+                            .append(Component.text(object.getClass().getSimpleName() + "\n")
+                                    .color(TextColor.color(0x1DC700))
+                            )
+                            .append(Component.text("Method: ")
+                                    .color(TextColor.color(0x2DABBB))
+                                    .append(Component.text(declaredMethod.getName())
+                                            .color(TextColor.color(0x1DC700))
+                                    )
+                            );
+                    components.add(((Component) result).hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, hoverMessage)));
+                } else if (result instanceof SubSection) {
+                    Method[] methods = result.getClass().getDeclaredMethods();
+                    components.addAll(methodsToComponents(result, methods));
+                } else {
+                    if (result == null) {
+                        components.add(Component.text(declaredMethod.getName() + " is null. Possibly not implemented?").style(errorStyle));
                     } else {
-                        obj = declaredMethod.invoke(configHandler.getSectionMessage());
+                        components.add(Component.text(declaredMethod.getName() + " returns " + result.getClass().getSimpleName() + ". Accepted types are Component or SubSection").style(errorStyle));
                     }
-                    Component component;
-                    Component indicator = Component.text(index);
-                    indicator = indicator.style(Style.style(TextColor.color(0xAAAAAA))).append(Component.text(". "));
-                    if (obj == null) {
-                        Component finalText = indicator.append(Component.text(declaredMethod.getName())).append(Component.text(" is null!").hoverEvent(Component.text(declaredMethod.getName())));
-                        plugin.getMessageHandler().sendMessage(sender, finalText);
-                    } else {
-                        component = (Component) obj;
-                        Component finalText = indicator.append(component).hoverEvent(Component.text(declaredMethod.getName()));
-                        plugin.getMessageHandler().sendMessage(sender, finalText);
-                    }
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
                 }
             }
         }
+        return components;
+    }
+
+    private Object instantiateObject(Object object, Method declaredMethod) throws InvocationTargetException, IllegalAccessException {
+        if (Modifier.isPublic(declaredMethod.getModifiers())) {
+            Class<?>[] parameterTypes = declaredMethod.getParameterTypes();
+            Set<Object> parameters = parameterTypeToValue(parameterTypes);
+            return declaredMethod.invoke(object, parameters.toArray());
+        }
+        return null;
+    }
+
+    private Set<Object> parameterTypeToValue(Class<?>[] parameterTypes) {
+        Set<Object> args = new HashSet<>();
+        for (Class<?> type : parameterTypes) {
+            if (type.isPrimitive()) {
+                args.add(100000);
+            } else if (type.isAssignableFrom(String.class)) {
+                args.add("<String>");
+            } else if (type.isAssignableFrom(RandomWorld.class)) {
+                //Grab the first world from the world queue. If non exists... well then it dies.
+                Set<RandomWorld> worldQueue = plugin.getWorldHandler().getWorldQueue().getWorldQueueMap().keySet();
+                Iterator<RandomWorld> worldIterator = worldQueue.iterator();
+                args.add(worldIterator.next());
+            } else if (type.isAssignableFrom(RandomLocation.class)) {
+                args.add(plugin.getWorldHandler().getWorld("world").getBlockAt(150, 10, 200).getLocation());
+            }
+        }
+        return args;
     }
 
     @Subcommand("show queue")

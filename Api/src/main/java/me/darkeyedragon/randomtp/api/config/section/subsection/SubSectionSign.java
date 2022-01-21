@@ -5,7 +5,7 @@ import net.kyori.adventure.text.Component;
 
 import java.util.List;
 
-public interface SubSectionSign {
+public interface SubSectionSign extends SubSection {
 
     List<Component> getComponents(RandomWorld world);
 
