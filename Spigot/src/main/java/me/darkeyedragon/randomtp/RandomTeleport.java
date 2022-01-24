@@ -128,7 +128,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         pluginManager.registerEvents(new WorldListener(this), plugin);
         pluginManager.registerEvents(new PlayerDeathListener(this), plugin);
         pluginManager.registerEvents(new ServerLoadListener(this), plugin);
-        plugin.getServer().getPluginManager().registerEvents(new WorldBorderChangeListener(this), plugin);
+        pluginManager.registerEvents(new WorldBorderChangeListener(this), plugin);
     }
 
     @Override
