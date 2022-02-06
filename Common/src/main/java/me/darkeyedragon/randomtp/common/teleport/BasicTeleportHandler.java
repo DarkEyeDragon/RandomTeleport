@@ -147,6 +147,9 @@ public class BasicTeleportHandler implements TeleportHandler {
                     }
                     if (ecoHandler.makePayment(player.getUniqueId(), price)) {
                         plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getSubSectionEconomy().getPayment(price, currency));
+                    } else {
+                        plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getSubSectionEconomy().getInsufficientFunds());
+                        return;
                     }
                 }
             } else {
@@ -158,11 +161,6 @@ public class BasicTeleportHandler implements TeleportHandler {
         //If deathtimer is enabled add it to the collection
         if (configHandler.getSectionTeleport().getDeathTimer() > 0) {
             addToDeathTimer(player);
-        }
-        if (configHandler.getSectionEconomy().getPrice() > 0 && !property.isBypassEco() && plugin.getEcoHandler() != null) {
-            ecoHandler.makePayment(player.getUniqueId(), property.getPrice());
-            String currency = property.getPrice() == 1 ? ecoHandler.getCurrencySingular() : ecoHandler.getCurrencyPlural();
-            plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getSubSectionEconomy().getPayment(property.getPrice(), currency));
         }
         drawWarpParticles(player, particle);
         plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getTeleport(location));
