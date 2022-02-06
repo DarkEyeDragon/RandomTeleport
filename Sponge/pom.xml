@@ -252,6 +252,10 @@
             <id>spongepowered-repo</id>
             <url>https://repo.spongepowered.org/maven/</url>
         </repository>
+        <repository>
+            <id>aikar</id>
+            <url>https://repo.aikar.co/content/groups/aikar/</url>
+        </repository>
     </repositories>
 
     <dependencies>
