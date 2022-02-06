@@ -10,9 +10,7 @@ public interface PluginLogger {
     void info(Component component);
 
     void warn(String s);
-    void warn(Component component);
 
     void severe(String s);
-    void severe(Component component);
 
 }

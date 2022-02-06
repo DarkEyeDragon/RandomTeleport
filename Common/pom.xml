@@ -7,7 +7,10 @@
         <artifactId>randomtp</artifactId>
         <version>0.1.0-SNAPSHOT</version>
     </parent>
+
     <modelVersion>4.0.0</modelVersion>
+
+    <name>RandomTeleport-Common</name>
 
     <groupId>me.darkeyedragon.randomtp</groupId>
     <artifactId>Common</artifactId>
@@ -57,6 +60,7 @@
             <groupId>org.spongepowered</groupId>
             <artifactId>configurate-yaml</artifactId>
             <version>4.1.2</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.kyori</groupId>

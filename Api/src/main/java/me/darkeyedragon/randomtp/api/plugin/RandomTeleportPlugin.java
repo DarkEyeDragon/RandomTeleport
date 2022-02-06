@@ -16,11 +16,10 @@ import me.darkeyedragon.randomtp.api.world.RandomWorldHandler;
 import net.kyori.adventure.platform.AudienceProvider;
 
 import java.io.File;
+import java.nio.file.Path;
 
 public interface RandomTeleportPlugin<T> {
 
-
-    Scheduler scheduler = null;
 
     AddonPlugin getPlugin(String name);
 
@@ -42,6 +41,8 @@ public interface RandomTeleportPlugin<T> {
 
     File getDataFolder();
 
+    Path getConfigPath();
+
     boolean isPluginLoaded(String name);
 
     AudienceProvider getAudience();
@@ -61,4 +62,8 @@ public interface RandomTeleportPlugin<T> {
     RandomAddonManager getAddonManager();
 
     RandomMaterialHandler getMaterialHandler();
+
+    boolean hasConsent();
+
+    Platform getPlatform();
 }

@@ -9,7 +9,7 @@
     <version>2.1.0</version>
     <packaging>jar</packaging>
 
-    <name>RandomTeleport</name>
+    <name>RandomTeleport-Spigot</name>
 
     <parent>
         <groupId>me.darkeyedragon</groupId>

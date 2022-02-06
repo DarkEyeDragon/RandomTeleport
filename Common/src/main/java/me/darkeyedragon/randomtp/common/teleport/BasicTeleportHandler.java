@@ -4,6 +4,7 @@ import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.eco.EcoHandler;
 import me.darkeyedragon.randomtp.api.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
+import me.darkeyedragon.randomtp.api.scheduler.TaskIdentifier;
 import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
 import me.darkeyedragon.randomtp.api.teleport.RandomCooldown;
 import me.darkeyedragon.randomtp.api.teleport.TeleportHandler;
@@ -14,7 +15,7 @@ import me.darkeyedragon.randomtp.api.world.RandomParticle;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
 import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
-import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
+import me.darkeyedragon.randomtp.common.world.WorldHandler;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -62,7 +63,7 @@ public class BasicTeleportHandler implements TeleportHandler {
         if (delay > 0) {
             plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getInitTeleportDelay(delay));
             AtomicBoolean complete = new AtomicBoolean(false);
-            int taskId = plugin.getScheduler().runTaskLater(() -> {
+            TaskIdentifier<?> taskId = plugin.getScheduler().runTaskLater(() -> {
                 complete.set(true);
                 teleport(property);
             }, delay).getTaskId();
@@ -125,7 +126,7 @@ public class BasicTeleportHandler implements TeleportHandler {
         double price = property.getPrice();
         RandomParticle particle = property.getParticle();
 
-        LocationSearcher baseLocationSearcher = LocationSearcherFactory.getLocationSearcher(property.getWorld(), plugin);
+        LocationSearcher baseLocationSearcher = WorldHandler.getLocationSearcher(property.getWorld().getEnvironment());
         if (!baseLocationSearcher.isSafe(location)) {
             toRandomLocation(property);
             return;
@@ -165,7 +166,9 @@ public class BasicTeleportHandler implements TeleportHandler {
         }
         drawWarpParticles(player, particle);
         plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getTeleport(location));
-        plugin.getStats().addTeleportStat();
+        if (plugin.hasConsent()) {
+            plugin.getStats().addTeleportStat();
+        }
         //TODO implement event pipeline
             /*RandomTeleportCompletedEvent event = new RandomTeleportCompletedEvent(player, property);
             Bukkit.getServer().getPluginManager().callEvent(event);*/

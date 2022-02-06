@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 public interface RandomBiomeHandler {
 
-    RandomBiome getBiome(String materialName);
+    RandomBiome getBiome(String biomeName);
 
     Set<RandomBiome> getBiomes(Pattern pattern) throws IllegalArgumentException;
 

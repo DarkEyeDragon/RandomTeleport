@@ -9,9 +9,11 @@ import me.darkeyedragon.randomtp.api.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.api.logging.PluginLogger;
 import me.darkeyedragon.randomtp.api.message.MessageHandler;
 import me.darkeyedragon.randomtp.api.metric.Metric;
+import me.darkeyedragon.randomtp.api.plugin.Platform;
 import me.darkeyedragon.randomtp.api.scheduler.Scheduler;
 import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
 import me.darkeyedragon.randomtp.api.world.PlayerHandler;
+import me.darkeyedragon.randomtp.api.world.RandomEnvironment;
 import me.darkeyedragon.randomtp.api.world.RandomMaterialHandler;
 import me.darkeyedragon.randomtp.api.world.RandomWorldHandler;
 import me.darkeyedragon.randomtp.command.completion.Registrar;
@@ -19,18 +21,23 @@ import me.darkeyedragon.randomtp.common.addon.AddonManager;
 import me.darkeyedragon.randomtp.common.command.DebugCommand;
 import me.darkeyedragon.randomtp.common.command.RandomTeleportCommand;
 import me.darkeyedragon.randomtp.common.config.CommonConfigHandler;
+import me.darkeyedragon.randomtp.common.config.serializer.ConfigTypeSerializerCollection;
+import me.darkeyedragon.randomtp.common.failsafe.CommonDeathTracker;
 import me.darkeyedragon.randomtp.common.message.CommonMessageHandler;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
+import me.darkeyedragon.randomtp.common.stat.BStats;
 import me.darkeyedragon.randomtp.common.teleport.CommonCooldownHandler;
+import me.darkeyedragon.randomtp.common.world.WorldHandler;
+import me.darkeyedragon.randomtp.common.world.location.search.EndLocationSearcher;
+import me.darkeyedragon.randomtp.common.world.location.search.NetherLocationSearcher;
+import me.darkeyedragon.randomtp.common.world.location.search.OverworldLocationSearcher;
 import me.darkeyedragon.randomtp.eco.BukkitEcoHandler;
-import me.darkeyedragon.randomtp.failsafe.SpigotDeathTracker;
-import me.darkeyedragon.randomtp.failsafe.listener.PlayerDeathListener;
+import me.darkeyedragon.randomtp.listener.PlayerDeathListener;
 import me.darkeyedragon.randomtp.listener.ServerLoadListener;
 import me.darkeyedragon.randomtp.listener.WorldBorderChangeListener;
 import me.darkeyedragon.randomtp.listener.WorldListener;
 import me.darkeyedragon.randomtp.log.BukkitLogger;
 import me.darkeyedragon.randomtp.scheduler.SpigotScheduler;
-import me.darkeyedragon.randomtp.stat.BStats;
 import me.darkeyedragon.randomtp.world.SpigotBiomeHandler;
 import me.darkeyedragon.randomtp.world.SpigotMaterialHandler;
 import me.darkeyedragon.randomtp.world.SpigotPlayerHandler;
@@ -40,8 +47,11 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public final class RandomTeleport extends RandomTeleportPluginImpl {
 
@@ -65,6 +75,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
 
     private PluginManager pluginManager;
     private MessageHandler messageHandler;
+    private Platform platform;
 
     public RandomTeleport(SpigotImpl plugin) {
         this.plugin = plugin;
@@ -89,21 +100,31 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
 
     public void init() {
         // Plugin startup logic
-        materialHandler = new SpigotMaterialHandler();
-        worldHandler = new SpigotWorldHandler(this, new SpigotBiomeHandler());
-        configHandler = new CommonConfigHandler(this);
-        configHandler.reload();
-        scheduler = new SpigotScheduler(this);
-        playerHandler = new SpigotPlayerHandler();
-        messageHandler = new CommonMessageHandler(this);
         logger = new BukkitLogger(this);
+        platform = Platform.of("bukkit", Bukkit.getMinecraftVersion(), Bukkit.getName(), Bukkit.getBukkitVersion());
+        logger.info(platform.toString());
         addonManager = new AddonManager(this, logger);
         if (addonManager.createAddonDir()) {
             logger.info("No addon folder. Creating one...");
         }
+
+        materialHandler = new SpigotMaterialHandler();
+        worldHandler = new SpigotWorldHandler(this, new SpigotBiomeHandler());
+        YamlConfigurationLoader configLoader = YamlConfigurationLoader
+                .builder()
+                .path(Paths.get(getDataFolder().getPath(), "config.yml"))
+                .defaultOptions(
+                        configurationOptions -> configurationOptions.serializers(new ConfigTypeSerializerCollection(this).build())
+                )
+                .build();
+        configHandler = new CommonConfigHandler(this, configLoader);
+        configHandler.reload();
+        scheduler = new SpigotScheduler(this);
+        playerHandler = new SpigotPlayerHandler();
+        messageHandler = new CommonMessageHandler(this);
         bukkitAudience = BukkitAudiences.create(plugin);
         commandManager = new PaperCommandManager(plugin);
-        deathTracker = new SpigotDeathTracker(this);
+        deathTracker = new CommonDeathTracker(this);
         commandManager.enableUnstableAPI("help");
         //commandManager.enableUnstableAPI("brigadier");
         //Register all completions and contexts for ACF
@@ -120,6 +141,9 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
         pluginManager = Bukkit.getPluginManager();
         cooldownHandler = new CommonCooldownHandler();
         metric = new BStats();
+        WorldHandler.registerLocationSearcher(RandomEnvironment.OVERWORLD, new OverworldLocationSearcher(this));
+        WorldHandler.registerLocationSearcher(RandomEnvironment.NETHER, new NetherLocationSearcher(this));
+        WorldHandler.registerLocationSearcher(RandomEnvironment.THE_END, new EndLocationSearcher(this));
         registerListeners();
     }
 
@@ -139,6 +163,17 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
     @Override
     public RandomMaterialHandler getMaterialHandler() {
         return materialHandler;
+    }
+
+    @Override
+    public boolean hasConsent() {
+        //Since BStats handles consent we don't have to worry about it
+        return true;
+    }
+
+    @Override
+    public Platform getPlatform() {
+        return Platform.of("bukkit", Bukkit.getVersion(), Bukkit.getName(), Bukkit.getBukkitVersion());
     }
 
     public SpigotImpl getPlugin() {
@@ -179,6 +214,11 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
     @Override
     public File getDataFolder() {
         return plugin.getDataFolder();
+    }
+
+    @Override
+    public Path getConfigPath() {
+        return Paths.get(getDataFolder().getPath(), "config.yml");
     }
 
     @Override

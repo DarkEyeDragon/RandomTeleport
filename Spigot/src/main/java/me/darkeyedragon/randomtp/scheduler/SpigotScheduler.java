@@ -3,6 +3,7 @@ package me.darkeyedragon.randomtp.scheduler;
 import me.darkeyedragon.randomtp.RandomTeleport;
 import me.darkeyedragon.randomtp.api.scheduler.Scheduler;
 import me.darkeyedragon.randomtp.api.scheduler.Task;
+import me.darkeyedragon.randomtp.api.scheduler.TaskIdentifier;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -50,8 +51,8 @@ public class SpigotScheduler implements Scheduler {
             }
 
             @Override
-            public int getTaskId() {
-                return bukkitTask.getTaskId();
+            public TaskIdentifier<Integer> getTaskId() {
+                return new SpigotTaskIdentifier(bukkitTask.getTaskId());
             }
 
             @Override
@@ -69,8 +70,8 @@ public class SpigotScheduler implements Scheduler {
             }
 
             @Override
-            public int getTaskId() {
-                return bukkitRunnable.getTaskId();
+            public TaskIdentifier<Integer> getTaskId() {
+                return new SpigotTaskIdentifier(bukkitRunnable.getTaskId());
             }
 
             @Override
@@ -81,8 +82,8 @@ public class SpigotScheduler implements Scheduler {
     }
 
     @Override
-    public void cancelTask(int taskId) {
-        Bukkit.getScheduler().cancelTask(taskId);
+    public void cancelTask(TaskIdentifier<?> taskId) {
+        Bukkit.getScheduler().cancelTask((int) taskId.getIdentifier());
     }
 
     @Override

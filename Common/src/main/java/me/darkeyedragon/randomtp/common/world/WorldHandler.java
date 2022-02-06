@@ -5,25 +5,39 @@ import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorld;
 import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
+import me.darkeyedragon.randomtp.api.world.RandomEnvironment;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.RandomWorldBorder;
 import me.darkeyedragon.randomtp.api.world.RandomWorldHandler;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.RandomOffset;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationDataProvider;
+import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
 import me.darkeyedragon.randomtp.common.config.datatype.Offset;
 import me.darkeyedragon.randomtp.common.queue.CommonQueueListener;
 import me.darkeyedragon.randomtp.common.world.location.search.CommonLocationDataProvider;
-import me.darkeyedragon.randomtp.common.world.location.search.LocationSearcherFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class WorldHandler implements RandomWorldHandler {
 
     private final WorldQueue worldQueue;
     private final RandomTeleportPlugin<?> plugin;
+    private static final Map<RandomEnvironment, LocationSearcher> locationSearcherMap = new HashMap<>();
+
 
     public WorldHandler(RandomTeleportPlugin<?> plugin) {
         this.plugin = plugin;
-        worldQueue = new WorldQueue();
+        this.worldQueue = new WorldQueue();
+    }
+
+    public static LocationSearcher registerLocationSearcher(RandomEnvironment environment, LocationSearcher locationSearcher) {
+        return locationSearcherMap.put(environment, locationSearcher);
+    }
+
+    public static LocationSearcher getLocationSearcher(RandomEnvironment environment) {
+        return locationSearcherMap.get(environment);
     }
 
     @Override
@@ -51,7 +65,7 @@ public abstract class WorldHandler implements RandomWorldHandler {
             return;
         }
         plugin.getLogger().info("Found \"" + world.getName() + "\". Loading...");
-        LocationQueue locationQueue = new LocationQueue(plugin, configHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(world, plugin));
+        LocationQueue locationQueue = new LocationQueue(plugin, configHandler.getSectionQueue().getSize(), getLocationSearcher(world.getEnvironment()));
 
         //Subscribe to the locationqueue to be notified of changes
         subscribe(locationQueue, world);

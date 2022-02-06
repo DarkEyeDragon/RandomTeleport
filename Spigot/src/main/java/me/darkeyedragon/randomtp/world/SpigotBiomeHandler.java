@@ -12,9 +12,9 @@ import java.util.regex.Pattern;
 public class SpigotBiomeHandler implements RandomBiomeHandler {
 
     @Override
-    public RandomBiome getBiome(String materialName) {
-        materialName = materialName.toUpperCase();
-        return new SpigotBiome(Biome.valueOf(materialName));
+    public RandomBiome getBiome(String biomeName) {
+        biomeName = biomeName.toUpperCase();
+        return new SpigotBiome(Biome.valueOf(biomeName));
     }
 
     @Override
@@ -23,7 +23,7 @@ public class SpigotBiomeHandler implements RandomBiomeHandler {
         for (Biome biome : Biome.values()) {
             Matcher matcher = pattern.matcher(biome.name());
             if (matcher.matches()) {
-                biomes.add(new SpigotBiome(Biome.valueOf(matcher.group(0).toUpperCase())));
+                biomes.add(getBiome(matcher.group(0)));
             }
         }
         return biomes;

@@ -1,14 +1,18 @@
 package me.darkeyedragon.randomtp.sponge.logging;
 
 import me.darkeyedragon.randomtp.api.logging.PluginLogger;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.platform.AudienceProvider;
 import net.kyori.adventure.text.Component;
 import org.slf4j.Logger;
 
 public class SpongeLogger implements PluginLogger {
 
+    private final AudienceProvider audienceProvider;
     private final Logger logger;
 
-    public SpongeLogger(Logger logger) {
+    public SpongeLogger(AudienceProvider audienceProvider, Logger logger) {
+        this.audienceProvider = audienceProvider;
         this.logger = logger;
     }
 
@@ -19,7 +23,8 @@ public class SpongeLogger implements PluginLogger {
 
     @Override
     public void info(Component component) {
-
+        Component finalComponent = Component.text(PREFIX).append(component);
+        audienceProvider.console().sendMessage(Identity.nil(), finalComponent);
     }
 
     @Override
@@ -28,17 +33,7 @@ public class SpongeLogger implements PluginLogger {
     }
 
     @Override
-    public void warn(Component component) {
-
-    }
-
-    @Override
     public void severe(String s) {
         logger.error(s);
-    }
-
-    @Override
-    public void severe(Component component) {
-
     }
 }

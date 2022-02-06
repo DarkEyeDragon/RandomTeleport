@@ -9,6 +9,7 @@ import me.darkeyedragon.randomtp.api.failsafe.DeathTracker;
 import me.darkeyedragon.randomtp.api.logging.PluginLogger;
 import me.darkeyedragon.randomtp.api.message.MessageHandler;
 import me.darkeyedragon.randomtp.api.metric.Metric;
+import me.darkeyedragon.randomtp.api.plugin.Platform;
 import me.darkeyedragon.randomtp.api.scheduler.Scheduler;
 import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
 import me.darkeyedragon.randomtp.api.world.PlayerHandler;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
 
@@ -45,6 +47,16 @@ class AddonManagerTest {
 
             @Override
             public RandomMaterialHandler getMaterialHandler() {
+                return null;
+            }
+
+            @Override
+            public boolean hasConsent() {
+                return false;
+            }
+
+            @Override
+            public Platform getPlatform() {
                 return null;
             }
 
@@ -90,6 +102,11 @@ class AddonManagerTest {
 
             @Override
             public File getDataFolder() {
+                return null;
+            }
+
+            @Override
+            public Path getConfigPath() {
                 return null;
             }
 

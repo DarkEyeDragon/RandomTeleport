@@ -19,8 +19,9 @@
 
     <modules>
         <module>Api</module>
-        <module>Spigot</module>
         <module>Common</module>
+        <module>Spigot</module>
+        <module>Sponge</module>
     </modules>
 
     <dependencies>

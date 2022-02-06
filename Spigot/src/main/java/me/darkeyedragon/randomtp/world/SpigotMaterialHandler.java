@@ -42,7 +42,7 @@ public class SpigotMaterialHandler implements RandomMaterialHandler {
         for (Material material : Material.values()) {
             Matcher matcher = pattern.matcher(material.name());
             if (matcher.matches()) {
-                randomMaterials.add(new SpigotMaterial(Material.valueOf(matcher.group(0).toUpperCase())));
+                randomMaterials.add(new SpigotMaterial(material));
             }
         }
         return randomMaterials;

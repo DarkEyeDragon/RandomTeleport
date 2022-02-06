@@ -13,7 +13,6 @@ import me.darkeyedragon.randomtp.api.world.RandomWorldHandler;
 import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
 import me.darkeyedragon.randomtp.common.addon.AddonManager;
 import me.darkeyedragon.randomtp.common.command.context.PlayerWorldContext;
-import me.darkeyedragon.randomtp.world.PlayerSpigot;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.command.ConsoleCommandSender;
@@ -76,7 +75,7 @@ public class Registrar {
         });
         manager.getCommandContexts().registerContext(RandomPlayer.class, c -> {
             String arg1 = c.popFirstArg();
-            return new PlayerSpigot(Bukkit.getPlayer(arg1));
+            return playerHandler.getPlayer(arg1);
         });
     }
 }

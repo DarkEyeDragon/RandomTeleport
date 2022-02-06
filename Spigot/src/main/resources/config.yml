@@ -67,15 +67,6 @@ teleport:
   #Setting this to false will teleport on the main thread preventing this issue but will block the main thread
   #For more info check: https://github.com/DarkEyeDragon/RandomTeleport/issues/190
   use-async-chunk-teleport: false
-#Plugins to take into consideration when teleporting. A player will not be teleported in those regions
-#Currently supports Factions (FactionsUUID), WorldGuard, GriefPrevention, RedProtect, Towny
-#If you want more plugins to be supported: https://github.com/DarkEyeDragon/RandomTeleport/issues
-plugins:
-  - Factions
-  - WorldGuard
-  - GriefPrevention
-  - RedProtect
-  - Towny
 debug:
   #Safe location added for world(3/5)
   #Location removed from world(2/5)

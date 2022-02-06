@@ -1,4 +1,4 @@
-package me.darkeyedragon.randomtp.stat;
+package me.darkeyedragon.randomtp.common.stat;
 
 import me.darkeyedragon.randomtp.api.metric.Metric;
 
