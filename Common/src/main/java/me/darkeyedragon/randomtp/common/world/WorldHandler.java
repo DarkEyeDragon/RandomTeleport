@@ -50,11 +50,13 @@ public abstract class WorldHandler implements RandomWorldHandler {
             plugin.getLogger().warn("World " + configWorld.getName() + " does not exist! Skipping...");
             return;
         }
+        plugin.getLogger().info("Found \"" + world.getName() + "\". Loading...");
         LocationQueue locationQueue = new LocationQueue(plugin, configHandler.getSectionQueue().getSize(), LocationSearcherFactory.getLocationSearcher(world, plugin));
 
         //Subscribe to the locationqueue to be notified of changes
         subscribe(locationQueue, world);
         getWorldQueue().put(world, locationQueue);
+        plugin.getLogger().info("Loaded \"" + world.getName() + "\"");
         generate(configWorld, world);
     }
 
