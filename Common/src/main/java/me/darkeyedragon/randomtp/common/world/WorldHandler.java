@@ -29,6 +29,7 @@ public abstract class WorldHandler implements RandomWorldHandler {
 
     public WorldHandler(RandomTeleportPlugin<?> plugin) {
         this.plugin = plugin;
+        this.configHandler = plugin.getConfigHandler();
         this.worldQueue = new WorldQueue();
     }
 
@@ -38,11 +39,6 @@ public abstract class WorldHandler implements RandomWorldHandler {
 
     public static LocationSearcher getLocationSearcher(RandomEnvironment environment) {
         return locationSearcherMap.get(environment);
-    }
-
-    @Override
-    public WorldQueue getWorldQueue() {
-        return worldQueue;
     }
 
     @Override
@@ -64,6 +60,10 @@ public abstract class WorldHandler implements RandomWorldHandler {
             plugin.getLogger().warn("World " + configWorld.getName() + " does not exist! Skipping...");
             return;
         }
+        if (getWorldQueue().get(world) != null) {
+            plugin.getLogger().warn("World " + world.getName() + " is already loaded. Skipping...");
+            return;
+        }
         plugin.getLogger().info("Found \"" + world.getName() + "\". Loading...");
         LocationQueue locationQueue = new LocationQueue(plugin, configHandler.getSectionQueue().getSize(), getLocationSearcher(world.getEnvironment()));
 
@@ -71,7 +71,7 @@ public abstract class WorldHandler implements RandomWorldHandler {
         subscribe(locationQueue, world);
         getWorldQueue().put(world, locationQueue);
         plugin.getLogger().info("Loaded \"" + world.getName() + "\"");
-        generate(configWorld, world);
+        generate(configWorld, world, configHandler.getSectionQueue().getSize());
     }
 
     private LocationDataProvider createDataProvider(ConfigWorld configWorld, RandomWorld world) {
@@ -90,14 +90,6 @@ public abstract class WorldHandler implements RandomWorldHandler {
         return new CommonLocationDataProvider(world, offset, radius);
     }
 
-    public void generate(ConfigWorld configWorld, RandomWorld randomWorld) {
-        getWorldQueue().get(randomWorld).generate(createDataProvider(configWorld, randomWorld));
-    }
-
-    public void generate(ConfigWorld configWorld, RandomWorld randomWorld, int size) {
-        getWorldQueue().get(randomWorld).generate(createDataProvider(configWorld, randomWorld), size);
-    }
-
     public void subscribe(LocationQueue locationQueue, RandomWorld world) {
         if (plugin.getConfigHandler().getSectionDebug().isShowQueuePopulation()) {
             CommonQueueListener queueListener = new CommonQueueListener(plugin, world, locationQueue);
@@ -105,6 +97,23 @@ public abstract class WorldHandler implements RandomWorldHandler {
         }
     }
 
+    public void generate(ConfigWorld configWorld, RandomWorld randomWorld) {
+        getWorldQueue().get(randomWorld).generate(createDataProvider(configWorld, randomWorld), 1);
+    }
+
+    public void generate(ConfigWorld configWorld, RandomWorld randomWorld, int size) {
+        getWorldQueue().get(randomWorld).generate(createDataProvider(configWorld, randomWorld), size);
+    }
+
     @Override
     public abstract RandomWorld getWorld(String worldName);
+
+    @Override
+    public WorldQueue getWorldQueue() {
+        return worldQueue;
+    }
+
+    public RandomTeleportPlugin<?> getPlugin() {
+        return plugin;
+    }
 }
