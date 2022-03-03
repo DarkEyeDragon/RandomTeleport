@@ -29,7 +29,6 @@ public abstract class WorldHandler implements RandomWorldHandler {
 
     public WorldHandler(RandomTeleportPlugin<?> plugin) {
         this.plugin = plugin;
-        this.configHandler = plugin.getConfigHandler();
         this.worldQueue = new WorldQueue();
     }
 
