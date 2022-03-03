@@ -39,15 +39,12 @@ public class CommonQueueListener implements QueueListener<RandomLocation> {
     @Override
     public void onRemove(RandomLocation element) {
         ConfigWorld configWorld = configHandler.getSectionWorld().getConfigWorld(randomWorld.getName());
-        long initDelay = configHandler.getSectionQueue().getInitDelay();
-        plugin.getScheduler().runTaskLater(() -> {
-            //TODO find a proper algorithm to determine generation
-            if (locationQueue.size() < size / 2) {
-                plugin.getWorldHandler().generate(configWorld, randomWorld);
-                if (configHandler.getSectionDebug().isShowQueuePopulation()) {
-                    plugin.getLogger().info("Safe location consumed for " + element.getWorld().getName() + " (" + locationQueue.size() + "/" + size + ")");
-                }
-            }
-        }, initDelay);
+        //TODO find a proper algorithm to determine generation
+        if (locationQueue.size() < size / 2) {
+            plugin.getWorldHandler().generate(configWorld, randomWorld, locationQueue.remainingCapacity());
+        }
+        if (configHandler.getSectionDebug().isShowQueuePopulation()) {
+            plugin.getLogger().info("Safe location consumed for " + element.getWorld().getName() + " (" + locationQueue.size() + "/" + size + ")");
+        }
     }
 }

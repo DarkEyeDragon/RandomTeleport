@@ -15,7 +15,6 @@ import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.RandomOffset;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationDataProvider;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
-import me.darkeyedragon.randomtp.common.exception.NoRandomLocationFoundException;
 import me.darkeyedragon.randomtp.common.util.ChunkTraverser;
 import me.darkeyedragon.randomtp.common.world.location.CommonLocation;
 
@@ -52,18 +51,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
      */
     @Override
     public CompletableFuture<RandomLocation> getRandom(LocationDataProvider dataProvider) {
-        return pickRandomLocation(dataProvider).thenCompose((loc) -> {
-            if (loc == null) {
-                if (count < max) {
-                    count++;
-                    return getRandom(dataProvider);
-                }
-                throw new NoRandomLocationFoundException(count, dataProvider.getWorld().getName());
-            } else {
-                count = 1;
-                return CompletableFuture.completedFuture(loc);
-            }
-        });
+        return pickRandomLocation(dataProvider);
     }
 
     /*Pick a random location based on chunks*/
@@ -92,8 +80,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
     CompletableFuture<RandomChunkSnapshot> getRandomChunk(LocationDataProvider dataProvider) {
         CompletableFuture<RandomChunkSnapshot> chunkFuture = getRandomChunkAsync(dataProvider);
         return chunkFuture.thenCompose((chunk) -> {
-            boolean isSafe = isSafeChunk(chunk);
-            if (!isSafe) {
+            if (!isSafeChunk(chunk)) {
                 ChunkTraverser chunkTraverser = new ChunkTraverser(chunk);
                 while (chunkTraverser.hasNext()) {
                     try {
@@ -110,7 +97,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
                         e.printStackTrace();
                     }
                 }
-                return getRandomChunk(dataProvider);
+                return CompletableFuture.completedFuture(null);
             } else {
                 return CompletableFuture.completedFuture(chunk);
             }
@@ -223,5 +210,4 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         RandomDimensionData dimensionData = blacklist.getDimensionData(dimension);
         return globalData.getBiomes().contains(randomBiome) || dimensionData.getBiomes().contains(randomBiome);
     }
-
 }
