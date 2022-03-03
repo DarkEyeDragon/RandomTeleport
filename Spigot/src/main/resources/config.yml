@@ -6,8 +6,8 @@ message:
   #valid placeholders: %hp (hours partial) %mp (minutes partial) %sp (seconds partial) %h (total hours) %m (total minutes) %s(total seconds)
   init-teleport-delay: '<green>You will be teleported in <gold><time>. <green>Do not move!'
   teleport-canceled: '<red>You moved! Teleportation canceled'
-  #valid placeholders: %posX, %posY, %posZ
-  teleport: '<aqua>A safe place has been found! Teleporting to <gold><posX>x <posY>y <posZ>z'
+  #valid placeholders: %x, %y, %z
+  teleport: '<aqua>A safe place has been found! Teleporting to <gold><x>x <y>y <z>z'
   #valid placeholders: %hp (hours partial) %mp (minutes partial) %sp (seconds partial) %h (total hours) %m (total minutes) %s(total seconds)
   countdown: '<gold>You cannot teleport for another <aqua><time>'
   #valid placeholders: %world

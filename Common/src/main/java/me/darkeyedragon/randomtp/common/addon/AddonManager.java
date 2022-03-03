@@ -13,7 +13,7 @@ import me.darkeyedragon.randomtp.common.addon.response.AddonResponse;
 import me.darkeyedragon.randomtp.common.addon.response.AddonResponseType;
 import me.darkeyedragon.randomtp.common.classloader.AddonClassLoader;
 import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
-import net.kyori.adventure.text.minimessage.MiniMessage;
+import me.darkeyedragon.randomtp.common.util.ComponentUtil;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -94,25 +94,25 @@ public class AddonManager implements RandomAddonManager {
             randomAddon = createAddonInstance(randomAddonClass);
             AddonResponse areRequiredPluginsPresent = areRequiredPluginsPresent(randomAddon);
             if (areRequiredPluginsPresent.getResponseType() != AddonResponseType.SUCCESS) {
-                logger.info(MiniMessage.get().parse("<gray>[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " missing required plugins."));
+                logger.info(ComponentUtil.toComponent("<gray>[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " missing required plugins."));
                 for (RequiredPlugin plugin : areRequiredPluginsPresent.getAddon().getRequiredPlugins()) {
                     if (!plugin.isLoaded()) {
-                        logger.info(MiniMessage.get().parse("    └─ " + plugin.getName() + " is not loaded."));
+                        logger.info(ComponentUtil.toComponent("    └─ " + plugin.getName() + " is not loaded."));
                     }
                 }
                 continue;
             }
             AddonResponse areRequiredVersionsPresent = areRequiredVersionsPresent(randomAddon);
             if (areRequiredVersionsPresent.getResponseType() != AddonResponseType.SUCCESS) {
-                logger.info(MiniMessage.get().parse("<gray>[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " version mismatch."));
+                logger.info(ComponentUtil.toComponent("<gray>[<red>-<gray>] <red>" + randomAddon.getIdentifier() + " version mismatch."));
                 for (RequiredPlugin plugin : areRequiredVersionsPresent.getAddon().getRequiredPlugins()) {
                     if (!plugin.isLoaded()) {
-                        logger.info(MiniMessage.get().parse("    └─ " + plugin.getName() + " with version " + plugin.getMinVersion() + " or newer is not loaded."));
+                        logger.info(ComponentUtil.toComponent("    └─ " + plugin.getName() + " with version " + plugin.getMinVersion() + " or newer is not loaded."));
                     }
                 }
                 continue;
             }
-            logger.info(MiniMessage.get().parse("<gray>[<green>+<gray>] <light_purple>" + randomAddon.getIdentifier() + " has been loaded."));
+            logger.info(ComponentUtil.toComponent("<gray>[<green>+<gray>] <light_purple>" + randomAddon.getIdentifier() + " has been loaded."));
             if (map.put(randomAddon.getIdentifier(), randomAddon) != null) {
                 throw new IllegalStateException("Duplicate key");
             }

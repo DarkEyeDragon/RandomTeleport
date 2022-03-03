@@ -10,7 +10,8 @@ import me.darkeyedragon.randomtp.common.util.ComponentUtil;
 import me.darkeyedragon.randomtp.common.util.CustomTime;
 import me.darkeyedragon.randomtp.common.util.TimeUtil;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.Template;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
 @ConfigSerializable
@@ -35,7 +36,8 @@ public class CommonSectionMessage implements SectionMessage {
     @Override
     public Component getInitTeleportDelay(long ticks) {
         CustomTime customTime = TimeUtil.formatTime(ticks);
-        return ComponentUtil.toComponent(initTeleportDelay, Template.of("time", customTime.toFormattedString()));
+        TagResolver.Single time = Placeholder.unparsed("time", customTime.toFormattedString());
+        return ComponentUtil.toComponent(initTeleportDelay, time);
     }
 
     @Override
@@ -45,18 +47,23 @@ public class CommonSectionMessage implements SectionMessage {
 
     @Override
     public Component getTeleport(RandomLocation location) {
-        return ComponentUtil.toComponent(teleport, Template.of("posX", location.getBlockX() + ""), Template.of("posY", location.getBlockY() + ""), Template.of("posZ", location.getBlockZ() + ""));
+        TagResolver.Single posX = Placeholder.unparsed("x", location.getBlockX() + "");
+        TagResolver.Single posY = Placeholder.unparsed("y", location.getBlockY() + "");
+        TagResolver.Single posZ = Placeholder.unparsed("z", location.getBlockZ() + "");
+        return ComponentUtil.toComponent(teleport, posX, posY, posZ);
     }
 
     @Override
     public Component getCountdown(long remainingTicks) {
         CustomTime customTime = TimeUtil.formatTime(remainingTicks);
-        return ComponentUtil.toComponent(countdown, Template.of("time", customTime.toFormattedString()));
+        TagResolver.Single time = Placeholder.unparsed("time", customTime.toFormattedString());
+        return ComponentUtil.toComponent(countdown, time);
     }
 
     @Override
     public Component getNoWorldPermission(RandomWorld world) {
-        return ComponentUtil.toComponent(noWorldPermission, Template.of("world", world.getName()));
+        TagResolver.Single worldName = Placeholder.unparsed("world", world.getName());
+        return ComponentUtil.toComponent(noWorldPermission, worldName);
     }
 
     @Override

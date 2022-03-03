@@ -32,12 +32,12 @@
         <dependency>
             <groupId>io.github.classgraph</groupId>
             <artifactId>classgraph</artifactId>
-            <version>4.8.116</version>
+            <version>4.8.139</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>23.0</version>
+            <version>31.0.1-jre</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -65,12 +65,12 @@
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-serializer-configurate4</artifactId>
-            <version>4.9.3</version>
+            <version>4.10.0</version>
         </dependency>
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-text-serializer-plain</artifactId>
-            <version>4.9.3</version>
+            <version>4.10.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
