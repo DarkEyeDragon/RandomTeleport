@@ -34,7 +34,7 @@ public class Registrar {
         completions.registerAsyncCompletion("playerFilteredWorlds", context -> {
             List<String> filteredWorlds = getFilteredWorlds(configHandler, context);
             //Add all online players to the filtered worlds.
-            filteredWorlds.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getDisplayName).collect(Collectors.toList()));
+            filteredWorlds.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getName).toList());
             return filteredWorlds;
         });
     }
