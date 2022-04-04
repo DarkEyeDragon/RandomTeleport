@@ -30,7 +30,7 @@
         <defaultGoal>clean package</defaultGoal>
         <plugins>
             <plugin>
-                <version>3.9.0</version>
+                <version>3.10.1</version>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
