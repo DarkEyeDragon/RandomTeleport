@@ -117,6 +117,7 @@ public class BasicTeleportHandler implements TeleportHandler {
     }
 
     private void drawWarpParticles(RandomPlayer player, RandomParticle particle) {
+        if (particle.getId().equalsIgnoreCase("none")) return;
         RandomLocation spawnLoc = player.getEyeLocation().add(player.getLocation().getDirection());
         player.getWorld().spawnParticle(particle.getId(), spawnLoc, particle.getAmount());
     }
