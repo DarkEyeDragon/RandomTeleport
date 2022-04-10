@@ -59,7 +59,7 @@ public class DebugCommand extends BaseCommand {
     private List<Component> methodsToComponents(Object object, Method[] declaredMethods) throws InvocationTargetException, IllegalAccessException {
         List<Component> components = new ArrayList<>(declaredMethods.length);
         for (Method declaredMethod : declaredMethods) {
-            if (declaredMethod != null) {
+            if (declaredMethod != null && Modifier.isPublic(declaredMethod.getModifiers())) {
                 Object result = instantiateObject(object, declaredMethod);
                 if (result instanceof Component) {
                     Component hoverMessage = Component.text("Class: ")
@@ -91,12 +91,9 @@ public class DebugCommand extends BaseCommand {
     }
 
     private Object instantiateObject(Object object, Method declaredMethod) throws InvocationTargetException, IllegalAccessException {
-        if (Modifier.isPublic(declaredMethod.getModifiers())) {
-            Class<?>[] parameterTypes = declaredMethod.getParameterTypes();
-            Set<Object> parameters = parameterTypeToValue(parameterTypes);
-            return declaredMethod.invoke(object, parameters.toArray());
-        }
-        return null;
+        Class<?>[] parameterTypes = declaredMethod.getParameterTypes();
+        Set<Object> parameters = parameterTypeToValue(parameterTypes);
+        return declaredMethod.invoke(object, parameters.toArray());
     }
 
     private Set<Object> parameterTypeToValue(Class<?>[] parameterTypes) {
