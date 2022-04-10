@@ -12,6 +12,7 @@ import me.darkeyedragon.randomtp.common.util.TimeUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
 @ConfigSerializable
@@ -35,9 +36,7 @@ public class CommonSectionMessage implements SectionMessage {
 
     @Override
     public Component getInitTeleportDelay(long ticks) {
-        CustomTime customTime = TimeUtil.formatTime(ticks);
-        TagResolver.Single time = Placeholder.unparsed("time", customTime.toFormattedString());
-        return ComponentUtil.toComponent(initTeleportDelay, time);
+        return getComponent(ticks, initTeleportDelay);
     }
 
     @Override
@@ -55,9 +54,7 @@ public class CommonSectionMessage implements SectionMessage {
 
     @Override
     public Component getCountdown(long remainingTicks) {
-        CustomTime customTime = TimeUtil.formatTime(remainingTicks);
-        TagResolver.Single time = Placeholder.unparsed("time", customTime.toFormattedString());
-        return ComponentUtil.toComponent(countdown, time);
+        return getComponent(remainingTicks, countdown);
     }
 
     @Override
@@ -84,5 +81,20 @@ public class CommonSectionMessage implements SectionMessage {
     @Override
     public Component getInvalidDefaultWorld(String worldName) {
         return ComponentUtil.toComponent(invalidDefaultWorld);
+    }
+
+    @NotNull
+    private Component getComponent(long remainingTicks, String message) {
+        CustomTime customTime = TimeUtil.formatTime(remainingTicks);
+        TagResolver resolver = TagResolver.resolver(
+                Placeholder.unparsed("time", customTime.toFormattedString()),
+                Placeholder.unparsed("hours", customTime.getHours() > 0 ? customTime.getHours() + "" : ""),
+                Placeholder.unparsed("minutes", customTime.getMinutes() > 0 ? customTime.getMinutes() + "" : ""),
+                Placeholder.unparsed("seconds", customTime.getSeconds() > 0 ? customTime.getSeconds() + "" : ""),
+                Placeholder.unparsed("total_hours", customTime.getTotalHours() + ""),
+                Placeholder.unparsed("total_minutes", customTime.getTotalMinutes() + ""),
+                Placeholder.unparsed("total_seconds", customTime.getTotalSeconds() + "")
+        );
+        return ComponentUtil.toComponent(message, resolver);
     }
 }
