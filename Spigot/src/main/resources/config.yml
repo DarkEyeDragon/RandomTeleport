@@ -8,7 +8,7 @@ message:
   teleport-canceled: '<red>You moved! Teleportation canceled'
   #valid placeholders: <x>, <y>, <z>
   teleport: '<aqua>A safe place has been found! Teleporting to <gold><x>x <y>y <z>z'
-  #valid placeholders: <time>
+  #valid placeholders: <time> a preformatted string, <hours>, <minutes>, <seconds>, <total_hours>, <total_minutes>, <total_seconds>
   countdown: '<gold>You cannot teleport for another <aqua><time>'
   #valid placeholders: <world>
   no-world-permission: '<red>I''m sorry, you cannot rtp in <gold><world>!'
