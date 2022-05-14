@@ -37,7 +37,7 @@ public class SpigotWorld implements RandomWorld {
     public CompletableFuture<RandomChunkSnapshot> getChunkAtAsync(RandomWorld world, int x, int z) {
         World regWorld = WorldUtil.toWorld(world);
         if (PaperLib.isPaper()) {
-            return regWorld.getChunkAtAsync(x, z, true, true).thenApply(chunk -> new SpigotChunkSnapshot(chunk.getChunkSnapshot(true, true, false)));
+            return PaperLib.getChunkAtAsync(regWorld, x, z, true, true).thenApply(chunk -> new SpigotChunkSnapshot(chunk.getChunkSnapshot(true, true, false)));
         }
         return PaperLib.getChunkAtAsync(regWorld, x, z, true, true).thenApply(chunk -> new SpigotChunkSnapshot(chunk.getChunkSnapshot(true, true, false)));
     }
@@ -76,8 +76,7 @@ public class SpigotWorld implements RandomWorld {
     public boolean equals(Object obj) {
         if (obj == null) return false;
         if (world == obj) return true;
-        if (obj instanceof RandomWorld) {
-            RandomWorld world = (RandomWorld) obj;
+        if (obj instanceof RandomWorld world) {
             return this.getUUID().equals(world.getUUID());
         }
         return false;

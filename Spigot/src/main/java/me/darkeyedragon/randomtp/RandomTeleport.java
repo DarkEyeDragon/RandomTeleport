@@ -101,7 +101,7 @@ public final class RandomTeleport extends RandomTeleportPluginImpl {
     public void init() {
         // Plugin startup logic
         logger = new BukkitLogger(this);
-        platform = Platform.of("bukkit", Bukkit.getMinecraftVersion(), Bukkit.getName(), Bukkit.getBukkitVersion());
+        platform = Platform.of("bukkit", Bukkit.getVersion(), Bukkit.getName(), Bukkit.getBukkitVersion());
         logger.info(platform.toString());
         addonManager = new AddonManager(this, logger);
         if (addonManager.createAddonDir()) {
