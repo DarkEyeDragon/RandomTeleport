@@ -1,15 +1,6 @@
 package me.darkeyedragon.randomtp.listener;
 
-import io.papermc.paper.event.world.border.WorldBorderBoundsChangeFinishEvent;
 import me.darkeyedragon.randomtp.RandomTeleport;
-import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
-import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorld;
-import me.darkeyedragon.randomtp.api.queue.LocationQueue;
-import me.darkeyedragon.randomtp.api.queue.WorldQueue;
-import me.darkeyedragon.randomtp.api.world.RandomWorld;
-import me.darkeyedragon.randomtp.common.world.WorldHandler;
-import me.darkeyedragon.randomtp.util.WorldUtil;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 public class WorldBorderChangeListener implements Listener {
@@ -25,7 +16,7 @@ public class WorldBorderChangeListener implements Listener {
      * to prevent people rtp'ing outside of the world border.
      * However this should only happen for worlds where the use_worldborder config setting is true.
      * */
-    @EventHandler
+    /*@EventHandler
     public void onWorldBorderChange(WorldBorderBoundsChangeFinishEvent event) {
         plugin.getLogger().info("WorldBorder changed. Updating worlds that rely on it...");
         RandomConfigHandler configHandler = plugin.getConfigHandler();
@@ -42,5 +33,5 @@ public class WorldBorderChangeListener implements Listener {
             );
             plugin.getWorldHandler().populateWorld(configWorld);
         }
-    }
+    }*/
 }
