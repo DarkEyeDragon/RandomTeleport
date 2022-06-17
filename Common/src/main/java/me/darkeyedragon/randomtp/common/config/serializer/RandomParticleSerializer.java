@@ -17,7 +17,11 @@ public class RandomParticleSerializer implements TypeSerializer<RandomParticle> 
 
     @Override
     public RandomParticle deserialize(Type source, ConfigurationNode node) throws SerializationException {
-        //final ConfigurationNode particleNode = nonVirtualNode(node, PARTICLE);
+        String particleStr = node.getString();
+        if (particleStr == null) {
+            throw new SerializationException("Particle string is null");
+        }
+        if (particleStr.equalsIgnoreCase("none")) return RandomParticle.NONE;
         final String[] particleString = Objects.requireNonNull(node.getString()).split(":");
         if (particleString[0].equalsIgnoreCase("none")) return new CommonParticle("NONE", 0);
         return new CommonParticle(particleString[0], Integer.parseInt(particleString[1]));
