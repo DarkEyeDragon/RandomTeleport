@@ -48,13 +48,13 @@ public class SpigotWorld implements RandomWorld {
     }
 
     @Override
-    public String getName() {
-        return world.getName();
+    public RandomBlock getBlockAt(int x, int y, int z) {
+        return new SpigotBlock(world.getBlockAt(x, y, z));
     }
 
     @Override
-    public RandomBlock getBlockAt(int x, int y, int z) {
-        return new SpigotBlock(world.getBlockAt(x, y, z));
+    public String getName() {
+        return world.getName();
     }
 
     @Override

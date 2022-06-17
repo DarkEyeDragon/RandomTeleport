@@ -123,8 +123,8 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         RandomWorld world = loc.getWorld();
         if (world == null) return false;
         RandomBlock block = loc.getBlock();
-        if (block.getBlockType().getType().isAir()) return false;
-        RandomBlockType blockType = loc.getBlock().getBlockType();
+        RandomBlockType blockType = block.getBlockType();
+        if (blockType.getType().isAir()) return false;
         //Check if it passes the global blacklist
         if (!isValidGlobalBlockType(loc)) return false;
         RandomDimensionData dimensionData = blacklist.getDimensionData(dimension);
@@ -158,8 +158,8 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
     }
 
     public boolean isSafeChunk(RandomChunkSnapshot chunk) {
-        for (int x = 2; x < CHUNK_SIZE - 2; x++) {
-            for (int z = 2; z < CHUNK_SIZE - 2; z++) {
+        for (int x = 0; x < CHUNK_SIZE; x += 4) {
+            for (int z = 0; z < CHUNK_SIZE; z += 4) {
                 int y = chunk.getHighestBlockYAt(x, z);
                 RandomBiome randomBiome = chunk.getBiome(x, y, z);
                 if (isBlacklistedBiome(randomBiome)) {
