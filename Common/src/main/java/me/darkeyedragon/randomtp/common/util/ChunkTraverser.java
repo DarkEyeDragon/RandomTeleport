@@ -3,11 +3,10 @@ package me.darkeyedragon.randomtp.common.util;
 import me.darkeyedragon.randomtp.api.world.RandomChunkSnapshot;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-public class ChunkIterator implements Iterator<CompletableFuture<RandomChunkSnapshot>> {
+public class ChunkTraverser {
 
     private static final Map<Integer, Direction> directionMap;
 
@@ -21,7 +20,7 @@ public class ChunkIterator implements Iterator<CompletableFuture<RandomChunkSnap
     private final RandomChunkSnapshot startChunk;
     private int counter;
 
-    public ChunkIterator(RandomChunkSnapshot startChunk) {
+    public ChunkTraverser(RandomChunkSnapshot startChunk) {
         this.startChunk = startChunk;
         counter = 0;
     }
