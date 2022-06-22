@@ -15,12 +15,13 @@ import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.RandomOffset;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationDataProvider;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
-import me.darkeyedragon.randomtp.common.util.ChunkIterator;
+import me.darkeyedragon.randomtp.common.util.ChunkTraverser;
 import me.darkeyedragon.randomtp.common.world.location.CommonLocation;
 
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class BaseLocationSearcher implements LocationSearcher {
@@ -80,20 +81,26 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         CompletableFuture<RandomChunkSnapshot> chunkFuture = getRandomChunkAsync(dataProvider);
         return chunkFuture.thenCompose((chunk) -> {
             if (!isSafeChunk(chunk)) {
-                ChunkIterator chunkIterator = new ChunkIterator(chunk);
-                chunkIterator.forEachRemaining(snapshotCompletableFuture -> snapshotCompletableFuture.thenApply(snapshot -> {
-                    int x = snapshot.getX() << CHUNK_SHIFT;
-                    int z = snapshot.getZ() << CHUNK_SHIFT;
-                    RandomOffset offset = dataProvider.getOffset();
-                    int radius = dataProvider.getRadius();
-                    boolean withinBounds = (x < radius + offset.getX() && z < radius + offset.getZ()) || (x > radius - offset.getX() && z > radius - offset.getZ());
-                    if (withinBounds && isSafeChunk(snapshot)) {
-                        return CompletableFuture.completedFuture(snapshot);
+                ChunkTraverser chunkTraverser = new ChunkTraverser(chunk);
+                while (chunkTraverser.hasNext()) {
+                    try {
+                        RandomChunkSnapshot snapshot = chunkTraverser.next().get();
+                        int x = snapshot.getX() << CHUNK_SHIFT;
+                        int z = snapshot.getZ() << CHUNK_SHIFT;
+                        RandomOffset offset = dataProvider.getOffset();
+                        int radius = dataProvider.getRadius();
+                        boolean withinBounds = (x < radius + offset.getX() && z < radius + offset.getZ()) || (x > radius - offset.getX() && z > radius - offset.getZ());
+                        if (withinBounds && isSafeChunk(snapshot)) {
+                            return CompletableFuture.completedFuture(snapshot);
+                        }
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
                     }
-                    return CompletableFuture.completedFuture(null);
-                }));
+                }
+                return CompletableFuture.completedFuture(null);
+            } else {
+                return CompletableFuture.completedFuture(chunk);
             }
-            return CompletableFuture.completedFuture(null);
         });
     }
 
