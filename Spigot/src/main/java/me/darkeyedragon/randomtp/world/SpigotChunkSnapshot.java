@@ -1,5 +1,6 @@
 package me.darkeyedragon.randomtp.world;
 
+import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.api.world.RandomBiome;
 import me.darkeyedragon.randomtp.api.world.RandomChunkSnapshot;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
@@ -10,8 +11,10 @@ import org.bukkit.ChunkSnapshot;
 public class SpigotChunkSnapshot implements RandomChunkSnapshot {
 
     private final ChunkSnapshot chunk;
+    private final boolean useNew;
 
     public SpigotChunkSnapshot(ChunkSnapshot chunk) {
+        useNew = PaperLib.isVersion(18, 2);
         this.chunk = chunk;
     }
 
@@ -38,7 +41,11 @@ public class SpigotChunkSnapshot implements RandomChunkSnapshot {
      * @return Y-coordinate of the highest non-air block
      */
     public int getHighestBlockYAt(int x, int z) {
-        return Math.max(chunk.getHighestBlockYAt(x, z), 0);
+        //https://hub.spigotmc.org/stash/projects/SPIGOT/repos/craftbukkit/commits/ce373be660c95d5ca2b2d167545565f9636f9cd8
+        if (useNew) {
+            return Math.max(chunk.getHighestBlockYAt(x, z), 0);
+        }
+        return Math.max(chunk.getHighestBlockYAt(x, z) - 1, 0);
     }
 
     @Override

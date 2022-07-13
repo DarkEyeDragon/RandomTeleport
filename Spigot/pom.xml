@@ -193,7 +193,7 @@
         <dependency>
             <groupId>me.darkeyedragon.randomtp</groupId>
             <artifactId>Common</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <version>0.1.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
