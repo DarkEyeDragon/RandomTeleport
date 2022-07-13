@@ -13,4 +13,8 @@ public interface MessageHandler {
     void sendMessage(CommandIssuer commandIssuer, Component component);
 
     void sendMessage(CommandIssuer commandIssuer, String message);
+
+    void sendDebugMessage(String message);
+
+    void sendDebugMessage(Component message);
 }

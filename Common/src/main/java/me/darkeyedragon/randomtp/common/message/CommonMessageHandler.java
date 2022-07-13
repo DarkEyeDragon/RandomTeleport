@@ -6,6 +6,7 @@ import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
 import me.darkeyedragon.randomtp.common.util.ComponentUtil;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 
 public class CommonMessageHandler implements MessageHandler {
 
@@ -23,8 +24,8 @@ public class CommonMessageHandler implements MessageHandler {
     }
 
     @Override
-    public void sendMessage(RandomPlayer randomPlayer, String component) {
-        sendMessage(randomPlayer, ComponentUtil.miniMessage.deserialize(component));
+    public void sendMessage(RandomPlayer randomPlayer, String message) {
+        sendMessage(randomPlayer, ComponentUtil.miniMessage.deserialize(message));
     }
 
     @Override
@@ -40,5 +41,19 @@ public class CommonMessageHandler implements MessageHandler {
     @Override
     public void sendMessage(CommandIssuer commandIssuer, String message) {
         sendMessage(commandIssuer, ComponentUtil.miniMessage.deserialize(message));
+    }
+
+    @Override
+    public void sendDebugMessage(String message) {
+        sendDebugMessage(ComponentUtil.miniMessage.deserialize(message));
+    }
+
+    @Override
+    public void sendDebugMessage(Component message) {
+        if (plugin.getConfigHandler().getSectionDebug().isShowExecutionTimes()) {
+            Component prefix = Component.text("DEBUG: ");
+            prefix = prefix.color(TextColor.color(0xff0000));
+            plugin.getAudience().console().sendMessage(prefix.append(message));
+        }
     }
 }
