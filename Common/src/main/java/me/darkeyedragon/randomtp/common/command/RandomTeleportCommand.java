@@ -32,9 +32,12 @@ import me.darkeyedragon.randomtp.common.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.common.teleport.BasicTeleportHandler;
 import me.darkeyedragon.randomtp.common.teleport.BasicTeleportResponse;
 import me.darkeyedragon.randomtp.common.teleport.CommonTeleportPropertyBuilder;
+import me.darkeyedragon.randomtp.common.util.ComponentUtil;
+import net.kyori.adventure.text.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @CommandAlias("rtp|randomtp|randomteleport")
 public class RandomTeleportCommand extends BaseCommand {
@@ -281,22 +284,44 @@ public class RandomTeleportCommand extends BaseCommand {
         } else {
             messageHandler.sendMessage(sender, "<red>That world is not not in the config!");
         }
-    }
+    }*/
 
-    @Subcommand("resetcooldown")
+    @Subcommand("reset cooldown")
     @CommandCompletion("@players")
     @CommandPermission("rtp.admin.resetcooldown")
     public void resetCooldown(CommandIssuer sender, RandomPlayer target) {
         if (target != null) {
             if (plugin.getCooldownHandler().removeCooldown(target.getUniqueId()) != null) {
-                messageHandler.sendMessage(sender, "<green>RandomCooldown reset for " + target.getName());
+                messageHandler.sendMessage(sender, "<green>Cooldown reset for " + target.getName());
             } else {
                 messageHandler.sendMessage(sender, "<red>There was no cooldown for " + target.getName());
             }
+        } else {
+            Component text = ComponentUtil.toComponent("<red>That player is not online... Use the ");
+            Component command = ComponentUtil.toComponent("<hover:show_text:'<green>Click to suggest command'><click:suggest_command:'/rtp reset offlinecooldown <uuid>'><aqua><underlined>reset offlinecooldown</underlined></aqua>");
+            Component finalComponent = text.append(command).append(ComponentUtil.toComponent(" <reset><red>command for offline players."));
+            messageHandler.sendMessage(sender, finalComponent);
         }
     }
 
-    @Subcommand("setprice")
+    @Subcommand("reset offlinecooldown")
+    @CommandCompletion("@players")
+    @CommandPermission("rtp.admin.resetcooldown")
+    @Description("Reset the cooldown of an offline player based on their UUID")
+    public void resetCooldown(CommandIssuer sender, String uuid) {
+        try {
+            final UUID finalUUID = UUID.fromString(uuid);
+            if (plugin.getCooldownHandler().removeCooldown(finalUUID) != null) {
+                messageHandler.sendMessage(sender, "<green>Cooldown reset for " + uuid);
+            } else {
+                messageHandler.sendMessage(sender, "<red>There was no cooldown for " + uuid);
+            }
+        } catch (IllegalArgumentException ex) {
+            messageHandler.sendMessage(sender, "<red>" + uuid + " is not a valid UUID. Example: f73aa17d-166f-4535-92bd-49eda5a27b31");
+        }
+    }
+
+    /*@Subcommand("setprice")
     @CommandCompletion("<price>")
     @CommandPermission("rtp.admin.setprice")
     public void setPrice(CommandIssuer sender, double price) {
@@ -307,7 +332,7 @@ public class RandomTeleportCommand extends BaseCommand {
         }
     }
 
-    /*@Subcommand("createSign")
+    @Subcommand("createSign")
     @CommandPermission("rtp.admin.createsign")
     public void createSign(Player player, World world) {
         List<Block> lastTwoTargetBlocks = player.getLastTwoTargetBlocks(null, 100);

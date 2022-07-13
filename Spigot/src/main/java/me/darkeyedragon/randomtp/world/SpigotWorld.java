@@ -91,4 +91,11 @@ public class SpigotWorld implements RandomWorld {
     public void spawnParticle(String particleId, RandomLocation spawnLoc, int amount) {
         world.spawnParticle(Particle.valueOf(particleId), WorldUtil.toLocation(spawnLoc), amount);
     }
+
+    @Override
+    public String toString() {
+        return "SpigotWorld{" +
+                "world=" + world +
+                '}';
+    }
 }
