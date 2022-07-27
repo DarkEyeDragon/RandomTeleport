@@ -75,6 +75,10 @@ debug:
   #Shows debug messages in game on the execution times of the entire teleport process.
   #Normally only enable to figure out what is causing teleport delays.
   show-execution-times: false
+  #Shows detailed debug messages about the searching process.
+  #Warning: Only enable when told to or if you know what you're doing.
+  #This will spam your console into oblivion as it tracks every block search.
+  show-searching-messages: false
 #Default price for worlds without a price defined.
 #0 to disable
 economy:
