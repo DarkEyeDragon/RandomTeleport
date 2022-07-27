@@ -6,7 +6,7 @@
 
     <groupId>me.darkeyedragon.randomtp</groupId>
     <artifactId>Api</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>${version.api</version>
 
     <name>RandomTeleport-Api</name>
 

@@ -2,13 +2,13 @@ package me.darkeyedragon.randomtp.world;
 
 import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.api.world.RandomBiome;
-import me.darkeyedragon.randomtp.api.world.RandomChunkSnapshot;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
+import me.darkeyedragon.randomtp.common.world.CommonChunkSnapshot;
 import me.darkeyedragon.randomtp.util.WorldUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 
-public class SpigotChunkSnapshot implements RandomChunkSnapshot {
+public class SpigotChunkSnapshot extends CommonChunkSnapshot {
 
     private final ChunkSnapshot chunk;
     private final boolean useNew;

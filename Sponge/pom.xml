@@ -6,10 +6,10 @@
 
     <groupId>me.darkeyedragon.randomtp</groupId>
     <artifactId>sponge</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>${version.sponge}</version>
     <packaging>jar</packaging>
 
-    <name>RandomTeleport-Sponge</name>
+    <name>${parent.name}-Sponge</name>
 
     <parent>
         <groupId>me.darkeyedragon</groupId>
@@ -282,7 +282,7 @@
         <dependency>
             <groupId>me.darkeyedragon.randomtp</groupId>
             <artifactId>Common</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <version>${version.common}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

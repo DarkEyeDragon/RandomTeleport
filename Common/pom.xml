@@ -13,7 +13,7 @@
     <name>RandomTeleport-Common</name>
     <groupId>me.darkeyedragon.randomtp</groupId>
     <artifactId>Common</artifactId>
-    <version>0.1.1-SNAPSHOT</version>
+    <version>${version.common</version>
 
     <repositories>
         <repository>

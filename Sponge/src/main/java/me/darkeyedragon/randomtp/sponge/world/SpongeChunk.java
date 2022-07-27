@@ -2,12 +2,12 @@ package me.darkeyedragon.randomtp.sponge.world;
 
 import com.flowpowered.math.vector.Vector3i;
 import me.darkeyedragon.randomtp.api.world.RandomBiome;
-import me.darkeyedragon.randomtp.api.world.RandomChunkSnapshot;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
+import me.darkeyedragon.randomtp.common.world.CommonChunkSnapshot;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
 
-public class SpongeChunk implements RandomChunkSnapshot {
+public class SpongeChunk extends CommonChunkSnapshot {
     private final Chunk chunk;
     private final Location<Chunk> location;
 
