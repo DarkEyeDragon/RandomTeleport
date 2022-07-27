@@ -6,10 +6,10 @@
 
     <groupId>me.darkeyedragon.randomtp</groupId>
     <artifactId>Spigot</artifactId>
-    <version>3.0.1</version>
     <packaging>jar</packaging>
+    <version>${version.spigot}</version>
 
-    <name>RandomTeleport-Spigot</name>
+    <name>${project.name}-${project.artifactId}</name>
 
     <parent>
         <groupId>me.darkeyedragon</groupId>
@@ -193,7 +193,7 @@
         <dependency>
             <groupId>me.darkeyedragon.randomtp</groupId>
             <artifactId>Common</artifactId>
-            <version>0.1.1-SNAPSHOT</version>
+            <version>${version.common}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
