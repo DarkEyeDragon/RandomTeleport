@@ -13,7 +13,7 @@
     <name>RandomTeleport-Common</name>
     <groupId>me.darkeyedragon.randomtp</groupId>
     <artifactId>Common</artifactId>
-    <version>${version.common</version>
+    <version>${version.common}</version>
 
     <repositories>
         <repository>
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>me.darkeyedragon.randomtp</groupId>
             <artifactId>Api</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <version>${version.api}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
