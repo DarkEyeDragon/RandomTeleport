@@ -9,7 +9,7 @@
     <version>${version.sponge}</version>
     <packaging>jar</packaging>
 
-    <name>${parent.name}-Sponge</name>
+    <name>${project.name}-Sponge</name>
 
     <parent>
         <groupId>me.darkeyedragon</groupId>
