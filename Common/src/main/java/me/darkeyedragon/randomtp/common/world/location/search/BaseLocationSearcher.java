@@ -20,7 +20,6 @@ import me.darkeyedragon.randomtp.common.world.location.CommonLocation;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class BaseLocationSearcher implements LocationSearcher {
@@ -81,23 +80,6 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         return chunkFuture.thenCompose((chunk) -> {
             if (!isSafeChunk(chunk)) {
                 for (CompletableFuture<RandomChunkSnapshot> neighborChunkSnapshot : chunk) {
-                    try {
-                        RandomChunkSnapshot snapshot = neighborChunkSnapshot.get();
-                        int x = snapshot.getX() << CHUNK_SHIFT;
-                        int z = snapshot.getZ() << CHUNK_SHIFT;
-                        RandomOffset offset = dataProvider.getOffset();
-                        int radius = dataProvider.getRadius();
-                        boolean withinBounds = (x < radius + offset.getX() && z < radius + offset.getZ()) || (x > radius - offset.getX() && z > radius - offset.getZ());
-                        if (withinBounds && isSafeChunk(snapshot)) {
-                            return CompletableFuture.completedFuture(snapshot);
-                        }
-                    } catch (InterruptedException | ExecutionException e) {
-                        e.printStackTrace();
-                    }
-                }
-                //Since minecraft 1.18 this causes crashes due to an overflow in the chunk system.
-                // So we must get the chunk sync to prevent this issue.
-                /*for (CompletableFuture<RandomChunkSnapshot> neighborChunkSnapshot : chunk) {
                     neighborChunkSnapshot.thenApply(newChunkSnapshot -> {
                         int x = newChunkSnapshot.getX() << CHUNK_SHIFT;
                         int z = newChunkSnapshot.getZ() << CHUNK_SHIFT;
@@ -109,7 +91,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
                         }
                         return CompletableFuture.completedFuture(null);
                     });
-                }*/
+                }
                 return CompletableFuture.completedFuture(null);
             } else {
                 return CompletableFuture.completedFuture(chunk);
