@@ -8,12 +8,11 @@ import com.google.common.collect.ImmutableList;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.config.datatype.ConfigWorld;
 import me.darkeyedragon.randomtp.api.world.PlayerHandler;
-import me.darkeyedragon.randomtp.api.world.RandomPlayer;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.RandomWorldHandler;
+import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
 import me.darkeyedragon.randomtp.common.addon.AddonManager;
 import me.darkeyedragon.randomtp.common.command.context.PlayerWorldContext;
-import me.darkeyedragon.randomtp.world.PlayerSpigot;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.command.ConsoleCommandSender;
@@ -35,7 +34,7 @@ public class Registrar {
         completions.registerAsyncCompletion("playerFilteredWorlds", context -> {
             List<String> filteredWorlds = getFilteredWorlds(configHandler, context);
             //Add all online players to the filtered worlds.
-            filteredWorlds.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getDisplayName).collect(Collectors.toList()));
+            filteredWorlds.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getName).toList());
             return filteredWorlds;
         });
     }
@@ -76,7 +75,7 @@ public class Registrar {
         });
         manager.getCommandContexts().registerContext(RandomPlayer.class, c -> {
             String arg1 = c.popFirstArg();
-            return new PlayerSpigot(Bukkit.getPlayer(arg1));
+            return playerHandler.getPlayer(arg1);
         });
     }
 }

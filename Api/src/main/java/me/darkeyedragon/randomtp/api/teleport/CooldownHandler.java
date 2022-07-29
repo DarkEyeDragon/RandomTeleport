@@ -1,13 +1,14 @@
 package me.darkeyedragon.randomtp.api.teleport;
 
-import me.darkeyedragon.randomtp.api.world.RandomPlayer;
+import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
 public interface CooldownHandler {
-    RandomCooldown getCooldown(RandomPlayer randomPlayer);
+    @Nullable RandomCooldown getCooldown(RandomPlayer randomPlayer);
 
-    RandomCooldown getCooldown(UUID playerUUID);
+    @Nullable RandomCooldown getCooldown(UUID playerUUID);
 
     RandomCooldown removeCooldown(RandomPlayer randomPlayer);
 

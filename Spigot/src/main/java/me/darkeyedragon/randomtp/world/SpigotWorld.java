@@ -36,9 +36,6 @@ public class SpigotWorld implements RandomWorld {
     @Override
     public CompletableFuture<RandomChunkSnapshot> getChunkAtAsync(RandomWorld world, int x, int z) {
         World regWorld = WorldUtil.toWorld(world);
-        if (PaperLib.isPaper()) {
-            return regWorld.getChunkAtAsync(x, z, true, true).thenApply(chunk -> new SpigotChunkSnapshot(chunk.getChunkSnapshot(true, true, false)));
-        }
         return PaperLib.getChunkAtAsync(regWorld, x, z, true, true).thenApply(chunk -> new SpigotChunkSnapshot(chunk.getChunkSnapshot(true, true, false)));
     }
 
@@ -48,13 +45,13 @@ public class SpigotWorld implements RandomWorld {
     }
 
     @Override
-    public String getName() {
-        return world.getName();
+    public RandomBlock getBlockAt(int x, int y, int z) {
+        return new SpigotBlock(world.getBlockAt(x, y, z));
     }
 
     @Override
-    public RandomBlock getBlockAt(int x, int y, int z) {
-        return new SpigotBlock(world.getBlockAt(x, y, z));
+    public String getName() {
+        return world.getName();
     }
 
     @Override
@@ -76,8 +73,7 @@ public class SpigotWorld implements RandomWorld {
     public boolean equals(Object obj) {
         if (obj == null) return false;
         if (world == obj) return true;
-        if (obj instanceof RandomWorld) {
-            RandomWorld world = (RandomWorld) obj;
+        if (obj instanceof RandomWorld world) {
             return this.getUUID().equals(world.getUUID());
         }
         return false;
@@ -91,5 +87,12 @@ public class SpigotWorld implements RandomWorld {
     @Override
     public void spawnParticle(String particleId, RandomLocation spawnLoc, int amount) {
         world.spawnParticle(Particle.valueOf(particleId), WorldUtil.toLocation(spawnLoc), amount);
+    }
+
+    @Override
+    public String toString() {
+        return "SpigotWorld{" +
+                "world=" + world +
+                '}';
     }
 }

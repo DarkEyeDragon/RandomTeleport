@@ -21,7 +21,11 @@ public class ServerLoadListener implements Listener {
     @EventHandler
     public void onServerLoad(ServerLoadEvent event){
         instance.getLogger().info(ChatColor.AQUA + "======== [Loading validators] ========");
-        instance.getAddonManager().instantiateAllLocal();
+        try {
+            instance.getAddonManager().instantiateAllLocal();
+        } catch (ReflectiveOperationException e) {
+            e.printStackTrace();
+        }
         instance.getLogger().info(ChatColor.AQUA + "======================================");
         instance.getWorldHandler().populateWorldQueue();
     }

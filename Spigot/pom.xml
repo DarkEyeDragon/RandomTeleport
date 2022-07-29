@@ -6,10 +6,10 @@
 
     <groupId>me.darkeyedragon.randomtp</groupId>
     <artifactId>Spigot</artifactId>
-    <version>2.1.0</version>
     <packaging>jar</packaging>
+    <version>${version.spigot}</version>
 
-    <name>RandomTeleport</name>
+    <name>${project.name}-${project.artifactId}</name>
 
     <parent>
         <groupId>me.darkeyedragon</groupId>
@@ -30,7 +30,7 @@
         <defaultGoal>clean package</defaultGoal>
         <plugins>
             <plugin>
-                <version>3.8.1</version>
+                <version>3.9.0</version>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -52,17 +52,7 @@
                 <version>3.3.1-SNAPSHOT</version>
                 <configuration>
                     <minimizeJar>true</minimizeJar>
-                    <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml
-                    </dependencyReducedPomLocation>
                     <relocations>
-                        <!--<relocation>
-                            <pattern>co.aikar.commands</pattern>
-                            <shadedPattern>me.darkeyedragon.randomtp.shaded.acf</shadedPattern>
-                        </relocation>-->
-                        <relocation>
-                            <pattern>co.aikar.locales</pattern>
-                            <shadedPattern>me.darkeyedragon.randomtp.shaded.locales</shadedPattern>
-                        </relocation>
                         <relocation>
                             <pattern>io.papermc.lib</pattern>
                             <shadedPattern>me.darkeyedragon.randomtp.shaded.paperlib</shadedPattern>
@@ -128,12 +118,12 @@
                     <dependency>
                         <groupId>org.ow2.asm</groupId>
                         <artifactId>asm</artifactId>
-                        <version>9.1</version>
+                        <version>9.3</version>
                     </dependency>
                     <dependency>
                         <groupId>org.ow2.asm</groupId>
                         <artifactId>asm-commons</artifactId>
-                        <version>9.1</version>
+                        <version>9.2</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -179,16 +169,10 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.destroystokyo.paper</groupId>
-            <artifactId>paper-api</artifactId>
-            <version>1.16.5-R0.1-SNAPSHOT</version>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.18.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.kyori</groupId>
-                    <artifactId>adventure-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>co.aikar</groupId>
@@ -204,24 +188,24 @@
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-platform-bukkit</artifactId>
-            <version>4.0.0-SNAPSHOT</version>
+            <version>4.1.1</version>
         </dependency>
         <dependency>
             <groupId>me.darkeyedragon.randomtp</groupId>
             <artifactId>Common</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <version>${version.common}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.github.MilkBowl</groupId>
             <artifactId>VaultAPI</artifactId>
-            <version>1.7</version>
+            <version>1.7.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
-            <version>2.1.0</version>
+            <version>3.0.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

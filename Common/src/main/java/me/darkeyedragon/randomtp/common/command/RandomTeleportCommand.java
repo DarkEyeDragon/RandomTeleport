@@ -22,16 +22,22 @@ import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 import me.darkeyedragon.randomtp.api.teleport.CooldownHandler;
+import me.darkeyedragon.randomtp.api.teleport.RandomCooldown;
 import me.darkeyedragon.randomtp.api.teleport.TeleportProperty;
-import me.darkeyedragon.randomtp.api.world.RandomPlayer;
+import me.darkeyedragon.randomtp.api.teleport.TeleportResponse;
+import me.darkeyedragon.randomtp.api.teleport.TeleportType;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
-import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
 import me.darkeyedragon.randomtp.common.command.context.PlayerWorldContext;
 import me.darkeyedragon.randomtp.common.teleport.BasicTeleportHandler;
-import me.darkeyedragon.randomtp.common.teleport.CommonTeleportProperty;
+import me.darkeyedragon.randomtp.common.teleport.BasicTeleportResponse;
+import me.darkeyedragon.randomtp.common.teleport.CommonTeleportPropertyBuilder;
+import me.darkeyedragon.randomtp.common.util.ComponentUtil;
+import net.kyori.adventure.text.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @CommandAlias("rtp|randomtp|randomteleport")
 public class RandomTeleportCommand extends BaseCommand {
@@ -68,7 +74,7 @@ public class RandomTeleportCommand extends BaseCommand {
 
     @Default
     @CommandPermission("rtp.teleport.self")
-    @CommandCompletion(" @worlds")
+    @CommandCompletion("@playerFilteredWorlds @filteredWorlds")
     @Description("Teleport players to a random location.")
     @Syntax("[world/player] [world]")
     public void onTeleport(CommandIssuer sender, @Optional PlayerWorldContext target, @Optional @CommandPermission("rtp.teleport.world") RandomWorld world) {
@@ -114,6 +120,9 @@ public class RandomTeleportCommand extends BaseCommand {
                     } else {
                         newWorld = world;
                     }
+                    if (newWorld == null) {
+                        throw new InvalidCommandArgument("World with that name does not exist!");
+                    }
                     if (!configWorld.contains(newWorld.getName())) {
                         plugin.getMessageHandler().sendMessage(sender, configMessage.getNoWorldPermission(newWorld));
                         return;
@@ -153,7 +162,7 @@ public class RandomTeleportCommand extends BaseCommand {
         }
     }
 
-    private void teleport(CommandIssuer sender, RandomPlayer player, RandomWorld world) {
+    private TeleportResponse teleport(CommandIssuer sender, RandomPlayer player, RandomWorld world) {
         setConfigs();
         final ConfigWorld worldDetail = plugin.getConfigHandler().getSectionWorld().getConfigWorld(world.getName());
         double price = 0;
@@ -170,15 +179,36 @@ public class RandomTeleportCommand extends BaseCommand {
         }
         boolean bypassDelay = player.hasPermission("rtp.teleportdelay.bypass") || sender.hasPermission("rtp.teleportdelay.bypass");
         boolean bypassCooldown = player.hasPermission("rtp.teleport.bypass") || sender.hasPermission("rtp.teleport.bypass");
-        boolean bypassEco = player.hasPermission("rtp.eco.bypass");
-        RandomLocation location = worldQueue.popLocation(world);
-        TeleportProperty teleportProperty = new CommonTeleportProperty(location, sender, player, price, bypassEco, bypassDelay, bypassCooldown, configTeleport.getParticle(), timeSpan);
-        BasicTeleportHandler teleportHandler = new BasicTeleportHandler(plugin, teleportProperty);
-        teleportHandler.toRandomLocation(player);
+        boolean bypassEco = player.hasPermission("rtp.eco.bypass") || sender.hasPermission("rtp.eco.bypass");
+        boolean cancelOnMove = configTeleport.isCancelOnMove();
+        long delay = bypassDelay ? 0 : configHandler.getSectionTeleport().getDelay();
+
+        CooldownHandler cooldownHandler = plugin.getCooldownHandler();
+        RandomCooldown cooldown = cooldownHandler.getCooldown(player);
+        if (!bypassCooldown && cooldown != null && cooldown.getRemainingTime() > 0) {
+            plugin.getMessageHandler().sendMessage(player, configHandler.getSectionMessage().getCountdown(cooldown.getRemainingTime() / 50));
+            return new BasicTeleportResponse(TeleportType.COOLDOWN);
+        }
+        TeleportProperty teleportProperty = new CommonTeleportPropertyBuilder()
+                .commandIssuer(sender)
+                .target(player)
+                .price(price)
+                .bypassEco(bypassEco)
+                .bypassTeleportDelay(bypassDelay)
+                .bypassCooldown(bypassCooldown)
+                .particle(configTeleport.getParticle())
+                .initTime(timeSpan)
+                .delay(delay)
+                .cancelOnMove(cancelOnMove)
+                .world(world)
+                .build();
+        BasicTeleportHandler teleportHandler = new BasicTeleportHandler(plugin);
+        TeleportResponse response = teleportHandler.toRandomLocation(teleportProperty);
         if (timeSpan != 0 && configHandler.getSectionDebug().isShowExecutionTimes()) {
             long totalTime = System.currentTimeMillis() - timeSpan;
             plugin.getLogger().info("Debug: Teleport request took: " + totalTime + "ms");
         }
+        return response;
     }
 
     @Subcommand("reload")
@@ -217,7 +247,7 @@ public class RandomTeleportCommand extends BaseCommand {
             }
             //TODO add to config
             /*if (configWorld.add(new WorldConfigSection(new Offset(offsetX, offsetZ, radius), randomWorld, price, useWorldBorder, needsWorldPermission))) {
-                plugin.getWorldHandler().getWorldQueue().put(randomWorld, new LocationQueue(plugin, configQueue.getSize(), LocationSearcherFactory.getLocationSearcher(randomWorld, plugin)));
+                plugin.getWorldHandler().getWorldQueue().put(randomWorld, new LocationQueue(plugin, configQueue.getSize(), LocationSearcherHandler.getLocationSearcher(randomWorld, plugin)));
             }*/
             /*LocationQueue locationQueue = worldQueue.get(randomWorld);
             if (locationQueue != null) {
@@ -254,22 +284,44 @@ public class RandomTeleportCommand extends BaseCommand {
         } else {
             messageHandler.sendMessage(sender, "<red>That world is not not in the config!");
         }
-    }
+    }*/
 
-    @Subcommand("resetcooldown")
+    @Subcommand("reset cooldown")
     @CommandCompletion("@players")
     @CommandPermission("rtp.admin.resetcooldown")
     public void resetCooldown(CommandIssuer sender, RandomPlayer target) {
         if (target != null) {
             if (plugin.getCooldownHandler().removeCooldown(target.getUniqueId()) != null) {
-                messageHandler.sendMessage(sender, "<green>RandomCooldown reset for " + target.getName());
+                messageHandler.sendMessage(sender, "<green>Cooldown reset for " + target.getName());
             } else {
                 messageHandler.sendMessage(sender, "<red>There was no cooldown for " + target.getName());
             }
+        } else {
+            Component text = ComponentUtil.toComponent("<red>That player is not online... Use the ");
+            Component command = ComponentUtil.toComponent("<hover:show_text:'<green>Click to suggest command'><click:suggest_command:'/rtp reset offlinecooldown <uuid>'><aqua><underlined>reset offlinecooldown</underlined></aqua>");
+            Component finalComponent = text.append(command).append(ComponentUtil.toComponent(" <reset><red>command for offline players."));
+            messageHandler.sendMessage(sender, finalComponent);
         }
     }
 
-    @Subcommand("setprice")
+    @Subcommand("reset offlinecooldown")
+    @CommandCompletion("@players")
+    @CommandPermission("rtp.admin.resetcooldown")
+    @Description("Reset the cooldown of an offline player based on their UUID")
+    public void resetCooldown(CommandIssuer sender, String uuid) {
+        try {
+            final UUID finalUUID = UUID.fromString(uuid);
+            if (plugin.getCooldownHandler().removeCooldown(finalUUID) != null) {
+                messageHandler.sendMessage(sender, "<green>Cooldown reset for " + uuid);
+            } else {
+                messageHandler.sendMessage(sender, "<red>There was no cooldown for " + uuid);
+            }
+        } catch (IllegalArgumentException ex) {
+            messageHandler.sendMessage(sender, "<red>" + uuid + " is not a valid UUID. Example: f73aa17d-166f-4535-92bd-49eda5a27b31");
+        }
+    }
+
+    /*@Subcommand("setprice")
     @CommandCompletion("<price>")
     @CommandPermission("rtp.admin.setprice")
     public void setPrice(CommandIssuer sender, double price) {
@@ -280,7 +332,7 @@ public class RandomTeleportCommand extends BaseCommand {
         }
     }
 
-    /*@Subcommand("createSign")
+    @Subcommand("createSign")
     @CommandPermission("rtp.admin.createsign")
     public void createSign(Player player, World world) {
         List<Block> lastTwoTargetBlocks = player.getLastTwoTargetBlocks(null, 100);

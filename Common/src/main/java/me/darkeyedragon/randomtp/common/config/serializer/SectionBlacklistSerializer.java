@@ -4,6 +4,7 @@ import io.leangen.geantyref.TypeToken;
 import me.darkeyedragon.randomtp.api.config.Dimension;
 import me.darkeyedragon.randomtp.api.config.RandomDimensionData;
 import me.darkeyedragon.randomtp.api.config.section.SectionBlacklist;
+import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.world.RandomBiome;
 import me.darkeyedragon.randomtp.api.world.RandomBiomeHandler;
 import me.darkeyedragon.randomtp.api.world.RandomBlockType;
@@ -11,7 +12,6 @@ import me.darkeyedragon.randomtp.api.world.RandomMaterialHandler;
 import me.darkeyedragon.randomtp.common.config.datatype.Blacklist;
 import me.darkeyedragon.randomtp.common.config.datatype.DimensionData;
 import me.darkeyedragon.randomtp.common.config.section.CommonSectionBlacklist;
-import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
 import me.darkeyedragon.randomtp.common.world.CommonBlockType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurationNode;
@@ -29,9 +29,9 @@ import java.util.stream.Collectors;
 
 public class SectionBlacklistSerializer implements TypeSerializer<SectionBlacklist> {
 
-    private final RandomTeleportPluginImpl impl;
+    private final RandomTeleportPlugin<?> impl;
 
-    public SectionBlacklistSerializer(RandomTeleportPluginImpl impl) {
+    public SectionBlacklistSerializer(RandomTeleportPlugin<?> impl) {
         this.impl = impl;
     }
 

@@ -84,4 +84,5 @@ public class CommonSectionTeleport implements SectionTeleport {
     public void setDefaultWorld(String defaultWorld) {
         this.defaultWorld = defaultWorld;
     }
+
 }

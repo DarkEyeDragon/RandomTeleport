@@ -1,12 +1,11 @@
 package me.darkeyedragon.randomtp.world;
 
 import me.darkeyedragon.randomtp.api.teleport.RandomCooldown;
-import me.darkeyedragon.randomtp.api.teleport.TeleportProperty;
 import me.darkeyedragon.randomtp.api.teleport.TeleportResponse;
 import me.darkeyedragon.randomtp.api.teleport.TeleportType;
-import me.darkeyedragon.randomtp.api.world.RandomPlayer;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
 import me.darkeyedragon.randomtp.common.teleport.BasicTeleportResponse;
 import me.darkeyedragon.randomtp.util.WorldUtil;
 import org.bukkit.entity.Player;
@@ -53,28 +52,22 @@ public class PlayerSpigot implements RandomPlayer {
         return WorldUtil.toRandomLocation(player.getEyeLocation());
     }
 
-@Override
-public CompletableFuture<TeleportResponse> teleportAsync(TeleportProperty teleportProperty) {
-    RandomLocation randomLocation = teleportProperty.getLocation();
-    //Teleport the player async if possible
-    /*return PaperLib.teleportAsync(player, WorldUtil.toLocation(randomLocation)).thenApply(aBoolean -> {
-        if (teleportProperty.getInitTime() != 0) {
-            Logger logger = LogManager.getLogManager().getLogger("RandomTeleport");
-            logger.info("Debug: total teleport time took: " + (System.currentTimeMillis() - teleportProperty.getInitTime()) + "ms");
-        }
-        if (aBoolean) {
-            return new BasicTeleportResponse(TeleportType.SUCCESS);
-        } else {
-            return new BasicTeleportResponse(TeleportType.FAIL);
-        }
-    });*/
-    //TODO TEMP FIX
-    boolean complete = player.teleport(WorldUtil.toLocation(randomLocation));
-    if (complete) {
-        return CompletableFuture.completedFuture(new BasicTeleportResponse(TeleportType.SUCCESS));
+    @Override
+    public CompletableFuture<TeleportResponse> teleportAsync(RandomLocation location) {
+        //Teleport the player async if possible
+        return PaperLib.teleportAsync(player, WorldUtil.toLocation(location)).thenApply(success -> {
+            if (success) {
+                return new BasicTeleportResponse(TeleportType.SUCCESS);
+            } else {
+                return new BasicTeleportResponse(TeleportType.FAIL);
+            }
+        });
     }
-    return CompletableFuture.completedFuture(new BasicTeleportResponse(TeleportType.FAIL));
-}
+
+    @Override
+    public void teleport(RandomLocation location) {
+        player.teleport(WorldUtil.toLocation(location));
+    }
 
     @Override
     public RandomCooldown getCooldown() {

@@ -1,8 +1,8 @@
 package me.darkeyedragon.randomtp.common.config.serializer;
 
 import io.leangen.geantyref.TypeToken;
+import me.darkeyedragon.randomtp.api.plugin.RandomTeleportPlugin;
 import me.darkeyedragon.randomtp.api.world.RandomMaterial;
-import me.darkeyedragon.randomtp.common.plugin.RandomTeleportPluginImpl;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.serialize.SerializationException;
@@ -13,9 +13,9 @@ import java.util.Set;
 
 public class RandomMaterialSerializer implements TypeSerializer<Set<RandomMaterial>> {
 
-    private final RandomTeleportPluginImpl impl;
+    private final RandomTeleportPlugin<?> impl;
 
-    public RandomMaterialSerializer(RandomTeleportPluginImpl impl) {
+    public RandomMaterialSerializer(RandomTeleportPlugin<?> impl) {
         this.impl = impl;
     }
 

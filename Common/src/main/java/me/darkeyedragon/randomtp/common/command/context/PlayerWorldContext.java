@@ -1,7 +1,7 @@
 package me.darkeyedragon.randomtp.common.command.context;
 
-import me.darkeyedragon.randomtp.api.world.RandomPlayer;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
+import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
 
 import java.util.ArrayList;
 import java.util.List;

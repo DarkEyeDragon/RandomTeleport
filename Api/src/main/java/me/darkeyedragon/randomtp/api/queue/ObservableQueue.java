@@ -39,6 +39,7 @@ public class ObservableQueue<T> extends ArrayBlockingQueue<T> {
     @Override
     public T poll() {
         T element = super.poll();
+        if (element == null) return null;
         listeners.forEach(listener -> listener.onRemove(element));
         return element;
     }

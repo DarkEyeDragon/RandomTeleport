@@ -1,6 +1,6 @@
 package me.darkeyedragon.randomtp;
 
-import me.darkeyedragon.randomtp.stat.BStats;
+import me.darkeyedragon.randomtp.common.stat.BStats;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SingleLineChart;
 import org.bukkit.plugin.java.JavaPlugin;

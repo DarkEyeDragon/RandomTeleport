@@ -1,6 +1,7 @@
 package me.darkeyedragon.randomtp.scheduler;
 
 import me.darkeyedragon.randomtp.api.scheduler.Task;
+import me.darkeyedragon.randomtp.api.scheduler.TaskIdentifier;
 import org.bukkit.scheduler.BukkitTask;
 
 public class SpigotTask implements Task {
@@ -17,8 +18,8 @@ public class SpigotTask implements Task {
     }
 
     @Override
-    public int getTaskId() {
-        return task.getTaskId();
+    public TaskIdentifier<Integer> getTaskId() {
+        return new SpigotTaskIdentifier(task.getTaskId());
     }
 
     @Override

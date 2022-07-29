@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
 
-    <name>RandomTeleport-Parent</name>
+    <name>RandomTeleport</name>
 
     <groupId>me.darkeyedragon</groupId>
     <artifactId>randomtp</artifactId>
@@ -15,19 +15,26 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <version.api>0.1.0-SNAPSHOT</version.api>
+        <version.common>0.2.0-SNAPSHOT</version.common>
+        <version.spigot>3.1.0</version.spigot>
+        <version.sponge>1.0-SNAPSHOT</version.sponge>
+        <project.name>RandomTeleport</project.name>
     </properties>
 
     <modules>
         <module>Api</module>
-        <module>Spigot</module>
         <module>Common</module>
+        <module>Spigot</module>
+        <module>Sponge</module>
     </modules>
 
     <dependencies>
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>20.1.0</version>
+            <version>23.0.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

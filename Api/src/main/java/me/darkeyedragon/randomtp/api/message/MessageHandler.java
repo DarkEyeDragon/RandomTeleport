@@ -1,7 +1,7 @@
 package me.darkeyedragon.randomtp.api.message;
 
 import co.aikar.commands.CommandIssuer;
-import me.darkeyedragon.randomtp.api.world.RandomPlayer;
+import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
 import net.kyori.adventure.text.Component;
 
 public interface MessageHandler {
@@ -13,4 +13,8 @@ public interface MessageHandler {
     void sendMessage(CommandIssuer commandIssuer, Component component);
 
     void sendMessage(CommandIssuer commandIssuer, String message);
+
+    void sendDebugMessage(String message);
+
+    void sendDebugMessage(Component message);
 }

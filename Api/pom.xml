@@ -6,7 +6,7 @@
 
     <groupId>me.darkeyedragon.randomtp</groupId>
     <artifactId>Api</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>${version.api}</version>
 
     <name>RandomTeleport-Api</name>
 
@@ -30,7 +30,7 @@
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-text-minimessage</artifactId>
-            <version>4.1.0-SNAPSHOT</version>
+            <version>4.11.0</version>
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
@@ -42,13 +42,13 @@
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-api</artifactId>
-            <version>4.8.1</version>
+            <version>4.11.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-platform-api</artifactId>
-            <version>4.0.0-SNAPSHOT</version>
+            <version>4.1.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

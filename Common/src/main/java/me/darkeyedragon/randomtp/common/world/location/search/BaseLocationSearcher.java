@@ -15,14 +15,11 @@ import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.RandomOffset;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationDataProvider;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
-import me.darkeyedragon.randomtp.common.exception.NoRandomLocationFoundException;
-import me.darkeyedragon.randomtp.common.util.ChunkTraverser;
 import me.darkeyedragon.randomtp.common.world.location.CommonLocation;
 
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class BaseLocationSearcher implements LocationSearcher {
@@ -52,18 +49,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
      */
     @Override
     public CompletableFuture<RandomLocation> getRandom(LocationDataProvider dataProvider) {
-        return pickRandomLocation(dataProvider).thenCompose((loc) -> {
-            if (loc == null) {
-                if (count < max) {
-                    count++;
-                    return getRandom(dataProvider);
-                }
-                throw new NoRandomLocationFoundException(count, dataProvider.getWorld().getName());
-            } else {
-                count = 1;
-                return CompletableFuture.completedFuture(loc);
-            }
-        });
+        return pickRandomLocation(dataProvider);
     }
 
     /*Pick a random location based on chunks*/
@@ -92,25 +78,21 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
     CompletableFuture<RandomChunkSnapshot> getRandomChunk(LocationDataProvider dataProvider) {
         CompletableFuture<RandomChunkSnapshot> chunkFuture = getRandomChunkAsync(dataProvider);
         return chunkFuture.thenCompose((chunk) -> {
-            boolean isSafe = isSafeChunk(chunk);
-            if (!isSafe) {
-                ChunkTraverser chunkTraverser = new ChunkTraverser(chunk);
-                while (chunkTraverser.hasNext()) {
-                    try {
-                        RandomChunkSnapshot snapshot = chunkTraverser.next().get();
-                        int x = snapshot.getX() << CHUNK_SHIFT;
-                        int z = snapshot.getZ() << CHUNK_SHIFT;
+            if (!isSafeChunk(chunk)) {
+                for (CompletableFuture<RandomChunkSnapshot> neighborChunkSnapshot : chunk) {
+                    neighborChunkSnapshot.thenApply(newChunkSnapshot -> {
+                        int x = newChunkSnapshot.getX() << CHUNK_SHIFT;
+                        int z = newChunkSnapshot.getZ() << CHUNK_SHIFT;
                         RandomOffset offset = dataProvider.getOffset();
                         int radius = dataProvider.getRadius();
                         boolean withinBounds = (x < radius + offset.getX() && z < radius + offset.getZ()) || (x > radius - offset.getX() && z > radius - offset.getZ());
-                        if (withinBounds && isSafeChunk(snapshot)) {
-                            return CompletableFuture.completedFuture(snapshot);
+                        if (withinBounds && isSafeChunk(newChunkSnapshot)) {
+                            return CompletableFuture.completedFuture(newChunkSnapshot);
                         }
-                    } catch (InterruptedException | ExecutionException e) {
-                        e.printStackTrace();
-                    }
+                        return CompletableFuture.completedFuture(null);
+                    });
                 }
-                return getRandomChunk(dataProvider);
+                return CompletableFuture.completedFuture(null);
             } else {
                 return CompletableFuture.completedFuture(chunk);
             }
@@ -135,9 +117,10 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
     public boolean isSafe(RandomLocation loc) {
         RandomWorld world = loc.getWorld();
         if (world == null) return false;
+        if (!isSafeForPlugins(loc)) return false;
         RandomBlock block = loc.getBlock();
-        if (block.getBlockType().getType().isAir()) return false;
-        RandomBlockType blockType = loc.getBlock().getBlockType();
+        RandomBlockType blockType = block.getBlockType();
+        if (blockType.getType().isAir()) return false;
         //Check if it passes the global blacklist
         if (!isValidGlobalBlockType(loc)) return false;
         RandomDimensionData dimensionData = blacklist.getDimensionData(dimension);
@@ -146,7 +129,6 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         if (block.isPassable()) return false;
         if (block.isLiquid()) return false;
         if (!isSafeAbove(loc)) return false;
-        if (!isSafeForPlugins(loc)) return false;
         return isSafeSurrounding(loc);
     }
 
@@ -171,8 +153,8 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
     }
 
     public boolean isSafeChunk(RandomChunkSnapshot chunk) {
-        for (int x = 2; x < CHUNK_SIZE - 2; x++) {
-            for (int z = 2; z < CHUNK_SIZE - 2; z++) {
+        for (int x = 0; x < CHUNK_SIZE; x += 4) {
+            for (int z = 0; z < CHUNK_SIZE; z += 4) {
                 int y = chunk.getHighestBlockYAt(x, z);
                 RandomBiome randomBiome = chunk.getBiome(x, y, z);
                 if (isBlacklistedBiome(randomBiome)) {
@@ -223,5 +205,4 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         RandomDimensionData dimensionData = blacklist.getDimensionData(dimension);
         return globalData.getBiomes().contains(randomBiome) || dimensionData.getBiomes().contains(randomBiome);
     }
-
 }

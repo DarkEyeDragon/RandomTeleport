@@ -1,8 +1,10 @@
 package me.darkeyedragon.randomtp.common.world.location;
 
 import me.darkeyedragon.randomtp.api.util.RandomVector;
+import me.darkeyedragon.randomtp.api.world.RandomChunkSnapshot;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
+import me.darkeyedragon.randomtp.api.world.location.ChunkLocation;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.common.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -116,6 +118,11 @@ public class CommonLocation implements RandomLocation {
     }
 
     @Override
+    public ChunkLocation toChunkLocation() {
+        return new ChunkLocation(getBlockX() >> RandomChunkSnapshot.CHUNK_SHIFT, getBlockZ() >> RandomChunkSnapshot.CHUNK_SHIFT);
+    }
+
+    @Override
     public final boolean equals(Object obj) {
         if (obj == null) return false;
         if (this == obj) return true;
@@ -132,5 +139,17 @@ public class CommonLocation implements RandomLocation {
     @Override
     public final int hashCode() {
         return Objects.hash(randomWorld, x, y, z);
+    }
+
+    @Override
+    public String toString() {
+        return "CommonLocation{" +
+                "randomWorld=" + randomWorld +
+                ", yaw=" + yaw +
+                ", pitch=" + pitch +
+                ", x=" + x +
+                ", y=" + y +
+                ", z=" + z +
+                '}';
     }
 }

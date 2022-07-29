@@ -3,47 +3,40 @@ package me.darkeyedragon.randomtp.common.teleport;
 import co.aikar.commands.CommandIssuer;
 import me.darkeyedragon.randomtp.api.teleport.TeleportProperty;
 import me.darkeyedragon.randomtp.api.world.RandomParticle;
-import me.darkeyedragon.randomtp.api.world.RandomPlayer;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
-import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
 
 public class CommonTeleportProperty implements TeleportProperty {
 
-    private RandomLocation location;
     private final CommandIssuer commandIssuer;
     private final RandomPlayer target;
+    private final RandomWorld world;
     private final boolean bypassEco;
     private final boolean bypassTeleportDelay;
     private final boolean bypassCooldown;
     private final RandomParticle particle;
     private final double price;
     private final long initTime;
+    private final long delay;
+    private final boolean cancelOnMove;
 
-    public CommonTeleportProperty(RandomLocation location, CommandIssuer commandIssuer, RandomPlayer target, double price, boolean bypassEco, boolean bypassTeleportDelay, boolean bypassCooldown, RandomParticle particle, long initTime) {
-        this.location = location;
+    protected CommonTeleportProperty(CommandIssuer commandIssuer, RandomPlayer target, RandomWorld world, double price, boolean bypassEco, boolean bypassTeleportDelay, boolean bypassCooldown, RandomParticle particle, long initTime, long delay, boolean cancelOnMove) {
         this.commandIssuer = commandIssuer;
         this.target = target;
+        this.world = world;
         this.bypassEco = bypassEco;
         this.price = price;
         this.bypassTeleportDelay = bypassTeleportDelay;
         this.bypassCooldown = bypassCooldown;
         this.particle = particle;
         this.initTime = initTime;
+        this.delay = delay;
+        this.cancelOnMove = cancelOnMove;
     }
 
     @Override
     public long getInitTime() {
         return initTime;
-    }
-
-    @Override
-    public RandomLocation getLocation() {
-        return location;
-    }
-
-    @Override
-    public void setLocation(RandomLocation location) {
-        this.location = location;
     }
 
     @Override
@@ -78,11 +71,21 @@ public class CommonTeleportProperty implements TeleportProperty {
 
     @Override
     public RandomWorld getWorld() {
-        return location.getWorld();
+        return world;
     }
 
     @Override
     public double getPrice() {
         return price;
+    }
+
+    @Override
+    public long getDelay() {
+        return delay;
+    }
+
+    @Override
+    public boolean getCancelOnMove() {
+        return cancelOnMove;
     }
 }

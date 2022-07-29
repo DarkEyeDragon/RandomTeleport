@@ -3,19 +3,20 @@
 message:
   init-teleport: '<green>Searching for safe location to teleport to...'
   #Used when teleport delay is larger than 0. This supports placeholders
-  #valid placeholders: %hp (hours partial) %mp (minutes partial) %sp (seconds partial) %h (total hours) %m (total minutes) %s(total seconds)
+  #valid placeholders: <time>
   init-teleport-delay: '<green>You will be teleported in <gold><time>. <green>Do not move!'
   teleport-canceled: '<red>You moved! Teleportation canceled'
-  #valid placeholders: %posX, %posY, %posZ
-  teleport: '<aqua>A safe place has been found! Teleporting to <gold><posX>x <posY>y <posZ>z'
-  #valid placeholders: %hp (hours partial) %mp (minutes partial) %sp (seconds partial) %h (total hours) %m (total minutes) %s(total seconds)
+  #valid placeholders: <x>, <y>, <z>
+  teleport: '<aqua>A safe place has been found! Teleporting to <gold><x>x <y>y <z>z'
+  #valid placeholders: <time> a preformatted string, <hours>, <minutes>, <seconds>, <total_hours>, <total_minutes>, <total_seconds>
   countdown: '<gold>You cannot teleport for another <aqua><time>'
-  #valid placeholders: %world
+  #valid placeholders: <world>
   no-world-permission: '<red>I''m sorry, you cannot rtp in <gold><world>!'
   depleted-queue: '<red>The teleport queue is currently empty. Try again later'
   invalid-default-world: '<red>The default world is not set or is invalid. Cannot teleport. Contact an admin to fix this issue.'
   economy:
     insufficient-funds: '<red>You do not have enough money to rtp!'
+    #valid placeholders: <price>, <currency>
     payment: '<green>You just paid <aqua><price><currency> <green>to rtp!'
   sign:
     - '<aqua>[RandomTeleport]'
@@ -63,15 +64,6 @@ teleport:
   #If use-default-world is false current world is used (if its allowed to be rtp'd in)
   use-default-world: false
   default-world: "world"
-#Plugins to take into consideration when teleporting. A player will not be teleported in those regions
-#Currently supports Factions (FactionsUUID), WorldGuard, GriefPrevention, RedProtect, Towny
-#If you want more plugins to be supported: https://github.com/DarkEyeDragon/RandomTeleport/issues
-plugins:
-  - Factions
-  - WorldGuard
-  - GriefPrevention
-  - RedProtect
-  - Towny
 debug:
   #Safe location added for world(3/5)
   #Location removed from world(2/5)

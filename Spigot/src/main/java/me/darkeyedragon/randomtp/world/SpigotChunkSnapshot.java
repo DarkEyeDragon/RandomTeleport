@@ -1,17 +1,20 @@
 package me.darkeyedragon.randomtp.world;
 
+import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.api.world.RandomBiome;
-import me.darkeyedragon.randomtp.api.world.RandomChunkSnapshot;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
+import me.darkeyedragon.randomtp.common.world.CommonChunkSnapshot;
 import me.darkeyedragon.randomtp.util.WorldUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 
-public class SpigotChunkSnapshot implements RandomChunkSnapshot {
+public class SpigotChunkSnapshot extends CommonChunkSnapshot {
 
     private final ChunkSnapshot chunk;
+    private final boolean useNew;
 
     public SpigotChunkSnapshot(ChunkSnapshot chunk) {
+        useNew = PaperLib.isVersion(18, 2);
         this.chunk = chunk;
     }
 
@@ -31,15 +34,18 @@ public class SpigotChunkSnapshot implements RandomChunkSnapshot {
     }
 
     /**
-     * Gets the highest non-air coordinate at the given coordinates
-     * Due to a bug in snapshots we're required to offset with -1.
+     * Gets the highest non-air coordinate at the given coordinates.
      *
      * @param x X-coordinate of the blocks (0-15)
      * @param z Z-coordinate of the blocks (0-15)
      * @return Y-coordinate of the highest non-air block
      */
     public int getHighestBlockYAt(int x, int z) {
-        return Math.max(chunk.getHighestBlockYAt(x, z)-1, 0);
+        //https://hub.spigotmc.org/stash/projects/SPIGOT/repos/craftbukkit/commits/ce373be660c95d5ca2b2d167545565f9636f9cd8
+        if (useNew) {
+            return Math.max(chunk.getHighestBlockYAt(x, z), 0);
+        }
+        return Math.max(chunk.getHighestBlockYAt(x, z) - 1, 0);
     }
 
     @Override

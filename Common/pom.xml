@@ -7,10 +7,13 @@
         <artifactId>randomtp</artifactId>
         <version>0.1.0-SNAPSHOT</version>
     </parent>
+
     <modelVersion>4.0.0</modelVersion>
 
+    <name>RandomTeleport-Common</name>
     <groupId>me.darkeyedragon.randomtp</groupId>
     <artifactId>Common</artifactId>
+    <version>${version.common}</version>
 
     <repositories>
         <repository>
@@ -23,24 +26,24 @@
         <dependency>
             <groupId>me.darkeyedragon.randomtp</groupId>
             <artifactId>Api</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <version>${version.api}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>io.github.classgraph</groupId>
             <artifactId>classgraph</artifactId>
-            <version>4.8.102</version>
+            <version>4.8.139</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>21.0</version>
+            <version>31.1-jre</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-artifact</artifactId>
-            <version>3.8.3</version>
+            <version>3.8.6</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -51,22 +54,23 @@
         <dependency>
             <groupId>co.aikar</groupId>
             <artifactId>acf-core</artifactId>
-            <version>0.5.0-SNAPSHOT</version>
+            <version>0.5.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.spongepowered</groupId>
             <artifactId>configurate-yaml</artifactId>
-            <version>4.1.1</version>
+            <version>4.1.2</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-serializer-configurate4</artifactId>
-            <version>4.9.2</version>
+            <version>4.11.0</version>
         </dependency>
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-text-serializer-plain</artifactId>
-            <version>4.8.1</version>
+            <version>4.11.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

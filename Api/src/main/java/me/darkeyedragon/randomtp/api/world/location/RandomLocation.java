@@ -1,5 +1,6 @@
 package me.darkeyedragon.randomtp.api.world.location;
 
+import com.sun.tools.javac.util.Pair;
 import me.darkeyedragon.randomtp.api.util.RandomVector;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
@@ -43,5 +44,10 @@ public interface RandomLocation extends Cloneable {
      */
     @NotNull
     RandomVector getDirection();
+
+    /**
+     * @return a {@link Pair} of chunk coordinates. First being X and second being Z
+     */
+    ChunkLocation toChunkLocation();
 
 }

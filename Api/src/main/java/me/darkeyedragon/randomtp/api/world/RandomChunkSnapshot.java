@@ -1,6 +1,10 @@
 package me.darkeyedragon.randomtp.api.world;
 
-public interface RandomChunkSnapshot {
+import java.util.concurrent.CompletableFuture;
+
+public interface RandomChunkSnapshot extends Iterable<CompletableFuture<RandomChunkSnapshot>> {
+
+    int CHUNK_SHIFT = 4;
 
     RandomWorld getWorld();
 
