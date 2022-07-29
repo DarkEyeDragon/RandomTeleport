@@ -25,7 +25,4 @@ public interface SectionTeleport {
 
     void setDefaultWorld(String defaultWorld);
 
-    boolean isUseAsyncChunkTeleport();
-
-    void setUseAsyncChunkTeleport(boolean useAsyncChunkTeleport);
 }

@@ -1,6 +1,8 @@
 package me.darkeyedragon.randomtp.common.world.location;
 
+import com.sun.tools.javac.util.Pair;
 import me.darkeyedragon.randomtp.api.util.RandomVector;
+import me.darkeyedragon.randomtp.api.world.RandomChunkSnapshot;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
@@ -113,6 +115,11 @@ public class CommonLocation implements RandomLocation {
         vector.setZ(xz * Math.cos(Math.toRadians(rotX)));
 
         return vector;
+    }
+
+    @Override
+    public Pair<Integer, Integer> toChunkLocation() {
+        return new Pair<>(getBlockX() >> RandomChunkSnapshot.CHUNK_SHIFT, getBlockZ() >> RandomChunkSnapshot.CHUNK_SHIFT);
     }
 
     @Override

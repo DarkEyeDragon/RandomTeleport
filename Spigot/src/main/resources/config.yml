@@ -64,10 +64,6 @@ teleport:
   #If use-default-world is false current world is used (if its allowed to be rtp'd in)
   use-default-world: false
   default-world: "world"
-  #Minecraft 1.18 seems to have issues with large (chunk) locations causing it to crash.
-  #Setting this to false will teleport on the main thread preventing this issue but will block the main thread
-  #For more info check: https://github.com/DarkEyeDragon/RandomTeleport/issues/190
-  use-async-chunk-teleport: false
 debug:
   #Safe location added for world(3/5)
   #Location removed from world(2/5)

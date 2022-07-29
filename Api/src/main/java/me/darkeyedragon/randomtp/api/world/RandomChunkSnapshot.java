@@ -4,6 +4,8 @@ import java.util.concurrent.CompletableFuture;
 
 public interface RandomChunkSnapshot extends Iterable<CompletableFuture<RandomChunkSnapshot>> {
 
+    int CHUNK_SHIFT = 4;
+
     RandomWorld getWorld();
 
     int getX();

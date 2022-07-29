@@ -1,5 +1,6 @@
 package me.darkeyedragon.randomtp.common.teleport;
 
+import com.sun.tools.javac.util.Pair;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.eco.EcoHandler;
 import me.darkeyedragon.randomtp.api.failsafe.DeathTracker;
@@ -37,7 +38,6 @@ public class BasicTeleportHandler implements TeleportHandler {
     @Override
     public TeleportResponse toRandomLocation(TeleportProperty property) {
         long cooldown = getCooldown(property);
-
         if (cooldown > 0) {
             plugin.getMessageHandler().sendMessage(property.getTarget(), configHandler.getSectionMessage().getCountdown(cooldown / 50));
             return new BasicTeleportResponse(TeleportType.COOLDOWN);
@@ -132,15 +132,8 @@ public class BasicTeleportHandler implements TeleportHandler {
             plugin.getMessageHandler().sendMessage(property.getCommandIssuer(), configHandler.getSectionMessage().getEmptyQueue());
             return;
         }
-
-        //Minecraft 1.18 seems to have issues with large (chunk) locations causing it to crash.
-        // Setting this to false will teleport on the main thread preventing this issue
-        if (plugin.getConfigHandler().getSectionTeleport().isUseAsyncChunkTeleport()) {
-            location.getWorld().getChunkAtAsync(location.getWorld(), location.getBlockX(), location.getBlockZ()).thenAcceptAsync(chunkSnapshot -> teleportLogic(property, location));
-        } else {
-            teleportLogic(property, location);
-        }
-
+        Pair<Integer, Integer> chunkCoords = location.toChunkLocation();
+        location.getWorld().getChunkAtAsync(location.getWorld(), chunkCoords.fst, chunkCoords.snd).thenAccept(chunkSnapshot -> teleportLogic(property, location));
     }
 
     private void teleportLogic(TeleportProperty property, RandomLocation location) {
