@@ -36,9 +36,6 @@ public class SpigotWorld implements RandomWorld {
     @Override
     public CompletableFuture<RandomChunkSnapshot> getChunkAtAsync(RandomWorld world, int x, int z) {
         World regWorld = WorldUtil.toWorld(world);
-        if (PaperLib.isPaper()) {
-            return PaperLib.getChunkAtAsync(regWorld, x, z, true, true).thenApply(chunk -> new SpigotChunkSnapshot(chunk.getChunkSnapshot(true, true, false)));
-        }
         return PaperLib.getChunkAtAsync(regWorld, x, z, true, true).thenApply(chunk -> new SpigotChunkSnapshot(chunk.getChunkSnapshot(true, true, false)));
     }
 

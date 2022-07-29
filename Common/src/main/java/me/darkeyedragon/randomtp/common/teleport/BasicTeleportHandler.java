@@ -12,6 +12,7 @@ import me.darkeyedragon.randomtp.api.teleport.TeleportProperty;
 import me.darkeyedragon.randomtp.api.teleport.TeleportResponse;
 import me.darkeyedragon.randomtp.api.teleport.TeleportType;
 import me.darkeyedragon.randomtp.api.world.RandomParticle;
+import me.darkeyedragon.randomtp.api.world.location.ChunkLocation;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
 import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
@@ -37,7 +38,6 @@ public class BasicTeleportHandler implements TeleportHandler {
     @Override
     public TeleportResponse toRandomLocation(TeleportProperty property) {
         long cooldown = getCooldown(property);
-
         if (cooldown > 0) {
             plugin.getMessageHandler().sendMessage(property.getTarget(), configHandler.getSectionMessage().getCountdown(cooldown / 50));
             return new BasicTeleportResponse(TeleportType.COOLDOWN);
@@ -132,15 +132,8 @@ public class BasicTeleportHandler implements TeleportHandler {
             plugin.getMessageHandler().sendMessage(property.getCommandIssuer(), configHandler.getSectionMessage().getEmptyQueue());
             return;
         }
-
-        //Minecraft 1.18 seems to have issues with large (chunk) locations causing it to crash.
-        // Setting this to false will teleport on the main thread preventing this issue
-        if (plugin.getConfigHandler().getSectionTeleport().isUseAsyncChunkTeleport()) {
-            location.getWorld().getChunkAtAsync(location.getWorld(), location.getBlockX(), location.getBlockZ()).thenAcceptAsync(chunkSnapshot -> teleportLogic(property, location));
-        } else {
-            teleportLogic(property, location);
-        }
-
+        ChunkLocation chunkCoords = location.toChunkLocation();
+        location.getWorld().getChunkAtAsync(location.getWorld(), chunkCoords.getX(), chunkCoords.getZ()).thenAccept(chunkSnapshot -> teleportLogic(property, location));
     }
 
     private void teleportLogic(TeleportProperty property, RandomLocation location) {
