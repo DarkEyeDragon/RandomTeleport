@@ -1,10 +1,10 @@
 package me.darkeyedragon.randomtp.common.world.location;
 
-import com.sun.tools.javac.util.Pair;
 import me.darkeyedragon.randomtp.api.util.RandomVector;
 import me.darkeyedragon.randomtp.api.world.RandomChunkSnapshot;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.block.RandomBlock;
+import me.darkeyedragon.randomtp.api.world.location.ChunkLocation;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.common.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -118,8 +118,8 @@ public class CommonLocation implements RandomLocation {
     }
 
     @Override
-    public Pair<Integer, Integer> toChunkLocation() {
-        return new Pair<>(getBlockX() >> RandomChunkSnapshot.CHUNK_SHIFT, getBlockZ() >> RandomChunkSnapshot.CHUNK_SHIFT);
+    public ChunkLocation toChunkLocation() {
+        return new ChunkLocation(getBlockX() >> RandomChunkSnapshot.CHUNK_SHIFT, getBlockZ() >> RandomChunkSnapshot.CHUNK_SHIFT);
     }
 
     @Override

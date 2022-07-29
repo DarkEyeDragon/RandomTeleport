@@ -48,6 +48,6 @@ public interface RandomLocation extends Cloneable {
     /**
      * @return a {@link Pair} of chunk coordinates. First being X and second being Z
      */
-    Pair<Integer, Integer> toChunkLocation();
+    ChunkLocation toChunkLocation();
 
 }

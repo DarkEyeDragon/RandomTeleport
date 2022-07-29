@@ -1,6 +1,5 @@
 package me.darkeyedragon.randomtp.common.teleport;
 
-import com.sun.tools.javac.util.Pair;
 import me.darkeyedragon.randomtp.api.config.RandomConfigHandler;
 import me.darkeyedragon.randomtp.api.eco.EcoHandler;
 import me.darkeyedragon.randomtp.api.failsafe.DeathTracker;
@@ -13,6 +12,7 @@ import me.darkeyedragon.randomtp.api.teleport.TeleportProperty;
 import me.darkeyedragon.randomtp.api.teleport.TeleportResponse;
 import me.darkeyedragon.randomtp.api.teleport.TeleportType;
 import me.darkeyedragon.randomtp.api.world.RandomParticle;
+import me.darkeyedragon.randomtp.api.world.location.ChunkLocation;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
 import me.darkeyedragon.randomtp.api.world.player.RandomPlayer;
@@ -132,8 +132,8 @@ public class BasicTeleportHandler implements TeleportHandler {
             plugin.getMessageHandler().sendMessage(property.getCommandIssuer(), configHandler.getSectionMessage().getEmptyQueue());
             return;
         }
-        Pair<Integer, Integer> chunkCoords = location.toChunkLocation();
-        location.getWorld().getChunkAtAsync(location.getWorld(), chunkCoords.fst, chunkCoords.snd).thenAccept(chunkSnapshot -> teleportLogic(property, location));
+        ChunkLocation chunkCoords = location.toChunkLocation();
+        location.getWorld().getChunkAtAsync(location.getWorld(), chunkCoords.getX(), chunkCoords.getZ()).thenAccept(chunkSnapshot -> teleportLogic(property, location));
     }
 
     private void teleportLogic(TeleportProperty property, RandomLocation location) {
