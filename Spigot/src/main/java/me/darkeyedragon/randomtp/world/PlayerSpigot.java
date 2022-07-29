@@ -1,6 +1,5 @@
 package me.darkeyedragon.randomtp.world;
 
-import io.papermc.lib.PaperLib;
 import me.darkeyedragon.randomtp.api.teleport.RandomCooldown;
 import me.darkeyedragon.randomtp.api.teleport.TeleportResponse;
 import me.darkeyedragon.randomtp.api.teleport.TeleportType;
