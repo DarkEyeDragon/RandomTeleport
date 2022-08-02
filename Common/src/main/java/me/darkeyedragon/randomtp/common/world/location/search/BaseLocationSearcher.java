@@ -16,6 +16,8 @@ import me.darkeyedragon.randomtp.api.world.location.RandomOffset;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationDataProvider;
 import me.darkeyedragon.randomtp.api.world.location.search.LocationSearcher;
 import me.darkeyedragon.randomtp.common.world.location.CommonLocation;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 
 import java.util.EnumSet;
 import java.util.Map;
@@ -33,6 +35,9 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
     protected final byte CHUNK_SHIFT = 4; //The amount of bits needed to translate between locations and chunks
     protected int count = 1;
     protected int max = 50;
+
+    private static final Component PASS = Component.text("PASS").color(TextColor.color(0x00ff00));
+    private static final Component FAIL = Component.text("FAIL").color(TextColor.color(0xff0000));
 
     public BaseLocationSearcher(RandomTeleportPlugin<?> plugin, Map<String, ? extends RandomLocationValidator> validatorMap, RandomBlacklist blacklist, Dimension dimension) {
         this.plugin = plugin;
@@ -60,6 +65,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
 
     /* Will search through the chunk to find a location that is safe, returning null if none is found. */
     public RandomLocation getRandomLocationFromChunk(RandomChunkSnapshot chunk) {
+        plugin.getMessageHandler().sendDebugMessage("2. Looking for location from chunk...");
         for (int x = 2; x < CHUNK_SIZE - 2; x++) {
             for (int z = 2; z < CHUNK_SIZE - 2; z++) {
                 //RandomBlock block = chunk.get((chunk.getX() << CHUNK_SHIFT) + x, (chunk.getZ() << CHUNK_SHIFT) + z);
@@ -72,6 +78,7 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
                 }
             }
         }
+        plugin.getMessageHandler().sendDebugMessage("No safe location found in chunk: {x:" + chunk.getX() + " z:" + chunk.getZ() + " world: " + chunk.getWorld() + "}");
         return null;
     }
 
@@ -87,19 +94,23 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
                         int radius = dataProvider.getRadius();
                         boolean withinBounds = (x < radius + offset.getX() && z < radius + offset.getZ()) || (x > radius - offset.getX() && z > radius - offset.getZ());
                         if (withinBounds && isSafeChunk(newChunkSnapshot)) {
+                            plugin.getMessageHandler().sendDebugMessage("1. Found safe chunk...");
                             return CompletableFuture.completedFuture(newChunkSnapshot);
                         }
                         return CompletableFuture.completedFuture(null);
                     });
                 }
+                plugin.getMessageHandler().sendDebugMessage("1. Not a safe chunk...");
                 return CompletableFuture.completedFuture(null);
             } else {
+                plugin.getMessageHandler().sendDebugMessage("1. Not a safe chunk...");
                 return CompletableFuture.completedFuture(chunk);
             }
         });
     }
 
     CompletableFuture<RandomChunkSnapshot> getRandomChunkAsync(LocationDataProvider dataProvider) {
+        plugin.getMessageHandler().sendDebugMessage("1. Getting random chunk async...");
         ThreadLocalRandom rnd = ThreadLocalRandom.current();
         RandomOffset offset = dataProvider.getOffset();
         int radius = dataProvider.getRadius();
@@ -109,33 +120,89 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
         int x = rnd.nextInt(-chunkRadius, chunkRadius + 1);
         int z = rnd.nextInt(-chunkRadius, chunkRadius + 1);
         RandomWorld world = dataProvider.getWorld();
-        if (world == null) return CompletableFuture.completedFuture(null);
+        if (world == null) {
+            plugin.getMessageHandler().sendDebugMessage("1.1 World is null...");
+            return CompletableFuture.completedFuture(null);
+        }
+        plugin.getMessageHandler().sendDebugMessage("1.1 Found random chunk in \"" + world.getName() + "\"");
         return world.getChunkAtAsync(world, x + chunkOffsetX, z + chunkOffsetZ);
     }
 
     @Override
     public boolean isSafe(RandomLocation loc) {
+        plugin.getMessageHandler().sendDebugMessage("3. Checking if safe...");
+        Component worldDebug = Component.text("3.1 world not null? ");
         RandomWorld world = loc.getWorld();
-        if (world == null) return false;
-        if (!isSafeForPlugins(loc)) return false;
+        if (world == null) {
+            plugin.getMessageHandler().sendDebugMessage(worldDebug.append(FAIL));
+            return false;
+        }
+        plugin.getMessageHandler().sendDebugMessage(worldDebug.append(PASS));
+        Component pluginsDebug = Component.text("3.8 block is safe for addons? ");
+        if (!isSafeForPlugins(loc)) {
+            plugin.getMessageHandler().sendDebugMessage(pluginsDebug.append(FAIL));
+            return false;
+        }
+        plugin.getMessageHandler().sendDebugMessage(pluginsDebug.append(PASS));
+
         RandomBlock block = loc.getBlock();
         RandomBlockType blockType = block.getBlockType();
-        if (blockType.getType().isAir()) return false;
+        Component airDebug = Component.text("3.2 block not air? ");
+        if (blockType.getType().isAir()) {
+            plugin.getMessageHandler().sendDebugMessage(airDebug.append(FAIL));
+            return false;
+        }
+        plugin.getMessageHandler().sendDebugMessage(airDebug.append(PASS));
         //Check if it passes the global blacklist
-        if (!isValidGlobalBlockType(loc)) return false;
+        Component blacklistDebug = Component.text("3.3 block not on global blacklist? ");
+        if (!isValidGlobalBlockType(loc)) {
+            plugin.getMessageHandler().sendDebugMessage(blacklistDebug.append(FAIL));
+            return false;
+        }
+        plugin.getMessageHandler().sendDebugMessage(blacklistDebug.append(PASS));
         RandomDimensionData dimensionData = blacklist.getDimensionData(dimension);
         //Check if it passes the dimension blacklist
-        if (dimensionData.getBlockTypes().contains(blockType)) return false;
-        if (block.isPassable()) return false;
-        if (block.isLiquid()) return false;
-        if (!isSafeAbove(loc)) return false;
-        return isSafeSurrounding(loc);
+        Component dimDebug = Component.text("3.4 block not on dimension blacklist? ");
+        if (dimensionData.getBlockTypes().contains(blockType)) {
+            plugin.getMessageHandler().sendDebugMessage(dimDebug.append(FAIL));
+            return false;
+        }
+        plugin.getMessageHandler().sendDebugMessage(dimDebug.append(PASS));
+        Component passableDebug = Component.text("3.5 block not passable? ");
+        if (block.isPassable()) {
+            plugin.getMessageHandler().sendDebugMessage(passableDebug.append(FAIL));
+            return false;
+        }
+        plugin.getMessageHandler().sendDebugMessage(passableDebug.append(PASS));
+        Component liquidDebug = Component.text("3.6 block not a liquid? ");
+        if (block.isLiquid()) {
+            plugin.getMessageHandler().sendDebugMessage(liquidDebug.append(FAIL));
+            return false;
+        }
+        plugin.getMessageHandler().sendDebugMessage(liquidDebug.append(PASS));
+
+        Component safeAboveDebug = Component.text("3.7 block above safe? ");
+        if (!isSafeAbove(loc)) {
+            plugin.getMessageHandler().sendDebugMessage(safeAboveDebug.append(FAIL));
+            return false;
+        }
+        plugin.getMessageHandler().sendDebugMessage(safeAboveDebug.append(PASS));
+
+        Component surDebug = Component.text("3.9 Block surroundings safe? ");
+        if (!isSafeSurrounding(loc)) {
+            plugin.getMessageHandler().sendDebugMessage(surDebug.append(FAIL));
+            return false;
+        }
+        plugin.getMessageHandler().sendDebugMessage(surDebug.append(PASS));
+        plugin.getMessageHandler().sendDebugMessage("3.10 Safe location found: " + loc);
+        return true;
     }
 
     @Override
     public boolean isSafeForPlugins(RandomLocation location) {
         for (RandomLocationValidator validator : validatorMap.values()) {
             if (!validator.isValid(location)) {
+                plugin.getMessageHandler().sendDebugMessage("3.1 Deemed unsafe for addon: " + validator.getIdentifier());
                 return false;
             }
         }
@@ -158,10 +225,12 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
                 int y = chunk.getHighestBlockYAt(x, z);
                 RandomBiome randomBiome = chunk.getBiome(x, y, z);
                 if (isBlacklistedBiome(randomBiome)) {
+                    plugin.getMessageHandler().sendDebugMessage("1.3 Biome at x" + x + "y " + y + "z" + z + " is a blacklisted biome");
                     return false;
                 }
             }
         }
+        plugin.getMessageHandler().sendDebugMessage("1.3 Chunk is safe...");
         return true;
     }
 

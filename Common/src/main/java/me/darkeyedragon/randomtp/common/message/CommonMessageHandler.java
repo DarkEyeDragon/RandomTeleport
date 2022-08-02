@@ -50,7 +50,7 @@ public class CommonMessageHandler implements MessageHandler {
 
     @Override
     public void sendDebugMessage(Component message) {
-        if (plugin.getConfigHandler().getSectionDebug().isShowExecutionTimes()) {
+        if (plugin.getConfigHandler().getSectionDebug().isShowSearchingMessages()) {
             Component prefix = Component.text("DEBUG: ");
             prefix = prefix.color(TextColor.color(0xff0000));
             plugin.getAudience().console().sendMessage(prefix.append(message));
