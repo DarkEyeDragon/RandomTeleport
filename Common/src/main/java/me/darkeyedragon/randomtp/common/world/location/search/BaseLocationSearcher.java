@@ -54,13 +54,19 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
      */
     @Override
     public CompletableFuture<RandomLocation> getRandom(LocationDataProvider dataProvider) {
-        return pickRandomLocation(dataProvider);
+        return pickRandomLocation(dataProvider).exceptionally(throwable -> {
+            throwable.printStackTrace();
+            return null;
+        });
     }
 
     /*Pick a random location based on chunks*/
     private CompletableFuture<RandomLocation> pickRandomLocation(LocationDataProvider dataProvider) {
         CompletableFuture<RandomChunkSnapshot> chunk = getRandomChunk(dataProvider);
-        return chunk.thenApply(this::getRandomLocationFromChunk);
+        return chunk.thenApply(this::getRandomLocationFromChunk).exceptionally(throwable -> {
+            throwable.printStackTrace();
+            return null;
+        });
     }
 
     /* Will search through the chunk to find a location that is safe, returning null if none is found. */
@@ -106,6 +112,9 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
                 plugin.getMessageHandler().sendDebugMessage("1. Not a safe chunk...");
                 return CompletableFuture.completedFuture(chunk);
             }
+        }).exceptionally(throwable -> {
+            throwable.printStackTrace();
+            return null;
         });
     }
 
@@ -147,9 +156,9 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
 
         RandomBlock block = loc.getBlock();
         RandomBlockType blockType = block.getBlockType();
+        plugin.getMessageHandler().sendDebugMessage("BlockType: " + blockType.getType().getName());
         Component airDebug = Component.text("3.2 block not air? ");
         if (blockType.getType().isAir()) {
-            plugin.getMessageHandler().sendDebugMessage(airDebug.append(FAIL));
             return false;
         }
         plugin.getMessageHandler().sendDebugMessage(airDebug.append(PASS));
@@ -215,7 +224,10 @@ public abstract class BaseLocationSearcher implements LocationSearcher {
      */
     protected boolean isSafeAbove(RandomLocation location) {
         RandomBlock blockAbove = location.getBlock().getRelative(BlockFace.UP);
+        plugin.getMessageHandler().sendDebugMessage("Block above: " + blockAbove.getBlockType().getType().getName() + " [" + blockAbove.getLocation() + "]");
         RandomBlock blockAboveAbove = blockAbove.getRelative(BlockFace.UP);
+        plugin.getMessageHandler().sendDebugMessage("Block above above: " + blockAboveAbove.getBlockType().getType().getName() + " [" + blockAboveAbove.getLocation() + "]");
+
         return (blockAbove.isPassable() && blockAboveAbove.isPassable() && !blockAbove.isLiquid());
     }
 

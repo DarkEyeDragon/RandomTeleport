@@ -14,6 +14,12 @@ import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.loader.AbstractConfigurationLoader;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+
 public class CommonConfigHandler implements RandomConfigHandler {
 
     protected final AbstractConfigurationLoader<CommentedConfigurationNode> loader;
@@ -71,10 +77,24 @@ public class CommonConfigHandler implements RandomConfigHandler {
 
     }
 
+    public static boolean saveDefaultConfig(InputStream inputStream, Path outputPath) {
+        boolean success = true;
+        try {
+            Files.copy(inputStream, outputPath, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException ex) {
+            success = false;
+        }
+
+        return success;
+    }
+
     @Override
     public void saveConfig() {
-        //TODO implement saveconfig
-        //configuration.save();
+        try {
+            loader.save(root);
+        } catch (ConfigurateException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     //TODO implement reload

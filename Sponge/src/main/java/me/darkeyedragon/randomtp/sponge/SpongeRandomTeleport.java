@@ -19,6 +19,7 @@ import me.darkeyedragon.randomtp.api.world.RandomWorldHandler;
 import me.darkeyedragon.randomtp.common.addon.AddonManager;
 import me.darkeyedragon.randomtp.common.command.DebugCommand;
 import me.darkeyedragon.randomtp.common.command.RandomTeleportCommand;
+import me.darkeyedragon.randomtp.common.config.CommonConfigHandler;
 import me.darkeyedragon.randomtp.common.config.serializer.ConfigTypeSerializerCollection;
 import me.darkeyedragon.randomtp.common.failsafe.CommonDeathTracker;
 import me.darkeyedragon.randomtp.common.message.CommonMessageHandler;
@@ -27,9 +28,11 @@ import me.darkeyedragon.randomtp.common.stat.BStats;
 import me.darkeyedragon.randomtp.common.stat.NoConsentException;
 import me.darkeyedragon.randomtp.common.teleport.CommonCooldownHandler;
 import me.darkeyedragon.randomtp.common.world.WorldHandler;
+import me.darkeyedragon.randomtp.common.world.location.search.EndLocationSearcher;
+import me.darkeyedragon.randomtp.common.world.location.search.NetherLocationSearcher;
+import me.darkeyedragon.randomtp.common.world.location.search.OverworldLocationSearcher;
 import me.darkeyedragon.randomtp.sponge.addon.SpongeAddonPlugin;
 import me.darkeyedragon.randomtp.sponge.command.completion.Registrar;
-import me.darkeyedragon.randomtp.sponge.config.SpongeConfigHandler;
 import me.darkeyedragon.randomtp.sponge.eco.SpongeEcoHandler;
 import me.darkeyedragon.randomtp.sponge.listener.PlayerDeathListener;
 import me.darkeyedragon.randomtp.sponge.logging.SpongeLogger;
@@ -38,9 +41,6 @@ import me.darkeyedragon.randomtp.sponge.world.SpongeBiomeHandler;
 import me.darkeyedragon.randomtp.sponge.world.SpongeMaterialHandler;
 import me.darkeyedragon.randomtp.sponge.world.SpongePlayerHandler;
 import me.darkeyedragon.randomtp.sponge.world.SpongeWorldHandler;
-import me.darkeyedragon.randomtp.sponge.world.search.SpongeEndLocationSearcher;
-import me.darkeyedragon.randomtp.sponge.world.search.SpongeNetherLocationSearcher;
-import me.darkeyedragon.randomtp.sponge.world.search.SpongeOverworldLocationSearcher;
 import net.kyori.adventure.platform.AudienceProvider;
 import net.kyori.adventure.platform.spongeapi.SpongeAudiences;
 import net.kyori.adventure.text.Component;
@@ -61,8 +61,8 @@ import org.spongepowered.api.util.metric.MetricsConfigManager;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Optional;
 
 @Plugin(
@@ -94,7 +94,7 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
 
     private PluginLogger pluginLogger;
     private EcoHandler ecoHandler;
-    private SpongeConfigHandler configHandler;
+    private CommonConfigHandler configHandler;
     private DeathTracker deathTracker;
     private AudienceProvider audience;
     private MessageHandler messageHandler;
@@ -116,7 +116,7 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
         scheduler = new SpongeScheduler(plugin, Sponge.getScheduler());
         PluginContainer container = Sponge.getPlatform().getContainer(org.spongepowered.api.Platform.Component.IMPLEMENTATION);
         platform = Platform.of("sponge", Sponge.getPlatform().getMinecraftVersion().getName(), container.getName(), container.getVersion().orElse("UNKNOWN"));
-        logger.info(platform.toString());
+
         HoconConfigurationLoader configLoader = HoconConfigurationLoader
                 .builder()
                 .path(defaultConfig)
@@ -126,13 +126,11 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
                 .build();
         materialHandler = new SpongeMaterialHandler();
         worldHandler = new SpongeWorldHandler(this, new SpongeBiomeHandler());
-        configHandler = new SpongeConfigHandler(this, configLoader);
-        try {
-            configHandler.saveDefaultConfig();
-            configHandler.load();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (!defaultConfig.toFile().exists()) {
+            CommonConfigHandler.saveDefaultConfig(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("randomteleport.conf")), defaultConfig);
         }
+        configHandler = new CommonConfigHandler(this, configLoader);
+        configHandler.reload();
         addonManager = new AddonManager(this, this.getLogger());
         if (addonManager.createAddonDir()) {
             logger.info("No addon folder. Creating one...");
@@ -159,9 +157,9 @@ public class SpongeRandomTeleport extends RandomTeleportPluginImpl {
 
     @Listener
     public void onGameLoadComplete(GameStartedServerEvent event) {
-        WorldHandler.registerLocationSearcher(RandomEnvironment.OVERWORLD, new SpongeOverworldLocationSearcher(this));
-        WorldHandler.registerLocationSearcher(RandomEnvironment.NETHER, new SpongeNetherLocationSearcher(this));
-        WorldHandler.registerLocationSearcher(RandomEnvironment.THE_END, new SpongeEndLocationSearcher(this));
+        WorldHandler.registerLocationSearcher(RandomEnvironment.OVERWORLD, new OverworldLocationSearcher(this));
+        WorldHandler.registerLocationSearcher(RandomEnvironment.NETHER, new NetherLocationSearcher(this));
+        WorldHandler.registerLocationSearcher(RandomEnvironment.THE_END, new EndLocationSearcher(this));
         getLogger().info(Component.text("======== [Loading validators] ========").color(TextColor.color(Color.CYAN.getRgb())));
         try {
             getAddonManager().instantiateAllLocal();

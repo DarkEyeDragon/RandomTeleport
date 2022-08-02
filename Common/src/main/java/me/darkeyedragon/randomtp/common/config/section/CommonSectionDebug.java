@@ -8,7 +8,7 @@ public class CommonSectionDebug implements SectionDebug {
 
     boolean showQueuePopulation;
     boolean showExecutionTimes;
-    private boolean showSearchingMessages;
+    boolean showSearchingMessages;
 
     @Override
     public boolean isShowQueuePopulation() {

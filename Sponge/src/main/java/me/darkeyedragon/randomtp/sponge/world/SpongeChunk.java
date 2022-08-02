@@ -4,6 +4,7 @@ import com.flowpowered.math.vector.Vector3i;
 import me.darkeyedragon.randomtp.api.world.RandomBiome;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.common.world.CommonChunkSnapshot;
+import me.darkeyedragon.randomtp.sponge.world.util.WorldUtil;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
 
@@ -39,6 +40,6 @@ public class SpongeChunk extends CommonChunkSnapshot {
     @Override
     public RandomBiome getBiome(int x, int y, int z) {
         Vector3i biomeMin = chunk.getBiomeMin();
-        return new SpongeBiome(chunk.getBiome(biomeMin.getX() + x, biomeMin.getY() + y, biomeMin.getZ() + z));
+        return WorldUtil.toRandomBiome(chunk.getBiome(biomeMin.getX() + x, biomeMin.getY(), biomeMin.getZ() + z));
     }
 }

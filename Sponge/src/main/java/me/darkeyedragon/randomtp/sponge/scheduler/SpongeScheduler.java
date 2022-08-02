@@ -45,8 +45,8 @@ public class SpongeScheduler implements Scheduler {
     public void runTaskTimer(Consumer<Task> taskConsumer, long delay, long interval) {
         org.spongepowered.api.scheduler.Task
                 .builder()
-                .delay(delay / 50, TimeUnit.MILLISECONDS)
-                .interval(interval / 50, TimeUnit.MILLISECONDS)
+                .delay(delay * 50, TimeUnit.MILLISECONDS)
+                .interval(interval * 50, TimeUnit.MILLISECONDS)
                 .execute(task -> taskConsumer.accept(toTask(task)))
                 .submit(plugin);
     }
