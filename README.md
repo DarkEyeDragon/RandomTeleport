@@ -8,7 +8,7 @@ Teleport a player to a random (safe) location in the Minecraft world.
 - Adjustable queue. Determine yourself how many pre generated locations you want.
 - Everything customizable.
 - Full async chunkloading support for Paper servers.
-- Choose if a world requires a permission or not
+- Choose if a world requires a permission or not.
 
 ### Supported plugins
 - FactionsUUID
