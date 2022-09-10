@@ -16,8 +16,8 @@ public class SpigotBiome implements RandomBiome {
     @Override
     public boolean equals(Object obj) {
         if(biome == obj) return true;
-        if(obj instanceof Biome){
-            return biome.name().equals(((Biome)obj).name());
+        if (obj instanceof Biome) {
+            return biome.name().equals(((Biome) obj).name());
         }
         return false;
     }
@@ -25,5 +25,10 @@ public class SpigotBiome implements RandomBiome {
     @Override
     public int hashCode() {
         return biome.hashCode();
+    }
+
+    @Override
+    public String getName() {
+        return biome.name();
     }
 }
