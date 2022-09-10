@@ -12,6 +12,7 @@ import me.darkeyedragon.randomtp.api.queue.LocationQueue;
 import me.darkeyedragon.randomtp.api.queue.WorldQueue;
 import me.darkeyedragon.randomtp.api.world.RandomWorld;
 import me.darkeyedragon.randomtp.api.world.location.RandomLocation;
+import me.darkeyedragon.randomtp.common.util.ComponentUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.Style;
@@ -109,7 +110,9 @@ public class DebugCommand extends BaseCommand {
                 Iterator<RandomWorld> worldIterator = worldQueue.iterator();
                 args.add(worldIterator.next());
             } else if (type.isAssignableFrom(RandomLocation.class)) {
-                args.add(plugin.getWorldHandler().getWorld("world").getBlockAt(150, 10, 200).getLocation());
+                Set<RandomWorld> worldQueue = plugin.getWorldHandler().getWorldQueue().getWorldQueueMap().keySet();
+                Iterator<RandomWorld> worldIterator = worldQueue.iterator();
+                args.add(plugin.getWorldHandler().getWorld(worldIterator.next().getName()).getBlockAt(150, 10, 200).getLocation());
             }
         }
         return args;
@@ -119,7 +122,7 @@ public class DebugCommand extends BaseCommand {
     @CommandPermission("rtp.debug.show.queue")
     public void showQueue(CommandIssuer sender) {
         WorldQueue worldQueue = plugin.getWorldHandler().getWorldQueue();
-        Component component = Component.text("=============== [ Queue ] ==============");
+        Component component = ComponentUtil.toComponent("<aqua>=============== [ Queue ] ==============");
         for (RandomWorld world : worldQueue.getWorldQueueMap().keySet()) {
             component = component.append(Component.text("\n" + world.getName()));
             LocationQueue locationQueue = worldQueue.get(world);
@@ -127,12 +130,15 @@ public class DebugCommand extends BaseCommand {
             for (int i = 0; i < configHandler.getSectionQueue().getSize(); i++) {
                 if (locations.length > i) {
                     RandomLocation randomLocation = locations[i];
-                    component = component.append(Component.text("\n         \u2514")).append(Component.text(randomLocation.getBlockX() + "x " + randomLocation.getBlockY() + "y " + randomLocation.getBlockZ() + "z").style(Style.style(TextColor.color(0x00ff00))));
+                    component = component
+                            .append(ComponentUtil.toComponent("\n     \u2514<green>" + randomLocation.getBlockX() + "x " + randomLocation.getBlockY() + "y " + randomLocation.getBlockZ() + "z"))
+                            .append(ComponentUtil.toComponent(" <gold>[" + randomLocation.getBlock().getBiome().getName() + "]"));
                 } else {
-                    component = component.append(Component.text("\n         \u2514")).append(Component.text("Pending location...").style(Style.style(TextColor.color(0xff0000))));
+                    component = component.append(Component.text("\n     \u2514")).append(Component.text("Pending location...").style(Style.style(TextColor.color(0xff0000))));
                 }
             }
         }
+        component = component.append(ComponentUtil.toComponent("\n<aqua>======================================"));
         plugin.getMessageHandler().sendMessage(sender, component);
     }
 

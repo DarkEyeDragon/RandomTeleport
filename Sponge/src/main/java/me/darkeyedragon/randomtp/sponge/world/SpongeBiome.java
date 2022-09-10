@@ -23,4 +23,9 @@ public class SpongeBiome implements RandomBiome {
     public int hashCode() {
         return biome.hashCode();
     }
+
+    @Override
+    public String getName() {
+        return biome.getName();
+    }
 }
