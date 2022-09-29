@@ -90,10 +90,8 @@ public abstract class WorldHandler implements RandomWorldHandler {
     }
 
     public void subscribe(LocationQueue locationQueue, RandomWorld world) {
-        if (plugin.getConfigHandler().getSectionDebug().isShowQueuePopulation()) {
-            CommonQueueListener queueListener = new CommonQueueListener(plugin, world, locationQueue);
-            locationQueue.subscribe(queueListener);
-        }
+        CommonQueueListener queueListener = new CommonQueueListener(plugin, world, locationQueue);
+        locationQueue.subscribe(queueListener);
     }
 
     public void generate(ConfigWorld configWorld, RandomWorld randomWorld) {
