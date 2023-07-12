@@ -57,6 +57,11 @@
             <version>0.5.1-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>cloud.commandframework</groupId>
+            <artifactId>cloud-core</artifactId>
+            <version>1.8.3</version>
+        </dependency>
+        <dependency>
             <groupId>org.spongepowered</groupId>
             <artifactId>configurate-yaml</artifactId>
             <version>4.1.2</version>
