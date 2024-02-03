@@ -56,13 +56,7 @@ public class PlayerSpigot implements RandomPlayer {
     @Override
     public CompletableFuture<TeleportResponse> teleportAsync(RandomLocation location) {
         //Teleport the player async if possible
-        return PaperLib.teleportAsync(player, WorldUtil.toLocation(location)).thenApply(success -> {
-            if (success) {
-                return new BasicTeleportResponse(TeleportType.SUCCESS);
-            } else {
-                return new BasicTeleportResponse(TeleportType.FAIL);
-            }
-        });
+        return PaperLib.teleportAsync(player, WorldUtil.toLocation(location)).thenApply(success -> success ? new BasicTeleportResponse(TeleportType.SUCCESS) : new BasicTeleportResponse(TeleportType.FAIL));
     }
 
     @Override
