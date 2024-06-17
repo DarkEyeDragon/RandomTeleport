@@ -77,6 +77,6 @@ permissions:
 - Setting a radius with all unsafe locations will cause the plugin to search indefinitely. There is no search limit.
 
 ### Platforms
-- [x] Spigot 
+- [x] Spigot
 - [X] Paper
-- [ ] Sponge (coming soon)
+- [x] Bukkit based platforms
